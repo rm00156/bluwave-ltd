@@ -6,6 +6,7 @@ const accountOperations = require('../utilty/account/accountOperations');
 const productOperations = require('../utilty/products/productOperations');
 const deliveryOperations = require('../utilty/delivery/deliveryOperations');
 const basketOperations = require('../utilty/basket/basketOperations');
+const emailOperations = require('../utilty/email/emailOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const refundOperations = require('../utilty/refund/refundOperations');
 const stripe = require('stripe')(process.env.STRIPE_KEY);
@@ -351,7 +352,8 @@ exports.getAccountPage = async function(req, res) {
     
     const id = req.params.id;
     const account = await accountOperations.getAccountById(id);
-
+    if(account.guestFl == true)
+        return res.redirect('/admin_dashboard/accounts');
     res.render('adminAccount', {user: req.user,
         account: account,
         companyDetails: companyInfo.getCompanyDetails()})
@@ -360,6 +362,8 @@ exports.getAccountPage = async function(req, res) {
 exports.getAccountDeletePage = async function(req, res) {
     const id = req.params.id;
     const account = await accountOperations.getAccountById(id);
+    if(account.guestFl == true)
+        return res.redirect('/admin_dashboard/accounts');
     const orders = await orderOperations.getSuccessfulOrdersForAccountId(id);
     res.render('adminAccountDelete', {user: req.user,
         account: account,
@@ -367,9 +371,23 @@ exports.getAccountDeletePage = async function(req, res) {
         companyDetails: companyInfo.getCompanyDetails()})
 }
 
+exports.getAccountEmailsPage = async function(req, res) {
+    const id = req.params.id;
+    const account = await accountOperations.getAccountById(id);
+    if(account.guestFl == true)
+        return res.redirect('/admin_dashboard/accounts');
+    const emails = await emailOperations.getEmailsForByEmailAddress(account.email);
+    res.render('adminAccountEmails', {user: req.user,
+        account: account,
+        emails: emails,
+        companyDetails: companyInfo.getCompanyDetails()})
+}
+
 exports.getAccountOrdersPage = async function(req, res) {
     const id = req.params.id;
     const account = await accountOperations.getAccountById(id);
+    if(account.guestFl == true)
+        return res.redirect('/admin_dashboard/accounts');
     const orders = await orderOperations.getSuccessfulOrdersForAccountId(id);
     res.render('adminAccountOrders', {user: req.user,
         account: account,

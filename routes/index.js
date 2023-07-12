@@ -67,6 +67,8 @@ router.get('/admin_dashboard/accounts', isAdmin, adminRequire2faSetup, adminDash
 router.get('/admin_dashboard/account/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountPage);
 router.get('/admin_dashboard/account/:id/delete', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountDeletePage);
 router.get('/admin_dashboard/account/:id/orders', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountOrdersPage);
+router.get('/admin_dashboard/account/:id/emails', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountEmailsPage);
+
 router.get('/admin_dashboard/order/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountOrderPage);
 router.get('/admin_dashboard/orders', isAdmin, adminRequire2faSetup, adminDashboardController.getOrdersPage);
 

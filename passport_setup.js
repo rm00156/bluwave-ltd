@@ -28,6 +28,10 @@ module.exports= function(passport)
         if(account == null){
             req.flash('message', 'Incorrect Credentials');
             return done(null,false);
+        } 
+        if(account.accountTypeFk == 1) {
+            req.flash('message', 'Admin');
+            return done(null,false);
         }
         else if( account.password == null || account.password == undefined){
             req.flash('message', 'You must reset your password');
@@ -74,6 +78,10 @@ module.exports= function(passport)
         {
             req.flash('message', 'Incorrect Credentials');
             return done(null,false);
+        } 
+        if(account.accountTypeFk != 1) {
+            req.flash('message', 'Not Admin');
+            return done(null,false);
         }
         else if( account.password == null || account.password == undefined)
         {
@@ -118,9 +126,12 @@ module.exports= function(passport)
 
         var account = await accountOperations.findAccountByEmail(email);
         
-        if(account == null )
-        {
+        if(account == null ) {
             req.flash('message', 'Incorrect Credentials');
+            return done(null,false);
+        }
+        if(account.accountTypeFk != 1) {
+            req.flash('message', 'Not Admin');
             return done(null,false);
         }
         else if( account.password == null || account.password == undefined)

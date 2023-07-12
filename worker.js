@@ -1,4 +1,8 @@
 const throng = require('throng');
+const isDevelopment = process.env.NODE_ENV === undefined;
+if (isDevelopment) {
+  require('dotenv').config(); // Load variables from .env file
+}
 const Queue = require("bull");
 const emailOperations = require('./utilty/email/emailOperations');
 // Connect to a local redis intance locally, and the Heroku-provided URL in production
@@ -13,11 +17,6 @@ const workers = process.env.WEB_CONCURRENCY || 2;
 // responses it can be much higher. If each job is CPU-intensive, it might need
 // to be much lower.
 const maxJobsPerWorker = 15;
-
-const isDevelopment = process.env.NODE_ENV === 'development';
-if (isDevelopment) {
-  require('dotenv').config(); // Load variables from .env file
-}
 
 const redisUrlParse = require('redis-url-parse');
 const redisUrlParsed = redisUrlParse(REDIS_URL);

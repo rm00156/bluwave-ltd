@@ -1,4 +1,8 @@
 const express = require('express');
+const isDevelopment = process.env.NODE_ENV === undefined;
+if (isDevelopment) {
+  require('dotenv').config(); // Load variables from .env file
+}
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
@@ -10,11 +14,6 @@ const bodyParser = require('body-parser');
 const upload = require('express-fileupload');
 const flash = require('connect-flash');
 require('./passport_setup')(passport);
-
-const isDevelopment = process.env.NODE_ENV === 'development';
-if (isDevelopment) {
-  require('dotenv').config(); // Load variables from .env file
-}
 
 const app = express();
 

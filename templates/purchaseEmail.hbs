@@ -106,7 +106,7 @@
                                                                             </tr>
                                                                             <tr>
                                                                                 <td width="20"></td>
-                                                                                <td width="178"
+                                                                                <td width="250"
                                                                                     style="font-size:13px;color:#000000">
                                                                                     Email Address<br>
                                                                                     <span><a style="color:#054597;text-decoration:none"
@@ -118,7 +118,7 @@
                                                                                     Phone Number<br>
                                                                                     <span><b>{{phone}}</b></span>
                                                                                 </td>
-                                                                                {{#if node}}
+                                                                                {{#if collect}}
                                                                                 <td width="178"
                                                                                     style="font-size:13px;color:#000000">
                                                                                     Collection</td>
@@ -126,11 +126,11 @@
                                                                                 <td width="178"
                                                                                     style="font-size:13px;color:#000000">
                                                                                     Shipping Address<br>
-                                                                                    <span><b>{{shippingDetail.addressLine}},
-                                                                                            {{#if shippingDetail.addressLine2}}
-                                                                                            {{shippingDetail.addressLine2}}
-                                                                                            {{/if}}, {{shippingDetail.city}},
-                                                                                            {{shippingDetail.postCode}}</b></span>
+                                                                                    <span><b>{{addressLine1}},
+                                                                                            {{#if addressLine2}}
+                                                                                            {{addressLine2}},
+                                                                                            {{/if}} {{city}},
+                                                                                            {{postCode}}</b></span>
                                                                                 </td>
                                                                                 {{/if}}
                                                                                 <td width="20"></td>
@@ -152,7 +152,7 @@
                                                                         style="font-family:Arial;border-collapse:collapse;font-size:13px;border:1px solid #f1f1f1">
                                                                         <tbody>
                                                                             <tr style="background:#f1f1f1">
-                                                                                <td width="40" height="40"
+                                                                                <td width="200" height="40"
                                                                                     style="vertical-align:middle;border-right:1px solid #d8d8d8;color:#2d2d2d">
                                                                                     <strong>&nbsp;&nbsp;&nbsp;Product</strong>
                                                                                 </td>
@@ -176,7 +176,10 @@
                                                                                 <td
                                                                                     style="color:#000000;border-right:1px solid #ebebeb;padding:18px 5px 12px 10px;vertical-align:middle;font-family:Arial;font-size:13px">
                                                                                     {{productName}}
-
+                                                                                    {{#each options}}
+                                                                                        <br>
+                                                                                        <span style="color:#adadad; font-size:9pt">{{optionType}}: {{name}}</span>
+                                                                                    {{/each}}
                                                                                 </td>
                                                                                 <td
                                                                                     style="color:#000000;border-right:1px solid #ebebeb;padding:18px 5px 12px 10px;vertical-align:middle;font-family:Arial;font-size:13px">
@@ -193,7 +196,7 @@
                                                                             <tr style="background:#fff3ae">
                                                                                 <td colspan="3"
                                                                                     style="font-size:13px;color:#000000;padding:10px 10px 12px;border-right:1px solid #ebe0a0;border-top:1px solid #f1f1f1;text-align:right">
-                                                                                    SubTotal</td>
+                                                                                    Sub Total</td>
                                                                                 <td
                                                                                     style="color:#2d2d2d;padding:10px 10px 12px;vertical-align:top;font-weight:bold;border-top:1px solid #f1f1f1">
                                                                                     £{{subTotal}}</td>
