@@ -51,11 +51,6 @@ module.exports = function(sequelize, Sequelize) {
             allowNull: false
         },
 
-        secret:{
-            type:Sequelize.STRING,
-            allowNull:true
-        },
-
         guestFl:{
             type: Sequelize.BOOLEAN,
             allowNull: false,
