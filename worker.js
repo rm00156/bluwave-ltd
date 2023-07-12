@@ -1,6 +1,5 @@
 const throng = require('throng');
 const Queue = require("bull");
-const dotenv = require('dotenv');
 const emailOperations = require('./utilty/email/emailOperations');
 // Connect to a local redis intance locally, and the Heroku-provided URL in production
 const REDIS_URL = process.env.REDIS_URL /*process.env.STACKHERO_REDIS_URL_TLS*/ || "redis://127.0.0.1:6379";
@@ -17,7 +16,7 @@ const maxJobsPerWorker = 15;
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 if (isDevelopment) {
-  dotenv.config(); // Load variables from .env file
+  require('dotenv').config(); // Load variables from .env file
 }
 
 const redisUrlParse = require('redis-url-parse');
