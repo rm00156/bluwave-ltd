@@ -15,6 +15,11 @@ const workers = process.env.WEB_CONCURRENCY || 2;
 // to be much lower.
 const maxJobsPerWorker = 15;
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+if (isDevelopment) {
+  dotenv.config(); // Load variables from .env file
+}
+
 const redisUrlParse = require('redis-url-parse');
 const redisUrlParsed = redisUrlParse(REDIS_URL);
 const { host, port, password } = redisUrlParsed;

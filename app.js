@@ -12,6 +12,11 @@ const upload = require('express-fileupload');
 const flash = require('connect-flash');
 require('./passport_setup')(passport);
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+if (isDevelopment) {
+  dotenv.config(); // Load variables from .env file
+}
+
 const app = express();
 
 const models = require('./models');
