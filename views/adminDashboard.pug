@@ -1,0 +1,283 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    // main
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        //- button#liveToastBtn.btn.btn-primary(type='button') Show live toast
+
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                section.container
+
+
+
+                    // row
+                    .row.mb-8
+                        .col-md-12
+                            // card
+                            .card.bg-light.border-0.rounded-4(style='background-image: url(/img/print-management-solutions.webp); background-repeat: no-repeat; background-size: cover; background-position: right;')
+                                .card-body.p-lg-12
+                                    h1.text-white
+                                        | Welcome back!
+                                    //- p
+                                    //-     | FreshCart is simple &amp; clean design for developer and
+                                    //-     | designer.
+                                    a.btn.btn-primary(href='/admin_dashboard/product/add_product')
+                                        | Create Product
+                    // table
+                    .row
+                        .col-lg-4.col-12.mb-6
+                            // card
+                            .card.h-100.card-lg
+                                // card body
+                                .card-body.p-6
+                                    // heading
+                                    .d-flex.justify-content-between.align-items-center.mb-6
+                                        div
+                                            h4.mb-0.fs-5 Earnings
+                                        .icon-shape.icon-md.bg-light-danger.text-dark-danger.rounded-circle
+                                            i.bi.bi-currency-dollar.fs-5
+                                    // project number
+                                    .lh-1
+                                        h1.mb-2.fw-bold.fs-2 $93,438.78
+                                        span Monthly revenue
+                        .col-lg-4.col-12.mb-6
+                            // card
+                            .card.h-100.card-lg
+                                // card body
+                                .card-body.p-6
+                                    // heading
+                                    .d-flex.justify-content-between.align-items-center.mb-6
+                                        div
+                                            h4.mb-0.fs-5 Orders
+                                        .icon-shape.icon-md.bg-light-warning.text-dark-warning.rounded-circle
+                                            i.bi.bi-cart.fs-5
+                                    // project number
+                                    .lh-1
+                                        h1.mb-2.fw-bold.fs-2 42,339
+                                        span
+                                            span.text-dark.me-1 35+
+                                            | New Sales
+                        .col-lg-4.col-12.mb-6
+                            // card
+                            .card.h-100.card-lg
+                                // card body
+                                .card-body.p-6
+                                    // heading
+                                    .d-flex.justify-content-between.align-items-center.mb-6
+                                        div
+                                            h4.mb-0.fs-5 Customer
+                                        .icon-shape.icon-md.bg-light-info.text-dark-info.rounded-circle
+                                            i.bi.bi-people.fs-5
+                                    // project number
+                                    .lh-1
+                                        h1.mb-2.fw-bold.fs-2 39,354
+                                        span
+                                            span.text-dark.me-1 30+
+                                            | new in 2 days
+                    // row
+                    .row
+                        .col-xl-8.col-lg-6.col-md-12.col-12.mb-6
+                            // card
+                            .card.h-100.card-lg
+                                .card-body.p-6
+                                    // heading
+                                    .d-flex.justify-content-between
+                                        div
+                                            h3.mb-1.fs-5 Revenue 
+                                            small (+63%) than last year)
+                                        div
+                                            // select option
+                                            select.form-select
+                                                option(selected='') 2019
+                                                option(value='2023') 2020
+                                                option(value='2024') 2021
+                                                option(value='2025') 2022
+                                                option(value='2025') 2023
+                                    // chart
+                                    #revenueChart.mt-6
+                        .col-xl-4.col-lg-6.col-12.mb-6
+                            // card
+                            .card.h-100.card-lg
+                                // card body
+                                .card-body.p-6
+                                    // heading
+                                    h3.mb-0.fs-5 Total Sales 
+                                    #totalSale.mt-6.d-flex.justify-content-center
+                                    .mt-4
+                                        // list
+                                        ul.list-unstyled.mb-0
+                                            li.mb-2
+                                                svg.bi.bi-circle-fill.text-primary(xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='currentColor' viewbox='0 0 16 16')
+                                                    circle(cx='8' cy='8' r='8')
+                                                span.ms-1
+                                                    span.text-dark
+                                                        | Shippings
+                                                        | $32.98
+                                                    |  (2%)
+                                            li.mb-2
+                                                svg.bi.bi-circle-fill.text-warning(xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='currentColor' viewbox='0 0 16 16')
+                                                    circle(cx='8' cy='8' r='8')
+                                                span.ms-1
+                                                    span.text-dark Refunds $11
+                                                    |                                                     (11%)
+                                            li.mb-2
+                                                svg.bi.bi-circle-fill.text-danger(xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='currentColor' viewbox='0 0 16 16')
+                                                    circle(cx='8' cy='8' r='8')
+                                                span.ms-1
+                                                    span.text-dark Order $14.87
+                                                    |                                                     (1%)
+                                            li
+                                                svg.bi.bi-circle-fill.text-info(xmlns='http://www.w3.org/2000/svg' width='8' height='8' fill='currentColor' viewbox='0 0 16 16')
+                                                    circle(cx='8' cy='8' r='8')
+                                                span.ms-1
+                                                    span.text-dark Income 3,271
+                                                    |                                                     (86%)
+                    // row
+                    .row
+                        .col-xl-6.col-lg-6.col-md-12.col-12.mb-6
+                            // card
+                            .card.h-100.card-lg
+                                // card body
+                                .card-body.p-6
+                                    h3.mb-0.fs-5 Sales Overview 
+                                    .mt-6
+                                        // text
+                                        .mb-5
+                                            .d-flex.align-items-center.justify-content-between
+                                                h5.fs-6 Total Profit
+                                                span
+                                                    span.me-1.text-dark $1,619
+                                                    |  (8.6%)
+                                            // main wrapper
+                                            div
+                                                // progressbar
+                                                .progress.bg-light-primary(style='height: 6px;')
+                                                    .progress-bar.bg-primary(role='progressbar' aria-label='Example 1px high' style='width: 25%;' aria-valuenow='25' aria-valuemin='0' aria-valuemax='100')
+                                        .mb-5
+                                            // text
+                                            .d-flex.align-items-center.justify-content-between
+                                                h5.fs-6 Total Income
+                                                span
+                                                    span.me-1.text-dark $3,571
+                                                    |  (86.4%)
+                                            div
+                                                // progressbar
+                                                .progress.bg-info-soft(style='height: 6px;')
+                                                    .progress-bar.bg-info(role='progressbar' aria-label='Example 1px high' style='width: 88%;' aria-valuenow='88' aria-valuemin='0' aria-valuemax='100')
+                                        div
+                                            // text
+                                            .d-flex.align-items-center.justify-content-between
+                                                h5.fs-6 Total Expenses
+                                                span
+                                                    span.me-1.text-dark $3,430
+                                                    |  (74.5%)
+                                            div
+                                                // progressbar
+                                                .progress.bg-light-danger(style='height: 6px;')
+                                                    .progress-bar.bg-danger(role='progressbar' aria-label='Example 1px high' style='width: 45%;' aria-valuenow='45' aria-valuemin='0' aria-valuemax='100')
+                        .col-xl-6.col-lg-6.col-md-12.col-12.mb-6
+                            .position-relative.h-100
+                                // card
+                                .card.card-lg.mb-6
+                                    // card body
+                                    .card-body.px-6.py-8
+                                        .d-flex.align-items-center
+                                            div
+                                                // svg
+                                                svg.bi.bi-bell.text-warning(xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='currentColor' viewbox='0 0 16 16')
+                                                    path(d='M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z')
+                                            // text
+                                            .ms-4
+                                                h5.mb-1 Start your day with New Notification.
+                                                p.mb-0
+                                                    | You have 
+                                                    a.link-info(href='#!')
+                                                        | 2 new
+                                                        | notification
+                                // card
+                                .card.card-lg
+                                    // card body
+                                    .card-body.px-6.py-8
+                                        .d-flex.align-items-center
+                                            // svg
+                                            div
+                                                svg.bi.bi-lightbulb.text-success(xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='currentColor' viewbox='0 0 16 16')
+                                                    path(d='M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z')
+                                            // text
+                                            .ms-4
+                                                h5.mb-1 Monitor your Sales and Profitability
+                                                p.mb-0
+                                                    a.link-info(href='#!') View Performance
+                    // row
+                    .row
+                        .col-xl-12.col-lg-12.col-md-12.col-12.mb-6
+                            .card.h-100.card-lg
+                                // heading
+                                .p-6
+                                    h3.mb-0.fs-5 Recent Order
+                                .card-body.p-0
+                                    // table
+                                    .table-responsive
+                                        table.table.table-centered.table-borderless.text-nowrap.table-hover
+                                            thead.bg-light
+                                                tr
+                                                    th(scope='col') Order Number
+                                                    th(scope='col') Product Name
+                                                    th(scope='col') Order Date
+                                                    th(scope='col') Price
+                                                    th(scope='col') Status
+                                            tbody
+                                                tr
+                                                    td #FC0005
+                                                    td Haldiram&apos;s Sev Bhujia
+                                                    td 28 March 2023
+                                                    td $18.00
+                                                    td
+                                                        span.badge.bg-light-primary.text-dark-primary Shipped
+                                                tr
+                                                    td #FC0004
+                                                    td NutriChoice Digestive
+                                                    td 24 March 2023
+                                                    td $24.00
+                                                    td
+                                                        span.badge.bg-light-warning.text-dark-warning Pending
+                                                tr
+                                                    td #FC0003
+                                                    td Onion Flavour Potato
+                                                    td 8 Feb 2023
+                                                    td $9.00
+                                                    td
+                                                        span.badge.bg-light-danger.text-dark-danger Cancel
+                                                tr
+                                                    td #FC0002
+                                                    td Blueberry Greek Yogurt
+                                                    td 20 Jan 2023
+                                                    td $12.00
+                                                    td
+                                                        span.badge.bg-light-warning.text-dark-warning Pending
+                                                tr
+                                                    td #FC0001
+                                                    td Slurrp Millet Chocolate
+                                                    td 14 Jan 2023
+                                                    td $8.00
+                                                    td
+                                                        span.badge.bg-light-info.text-dark-info Processing
+            +adminScripts()
+            script(src="/js/adminDashboard.js")

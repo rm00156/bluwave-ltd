@@ -1,0 +1,175 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            .mt-4
+                .container
+                    // row
+                    .row
+                        // col
+                        .col-12
+                            // breadcrumb
+                            nav(aria-label='breadcrumb')
+                                ol.breadcrumb.mb-0
+                                    li.breadcrumb-item
+                                        a(href='/') Home
+                                    if(productType)
+                                        li.breadcrumb-item.active(aria-current='page') #{productType.productType}
+                                    else
+                                        li.breadcrumb-item.active(aria-current='page') All Products
+            section.mt-8.mb-lg-14.mb-8
+                .container
+                    // row
+                    .row
+                        // col
+                        .col-lg-12
+                            // page header
+                            if(productType)
+                                .card.mb-4.bg-light.border-0(style='background: url(' + productType.bannerPath + ')no-repeat; background-position: center; background-size: cover;')
+                                    // card body
+                                    .card-body.p-12
+                                        // title
+                                        h2.mb-0.fs-1 #{productType.productType}
+                            else 
+                                .card.mb-4.bg-light.border-0(style='background: url(' + + ')no-repeat; background-position: center; background-size: cover;')
+                                    // card body
+                                    .card-body.p-12
+                                        // title
+                                        h2.mb-0.fs-1 All Products
+
+                            // list icon
+                            .row 
+                                if(productType)
+                                    h4 Choose #{productType.productType} by type
+                                else 
+                                    h4 Choose All Products by type
+                            //- .d-lg-flex.justify-content-between.align-items-center
+                                div
+                                    p.mb-3.mb-md-0
+                                        span.text-dark 24 
+                                        |  Products found
+                                // icon
+                                .d-md-flex.justify-content-between.align-items-center
+                                    div
+                                        a.text-muted.me-3(href='shop-list.html')
+                                            i.bi.bi-list-ul
+                                        a.me-3.active(href='shop-grid.html')
+                                            i.bi.bi-grid
+                                        a.me-3.text-muted(href='shop-grid-3-column.html')
+                                            i.bi.bi-grid-3x3-gap
+                                    .d-flex.mt-2.mt-lg-0
+                                        .me-2.flex-grow-1
+                                            // select option
+                                            select.form-select
+                                                option(selected='') Show: 50
+                                                option(value='10') 10
+                                                option(value='20') 20
+                                                option(value='30') 30
+                                        div
+                                            // select option
+                                            select.form-select
+                                                option(selected='') Sort by: Featured
+                                                option(value='Low to High') Price: Low to High
+                                                option(value='High to Low')  Price: High to Low
+                                                option(value='Release Date')  Release Date
+                                                option(value='Avg. Rating')  Avg. Rating
+                            .row.g-4.row-cols-lg-5.row-cols-2.row-cols-md-3.mt-2
+                                // col
+                                each product in products
+                                    .col
+                                    
+                                        // card product
+                                        .card.card-product
+                                            .card-header(style="padding:0")
+                                                // badge
+                                                .text-center.position-relative
+                                                    
+                                                    a(href='/shop/' + product.name)
+                                                        // img
+                                                        img.img-fluid(src=product.image1Path alt='Bluwave ' + product.name + ' image')
+                                                    // action btn
+                                                    //- .card-product-action
+                                                        a.btn-action(href='#!' data-bs-toggle='modal' data-bs-target='#quickViewModal')
+                                                            i.bi.bi-eye(data-bs-toggle='tooltip' data-bs-html='true' title='Quick View')
+                                                        a.btn-action(href='shop-wishlist.html' data-bs-toggle='tooltip' data-bs-html='true' title='Wishlist')
+                                                            i.bi.bi-heart
+                                                        a.btn-action(href='#!' data-bs-toggle='tooltip' data-bs-html='true' title='Compare')
+                                                            i.bi.bi-arrow-left-right
+
+                                            .card-body
+                                                
+                                                // heading
+                                                h2.fs-6
+                                                    a.text-inherit.text-decoration-none(href='/shop/' + product.name) #{product.name}
+                                                .text-small.mb-1
+                                                    //- a.text-decoration-none.text-muted(href='#!')
+                                                    //-     small
+                                                    //-         | #{product.description}
+                                                
+                                                ul(style="padding-left:1rem !important")
+                                                    li.text-decoration-none.text-muted
+                                                       small #{product.descriptionPoint1}
+                                                    if(product.descriptionPoint2)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint2}
+
+                                                    if(product.descriptionPoint3)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint3}
+
+                                                    if(product.descriptionPoint4)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint4}
+
+                                                    if(product.descriptionPoint5)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint5}
+                                                // price
+                                                .d-flex.justify-content-between.align-items-center.mt-3
+                                                    div
+                                                        a(href='/shop/' + product.name)
+                                                            |  #{product.name} >
+                                                    
+                                                        
+                                    
+                                // row
+                                //- .row.mt-8
+                                    .col
+                                        // nav
+                                        nav
+                                            ul.pagination
+                                                li.page-item.disabled
+                                                    a.page-link.mx-1(href='#' aria-label='Previous')
+                                                        i.feather-icon.icon-chevron-left
+                                                li.page-item
+                                                    a.page-link.mx-1.active(href='#') 1
+                                                li.page-item
+                                                    a.page-link.mx-1.text-body(href='#') 2
+                                                li.page-item
+                                                    a.page-link.mx-1.text-body(href='#') ...
+                                                li.page-item
+                                                    a.page-link.mx-1.text-body(href='#') 12
+                                                li.page-item
+                                                    a.page-link.mx-1.text-body(href='#' aria-label='Next')
+                                                        i.feather-icon.icon-chevron-right
+
+
+
+
+            +footer()
+            +scripts()
+            

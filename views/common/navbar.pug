@@ -1,0 +1,115 @@
+mixin navbar()
+    nav.navbar.navbar-expand-lg.navbar-light.navbar-default.py-0.py-lg-2.border-top.navbar-offcanvas-color(aria-label='Offcanvas navbar large')
+        .container
+            #navbar-default.offcanvas.offcanvas-start(tabindex='-1' aria-labelledby='navbar-defaultLabel')
+                .offcanvas-header.pb-1
+                    a(href='/' style="width:100%")
+                        img(src=companyDetails.COMPANY_LOGO alt='eCommerce HTML Template' style="width:50%")
+                .offcanvas-body
+                    .d-block.d-lg-none.mb-4
+                        form(action='#')
+                            .input-group
+                                input.search.form-control.rounded(type='search' placeholder='Search for products')
+                                span.input-group-append
+                                    button.btn.bg-white.border.border-start-0.ms-n10.rounded-0.rounded-end(type='button')
+                                        svg.feather.feather-search(xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
+                                            circle(cx='11' cy='11' r='8')
+                                            line(x1='21' y1='21' x2='16.65' y2='16.65')
+                        
+                    div
+                        ul.navbar-nav.align-items-center
+                            
+                            li.nav-item.dropdown.dropdown-fullwidth
+                                a.nav-link.dropdown-toggle(href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | All Products
+                                .dropdown-menu.pb-0
+                                    .row.p-2.p-lg-4
+                                        .col-lg-3.col-12.mb-4.mb-lg-0
+                                            a.dropdown-item(href='/shop?type=bookmarks') Bookmarks
+                                            a.dropdown-item(href='/shop?type=books') Books
+                                            a.dropdown-item(href='/shop?type=brochures') Brochures
+                                            a.dropdown-item(href='/shop?type=business cards') Business Cards
+                                            a.dropdown-item(href='/shop?type=calendars') Calendars
+                                            a.dropdown-item(href='/shop?type=canvas prints') Canvas Prints
+                                            a.dropdown-item(href='/shop?type=christmas cards') Christmas Cards
+                                            a.dropdown-item(href='/shop?type=envelopes') Envelopes
+                                            a.dropdown-item(href='/shop?type=flyers%20%26%20leaflets') Flyers &amp; Leaflets
+                                            a.dropdown-item(href='/shop?type=greeting cards') Greeting Cards
+
+                                        .col-lg-3.col-12.mb-4.mb-lg-0
+                                            a.dropdown-item(href='/shop?type=labels') Labels
+                                            a.dropdown-item(href='/shop?type=note books') Note Books
+                                            a.dropdown-item(href='/shop?type=postcards') Postcards
+                                            a.dropdown-item(href='/shop?type=posters') Posters
+                                            a.dropdown-item(href='/shop?type=roller banners') Roller Banners
+                                            a.dropdown-item(href='/shop?type=stickers') Stickers
+                                            a.dropdown-item(href='/shop?type=tickets') Tickets
+                                            a.dropdown-item(href='/shop?type=wedding invitations') Wedding Invitations
+                                            
+                                        .col-lg-3.col-12.mb-4.mb-lg-0
+                                            
+                                        .col-lg-3.col-12.mb-4.mb-lg-0
+                                            .card.border-0
+                                                img.img-fluid(src='/img/business_card2.jpg' alt='eCommerce HTML Template')
+                                                .position-absolute.ps-6.mt-8
+                                                    //- h5.mb-0
+                                                        | Dont miss this 
+                                                        br
+                                                        | offer today.
+                                                    a.btn.btn-primary.btn-sm.mt-3(href='/shop') Shop Now
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href='/shop?type=flyers%20%26%20leaflets' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | Flyers &amp; Leaflets
+                                ul.dropdown-menu
+                                    each flyerProduct in flyerProducts
+                                        li
+                                            a.dropdown-item(href='/shop?type=' + flyerProduct.name) #{flyerProduct.name}
+                                    
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href='/shop?type=business cards' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | Business Cards
+                                ul.dropdown-menu
+                                    each businessCard in businessCards
+                                        li
+                                            a.dropdown-item(href='/shop?type=' + businessCard.name) #{businessCard.name}
+                                    
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href='/shop?type=brochures' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | Brochures
+                                ul.dropdown-menu
+                                    each brochure in brochures
+                                        li
+                                            a.dropdown-item(href='/shop?type=' + brochure.name) #{brochure.name}
+                                
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | Books
+                                ul.dropdown-menu
+                                    each book in books
+                                        li
+                                            a.dropdown-item(href='/shop?type=' + book.name) #{book.name}
+                                
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | Roller Banners
+                                ul.dropdown-menu
+                                    each rollerBanner in rollerBanners
+                                        li
+                                            a.dropdown-item(href='/shop?type=' + rollerBanner.name) #{rollerBanner.name}
+                            
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | Posters
+                                ul.dropdown-menu
+                                    each poster in posters
+                                        li
+                                            a.dropdown-item(href='/shop?type=' + poster.name) #{poster.name}
+                            
+                            li.nav-item.dropdown
+                                a.nav-link.dropdown-toggle(href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    | Cards
+                                ul.dropdown-menu
+                                    each card in cards
+                                        li
+                                            a.dropdown-item(href='/shop?type=' + card.name) #{card.name}
+                            

@@ -1,0 +1,77 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    body
+        //- +header()
+        .border-bottom.shadow-sm
+            nav.navbar.navbar-light.py-2
+                .container.justify-content-center.justify-content-lg-between
+                    a.navbar-brand(href='/' style="width:15%")
+                        img.d-inline-block.align-text-top(src=companyDetails.COMPANY_LOGO alt='' style="width:100%")
+                    span.navbar-text
+                        | Already have an account? 
+                        a(href='/login') Sign in
+
+        main
+            // section
+            section.my-lg-14.my-8
+                .container
+                    // row
+                    .row.justify-content-center.align-items-center
+                        .col-12.col-md-6.col-lg-4.order-lg-1.order-2
+                            // img
+                            img.img-fluid(src='../assets/images/svg-graphics/signin-g.svg' alt='')
+                        // col
+                        .col-12.col-md-6.offset-lg-1.col-lg-4.order-lg-2.order-1
+                            .mb-lg-9.mb-5
+                                h1.mb-1.h2.fw-bold Sign Up
+                                p Welcome to Bluwave! Enter your email to get started.
+                            form(action="/signup" method="post")
+                                .row.g-3
+                                    // row
+                                    .col-12
+                                        // input
+                                        input#name.form-control(type='text' placeholder='Name' name="name" required)
+                                        if(errors && errors.name)
+                                            p.error#error.small.text-danger.mt-2 #{errors.name}
+                                    .col-12
+                                        // input
+                                        input#email.form-control(type='email' placeholder='Email' name="email" required)
+                                        if(errors && errors.email)
+                                            p.error#error.small.text-danger.mt-2 #{errors.email}
+                                    .col-12
+                                        // input
+                                        .password-field.position-relative
+                                            input#password.form-control(type='password' name="password" placeholder='Enter Password' required)
+                                            span
+                                                i#passwordToggler.bi.bi-eye-slash
+                                            if(errors && errors.password)
+                                                p.error#error.small.text-danger.mt-2 #{errors.password}
+
+                                    .col-12
+                                        // input
+                                        input#phoneNumber.form-control.mb-2(type='text' placeholder='Phone Number' name="phoneNumber" required)
+                                        p.text-danger#phoneNumberError
+                                    // btn
+                                    .col-12.d-grid
+                                        button.btn.btn-primary(type='submit') Sign Up
+                                    // link
+                                    div
+                                        p
+                                            small
+                                                | By continuing, you agree to our 
+                                                a(href='#!')  Terms of Service
+                                                |  &amp; 
+                                                a(href='#!')
+                                                    | Privacy
+                                                    | Policy
+
+            +footer()
+            +scripts()
+            script(src='../assets/js/vendors/password.js')
+            script(src='/js/signup.js')

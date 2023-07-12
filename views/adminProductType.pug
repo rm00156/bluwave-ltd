@@ -1,0 +1,123 @@
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    link(href='/assets/libs/dropzone/dist/min/dropzone.min.css' rel='stylesheet')
+    link(href='/assets/css/croppie.css' rel='stylesheet')
+    #overlay
+        .section.section-full
+            .container
+                .row.justify-content-center
+
+                    .col-md-10.col-lg-10
+                        
+                        .form-styled.bg-white(style="overflow-y: scroll;height:640px;margin-top:100px; padding:10px")
+                            div#gif(style="display: none;justify-content: center;")
+                                img(src="img/loading2.gif" style="margin:auto")
+                            
+                            
+                            div#cropSection
+                                div(style="height:400px;width:100%")
+                                    #uploadedImageForCrop(style="height:60%;width:100%")
+                                div
+                                    p(style="text-align:center") Crop image to your liking, and when everything is ok click 'Confirm Crop'
+                                    .row
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id="confirmCrop") Confirm Crop
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3.text-center(id ="rotate"  data-deg="-90" style="margin-right:5px") Rotate
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id ="cancelCrop" ) Cancel
+    
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                .container
+                    // row
+                    .row.mb-8
+                        .col-md-12
+                            .d-md-flex.justify-content-between.align-items-center
+                                // page header
+                                div
+                                    input#productTypeId(type="hidden" value=productType.id)
+                                    input#bannerPath(type="hidden" value=productType.bannerPath)
+                                    h2 Product Type Details
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard/product_types') Product Types
+                                            li.breadcrumb-item.active(aria-current='page') Product Type Details
+                                // button
+                                div
+                                    a.btn.btn-light(href='/admin_dashboard/product_types') Back to Product Types
+                    // row
+                    .row
+                        .col-lg-12.col-12
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    h4.mb-4.h5 Product Type Information
+                                    .row
+                                        form#form
+                                            // input
+                                            .mb-2
+                                                label.form-label  Status
+                                                br
+                                                .form-check.form-check-inline
+                                                    if(productType.deleteFl == false)
+                                                        input#active.form-check-input(type='radio' name='statusOptions' value='active' checked='')
+                                                    else 
+                                                        input#active.form-check-input(type='radio' name='statusOptions' value='active')
+                                                    label.form-check-label(for='inlineRadio1') Active
+                                                // input
+                                                .form-check.form-check-inline
+                                                    if(productType.deleteFl == false)
+                                                        input#inlinedisRadio2.form-check-input(type='radio' name='statusOptions' value='deactive')
+                                                    else 
+                                                        input#inlinedisRadio2.form-check-input(type='radio' name='statusOptions' value='deactive' checked)
+                                                    label.form-check-label(for='inlineRadio2') Deactive
+                                            .mb-3.col-lg-6
+                                                label.form-label Product Type Name
+                                                input.form-control#name(type='text' value=productType.productType required)
+                                            
+                                            div
+                                                .mb-3.col-lg-12.mt-5
+                                                    // heading
+                                                    label.form-label Banner Image For Product Type Page
+                                                    // input
+                                                    .row 
+                                                        .col-12.mr-2.label-container(style="height:150px")
+                                                            label.border-dashed.rounded-2.text-center.label(for="picture1" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + productType.bannerPath + '")')
+                                                            button.small-button.btn.btn-danger(type="button") X
+                                                            input.picture(id="picture1" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                            p.small.text-danger(id="picture1Error")
+                                            
+                                            .mb-3.col-sm-6.offset-sm-3.mt-5
+                                                .d-grid
+                                                    button.btn.btn-primary#createProduct(type='submit')
+                                                        | Edit Product Type
+    +adminScripts()
+     script(src='/assets/libs/quill/dist/quill.min.js')
+    script(src='/assets/js/vendors/editor.js')
+    script(src='/assets/libs/dropzone/dist/min/dropzone.min.js')
+    script(src='/assets/js/croppie.js')
+    script(src='/js/adminProductType.js')
+    script(src="/js/adminDashboard.js")

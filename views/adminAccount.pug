@@ -1,0 +1,90 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    include common/adminAccountSideBar.pug
+    +adminHead()
+    link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+    // main
+    div
+
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                .container
+                    .row.mb-8
+                        .col-md-12
+                            // page header
+                            .d-md-flex.justify-content-between.align-items-center
+                                div
+                                    h2 Account - #{account.name}
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard/accounts') Accounts
+                                            li.breadcrumb-item.active(aria-current='page') Account
+                                // button
+
+                    section
+                        .container
+                            // row
+                            .row
+                                +adminAccountSideBar('details', account.accountType)
+                                .col-lg-9.col-md-8.col-12
+                                    .py-6.p-md-6.p-lg-10
+                                        // heading
+                                        h2.mb-6 Account Details
+                                        div
+                                            // heading
+                                            h5.mb-4 Account details
+                                            .row
+                                                .col-lg-8
+                                                    // form
+                                                    form
+                                                        // input
+                                                        .mb-3
+                                                            label.form-label Account Number
+                                                            input.form-control(type='text' disabled value=account.accountNumber)
+                                                        .mb-3
+                                                            label.form-label Account Type
+                                                            input.form-control(type='text' disabled value=account.accountType)
+                                                        // input
+                                                        .mb-3
+                                                            label.form-label Email
+                                                            input.form-control(type='email' disabled value=account.email)
+                                                        .mb-3
+                                                            label.form-label Name
+                                                            input.form-control(type='text' value=account.name)
+                                                        
+                                                        // input
+                                                        .mb-3
+                                                            label.form-label Phone
+                                                            input.form-control(type='text' value=account.phoneNumber)
+                                                        // button
+
+                                                        .mb-5 
+                                                            a.btn.btn-outline-danger(href='#') Send Reset Password Email
+                                                        .mb-3
+                                                            button.btn.btn-primary Save Details
+                                            
+                                            //- hr.my-10
+                                            //- div
+                                            //-     // heading
+                                            //-     h5.mb-4 Delete Account
+                                            //-     p.mb-2 Would you like to delete your account?
+                                            //-     p.mb-5
+                                            //-         | This account contain 12 orders, Deleting your account will remove all the order details
+                                            //-         | associated with it.
+                                            //-     // btn
+                                            //-     a.btn.btn-outline-danger(href='#') I want to delete my account
+
+        +adminScripts()

@@ -1,0 +1,53 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            section.mb-lg-14.mb-8.mt-8
+                .container
+                    // row
+                    .row
+                        .col-12
+                            // card
+                            .card.py-1.border-0.mb-8
+                                div
+                                    .text-center
+                                        img.mb-3.text-center(src="/img/green_tick.webp" style="width:50px")
+                                    h1.fw-bold.text-center.mb-3 Purchase Successful
+                                    .text-center.mb-3 
+                                        img.img-fluid.w-50(src='/img/undraw_celebration_0jvk.svg' alt='')
+                                    h5.text-center Order Number: <b>#{orderNumber}</b>
+                                    p.text-center We have received your order
+                                    p.text-center You will shortly receive an email with details of your order 
+
+                                div     
+
+                                    .text-center 
+                                        a.btn.btn-primary(href="/shop") Continue Shopping
+
+
+
+
+
+
+
+
+
+
+
+
+        +footer()
+        +scripts()

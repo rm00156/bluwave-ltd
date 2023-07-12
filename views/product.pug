@@ -1,0 +1,206 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        
+        +header()
+        +navbar()
+        main
+            .mt-4
+                .container
+                    // row
+                    .row
+                        // col
+                        .col-12
+                            // breadcrumb
+                            nav(aria-label='breadcrumb')
+                                ol.breadcrumb.mb-0
+                                    li.breadcrumb-item
+                                        a(href='/') Home
+
+                                    li.breadcrumb-item
+                                        a(href="/shop?type=" + productType.productType) #{productType.productType}
+
+                                    li.breadcrumb-item.active(aria-current='page') #{product.name}
+
+            section.mt-8
+                .container
+                    .row
+                        .col-md-6
+                            .slider.slider-for
+                                div
+                                    .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image1Path + '")')
+                                        // img
+                                        // img
+                                        img(src=product.image1Path alt='')
+                                if(product.image2Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image2Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image2Path alt='')
+                                if(product.image3Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image3Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image3Path alt='')
+                                if(product.image4Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image4Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image4Path alt='')
+                                if(product.image5Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image5Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image5Path alt='')
+                            .slider.slider-nav.mt-4
+                                div
+                                    img.w-100(src=product.image1Path alt='')
+                                if(product.image2Path)
+                                    div
+                                        img.w-100(src=product.image2Path alt='')
+                                if(product.image3Path)
+                                    div
+                                        img.w-100(src=product.image3Path alt='')
+                                if(product.image4Path)
+                                    div
+                                        img.w-100(src=product.image4Path alt='')
+                                if(product.image5Path)
+                                    div
+                                        img.w-100(src=product.image5Path alt='')
+                            
+                            section.mt-lg-14.mt-8
+                                .container
+                                    .row
+                                        .col-md-12
+                                            ul#myTab.nav.nav-pills.nav-lb-tab(role='tablist')
+                                                // nav item
+                                                li.nav-item(role='presentation')
+                                                    // btn
+                                                    button#product-tab.nav-link.active(data-bs-toggle='tab' data-bs-target='#product-tab-pane' type='button' role='tab' aria-controls='product-tab-pane' aria-selected='true') Description
+                                                // nav item
+                                                li.nav-item(role='presentation')
+                                                    // btn
+                                                    button#details-tab.nav-link(data-bs-toggle='tab' data-bs-target='#details-tab-pane' type='button' role='tab' aria-controls='details-tab-pane' aria-selected='false') Delivery
+                                                //- // nav item
+                                                //- li.nav-item(role='presentation')
+                                                //-     // btn
+                                                //-     button#reviews-tab.nav-link(data-bs-toggle='tab' data-bs-target='#reviews-tab-pane' type='button' role='tab' aria-controls='reviews-tab-pane' aria-selected='false') Reviews
+                                                //- // nav item
+                                                //- li.nav-item(role='presentation')
+                                                //-     // btn
+                                                //-     button#sellerInfo-tab.nav-link(data-bs-toggle='tab' data-bs-target='#sellerInfo-tab-pane' type='button' role='tab' aria-controls='sellerInfo-tab-pane' aria-selected='false' disabled='')
+                                                //-         | Seller
+                                                //-         | Info
+                                            // tab content
+                                            #myTabContent.tab-content
+                                                // tab pane
+                                                #product-tab-pane.tab-pane.fade.show.active(role='tabpanel' aria-labelledby='product-tab' tabindex='0')
+                                                    .my-8
+                                                        .mb-5
+                                                            // text
+                                                            //- h4.mb-1 #MAIN_DESCRIPTION_TITLE
+                                                            p.mb-0 #{product.description}
+                                                        .mb-5
+                                                            //- h5.mb-1 Storage Tips
+                                                            //- p.mb-0
+                                                            //-     | Nisi, tellus iaculis urna bibendum in lacus, integer. Id imperdiet vitae varius sed
+                                                            //-     | magnis eu
+                                                            //-     | nisi nunc sit. Vel, varius habitant ornare ac rhoncus. Consequat risus facilisis ante ipsum
+                                                            //-     | netus risus adipiscing sagittis sed.Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                                        
+                                                // tab pane
+                                                #details-tab-pane.tab-pane.fade(role='tabpanel' aria-labelledby='details-tab' tabindex='0')
+                                                    .my-8
+                                                        .row
+                                                            .col-12
+                                                                h4.mb-4 Delivery Details
+                                                            .col-12.col-lg-6
+                                                                h5 PLACEHOLDER
+                                                
+                        .col-md-6
+                            .ps-lg-10.mt-6.mt-md-0
+                                // content
+                                a.mb-4.d-block(href='/shop?type=' + productType.productType) #{productType.productType}
+                                // heading
+                                h1.mb-1 #{product.name}
+                                .mb-4
+                                    // rating
+                                    // rating
+                                    medium #{product.descriptionPoint1}
+                                    br
+                                    medium <b>#{lowestPriceWithQuantity.quantity}</b> #{productType.productType} starts from <b>£#{lowestPriceWithQuantity.price}</b>   
+                                    
+                                .mb-4
+                                    // price
+                                    large.fw-bold.text-dark #{product.subDescriptionTitle}
+                                    //- span.text-decoration-line-through.text-muted   $35
+                                    //- span
+                                        small.fs-6.ms-2.text-danger
+                                            | 26%
+                                            | Off
+                                    br
+                                    medium #{product.subDescription}
+                                    br
+                                    br
+                                    ul(style="padding-left:1rem !important")
+                                        li.text-decoration-none.text-muted
+                                            medium #{product.descriptionPoint1}
+                                        if(product.descriptionPoint2)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint2}
+
+                                        if(product.descriptionPoint3)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint3}
+
+                                        if(product.descriptionPoint4)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint4}
+
+                                        if(product.descriptionPoint5)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint5}
+                                    
+
+                                .mb-4
+                                    input#productId(type="hidden" value=product.id)
+                                    input#productType(type="hidden" value=productType.productType)
+                                    large.fw-bold.text-dark Customise your #{product.name}
+                                    br
+                                    br
+                                    #optionsSection
+                                .mb-4
+                                    large.fw-bold.text-dark Select your Quantity 
+                                    .col-12
+                                        #quantityPriceTableSection
+                                        
+                                
+                                .mb-4
+                                    large.fw-bold.text-dark Summary
+                                    // table
+                                    #summaryTableSection
+                                    table.table#summary
+
+                                    button.btn.btn-primary#addToBasket(style="width:100%") Add to Basket       
+                                
+            
+            +footer()
+            +scripts()
+            script(src="/js/product.js")
+            

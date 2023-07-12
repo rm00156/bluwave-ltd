@@ -1,0 +1,168 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            // section
+            section.py-lg-16.py-10(style='background: url(/img/stock_home_8.jpg)no-repeat; background-position: center; background-size: cover;')
+                .container
+                    // row
+                    .row
+                        .col-xl-4.col-lg-6.col-md-7
+                            .card.border-0.shadow
+                                .card-body.p-6
+                                    .mb-4
+
+                                        h1.mt-3.mb-2.h4 Unlock Your Creative Vision with High-Quality Printing
+                                        medium Bringing digital content into tangible reality through the art of printing.
+                                    form
+                                        .row.g-3
+                                            .col-auto
+                                                a.btn.btn-primary(href="/shop") Shop
+
+
+            .my-lg-14.my-8
+                .container
+                    // row
+                    .table-responsive-xxl.pb-6.pb-lg-0
+                        .row.flex-nowrap
+                            .col-sm-4
+                                //- .card.border-0.card-hover.shadow
+                                    a.img-zoom(href='#')
+                                        img(src='/img/flyers.jpg' alt='' style="width: 100%; height: 100%")
+                                    .position-absolute.w-100.bottom-0.py-3.px-4
+                                        a.text-blue.d-flex.align-items-center.btn-transition(href='#')
+                                            | Flyers &amp Leaflets
+                                            i.feather-icon.icon-chevron-right.fs-5
+                                .text-center.mb-10
+                                    // img
+                                    a(href='/shop?type=flyers%20%26%20leaflets')
+                                        img.card-image.shadow(src='/img/flyers2.jpg' style="height:200px;width:200px" alt='')
+                                    // text
+                                    .mt-4
+                                        h5.fs-6.mb-0
+                                            a.text-inherit(href='/shop?type=flyers%20%26%20leaflets') Flyers & Leaflets
+                            .col-sm-4
+                                //- .card.border-0.shadow
+                                    a.img-zoom(href='#')
+                                        img(src='/img/business.jpg' alt='' style="width: 100%; height: 100%")
+                                    .position-absolute.w-100.bottom-0.py-3.px-4.bg-primary
+                                        a.text-blue.d-flex.align-items-center.btn-transition.text-white(href='#')
+                                            | Business Cards
+                                            i.feather-icon.icon-chevron-right.fs-5
+                                .text-center.mb-10
+                                    // img
+                                    a(href='/shop?type=business cards')
+                                        img.card-image.shadow(src='/img/business2.jpg' style="height:200px;width:200px" alt='')
+                                    // text
+                                    .mt-4
+                                        h5.fs-6.mb-0
+                                            a.text-inherit(href='/shop?type=business cards') Business Cards
+                            .col-sm-4
+                                //- .card.border-0.shadow
+                                    a.img-zoom(href='#')
+                                        img(src='/img/notebook.jpg' alt='' style="width: 100%; height: 100%")
+                                    .position-absolute.w-100.bottom-0.py-3.px-4
+                                        a.btn.btn-primary.text-blue.d-flex.align-items-center.btn-transition(href='#')
+                                            | Books
+                                            i.feather-icon.icon-chevron-right.fs-5
+                                
+                                .text-center.mb-10
+                                    // img
+                                    a(href='/shop?type=books')
+                                        img.card-image.shadow(src='/img/notebook2.jpg' style="height:200px;width:200px" alt='')
+                                    // text
+                                    .mt-4
+                                        h5.fs-6.mb-0
+                                            a.text-inherit(href='/shop?type=books') Books
+                .my-lg-14.my-8
+                    .container
+                        .table-responsive-xxl.pb-6.pb-lg-0        
+                            .row.flex-nowrap    
+                                .col-sm-4
+                                    //- .card.border-0.shadow
+                                    //-     a.img-zoom(href='#')
+                                    //-         img(src='/img/banner.jpg' alt='' style="width: 100%; height: 100%")
+                                    //-     .position-absolute.w-100.bottom-0.py-3.px-4
+                                    //-         a.text-blue.d-flex.align-items-center.btn-transition(href='#')
+                                    //-             | Roller Banner
+                                    //-             i.feather-icon.icon-chevron-right.fs-5
+                                    .text-center.mb-10
+                                        // img
+                                        a(href='/shop?type=roller banner')
+                                            img.card-image.shadow(src='/img/banner.jpg' style="height:200px;width:200px" alt='')
+                                        // text
+                                        .mt-4
+                                            h5.fs-6.mb-0
+                                                a.text-inherit(href='/shop?type=roller banner') Roller Banner
+                                .col-sm-4
+                                    //- .card.border-0.shadow
+                                        a.img-zoom(href='#')
+                                            img(src='/img/poster.jpg' alt='' style="width: 100%; height: 100% object:fit")
+                                        .position-absolute.w-100.bottom-0.py-3.px-4
+                                            a.text-blue.d-flex.align-items-center.btn-transition(href='#')
+                                                | Posters
+                                                i.feather-icon.icon-chevron-right.fs-5
+                                    .text-center.mb-10
+                                        // img
+                                        a(href='/shop?type=posters')
+                                            img.card-image.shadow(src='/img/poster2.jpg' style="height:200px;width:200px" alt='')
+                                        // text
+                                        .mt-4
+                                            h5.fs-6.mb-0
+                                                a.text-inherit(href='/shop?type=posters') Posters
+                                .col-sm-4
+                                    //- .card.border-0.shadow
+                                        a.img-zoom(href='#')
+                                            img(src='/img/cards.jpg' alt='' style="width: 100%; height: 100%")
+                                        .position-absolute.w-100.bottom-0.py-3.px-4
+                                            a.text-blue.d-flex.align-items-center.btn-transition(href='#')
+                                                | Cards
+                                                i.feather-icon.icon-chevron-right.fs-5
+
+                                    .text-center.mb-10
+                                        // img
+                                        a(href='/shop?type=cards')
+                                            img.card-image.shadow(src='/img/cards.jpg' style="height:200px;width:200px" alt='')
+                                        // text
+                                        .mt-4
+                                            h5.fs-6.mb-0
+                                                a.text-inherit(href='/shop?type=cards') Cards
+
+
+            section.py-lg-16.py-10(style='background: url(/img/notebook_banner2.jpg)no-repeat; background-position: center; background-size: cover;')
+                .container
+                    // row
+                    .row
+                        .col-xl-4.col-lg-6.col-md-7.offset-xl-8.offset-lg-6.offset-md-5
+                            .card.border-0.shadow
+                                .card-body.p-6
+                                    .mb-4
+
+                                        h1.mt-3.mb-0.h4 Create Your Perfect Notebook Here
+                                        medium Having a notebook is more than just having a tool for writing. It is a gateway to unleashing your creativity, enhancing productivity, and capturing your thoughts and ideas. 
+                                    form
+                                        .row.g-3
+                                            .col-auto
+                                                a.btn.btn-primary(href=href='/shop?type=note books') Shop Notebooks
+
+
+
+
+
+            +footer()
+            +scripts()
