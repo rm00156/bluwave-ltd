@@ -15,7 +15,7 @@ async function createPurchaseBasket(accountId, fullName, email, phoneNumber, sub
         deliveryTypeFk: deliveryTypeId,
         deliveryPrice: deliveryPrice,
         deleteFl: false,
-        versionNo:1
+        versionNo: 1
 
     })
 }
@@ -44,22 +44,26 @@ async function getPurchaseBasketWithIdAndAccountId(id, accountId) {
 }
 
 async function getSuccessfulOrdersForAccountId(accountId) {
-    return await models.sequelize.query('select pb.*, dt.name as deliveryType, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb ' + 
-                    ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id ' + 
-                    ' where pb.status = :completed ' + 
-                    ' and pb.accountFk = :accountId ' +
-                    ' and pb.deleteFl = false ', {replacements:{completed:'Completed', accountId: accountId}, 
-                                            type: models.sequelize.QueryTypes.SELECT});
+    return await models.sequelize.query('select pb.*, dt.name as deliveryType, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb ' +
+        ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id ' +
+        ' where pb.status = :completed ' +
+        ' and pb.accountFk = :accountId ' +
+        ' and pb.deleteFl = false ', {
+            replacements: { completed: 'Completed', accountId: accountId },
+        type: models.sequelize.QueryTypes.SELECT
+    });
 }
 
 async function getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId) {
-    const result = await models.sequelize.query('select pb.*, dt.name as deliveryType, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb ' + 
-                    ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id ' + 
-                    ' where pb.status = :completed ' + 
-                    ' and pb.id = :purchaseBasketId ' +
-                    ' and pb.deleteFl = false ', {replacements:{completed:'Completed', purchaseBasketId: purchaseBasketId}, 
-                                            type: models.sequelize.QueryTypes.SELECT});
-    if(result.length == 0)
+    const result = await models.sequelize.query('select pb.*, dt.name as deliveryType, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb ' +
+        ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id ' +
+        ' where pb.status = :completed ' +
+        ' and pb.id = :purchaseBasketId ' +
+        ' and pb.deleteFl = false ', {
+            replacements: { completed: 'Completed', purchaseBasketId: purchaseBasketId },
+        type: models.sequelize.QueryTypes.SELECT
+    });
+    if (result.length == 0)
         return null;
     else
         return result[0];
@@ -67,12 +71,12 @@ async function getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketI
 
 async function getAllCompletedOrders() {
 
-    return await models.sequelize.query('select pb.*, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt, dt.name as deliveryType, a.guestFl from purchaseBaskets pb ' + 
-            ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id ' +
-            ' inner join accounts a on pb.accountFk = a.id ' +
-            ' where pb.deleteFl = false ' +
-            ' and pb.status = :completed ', 
-            {replacements: {completed: 'Completed'}, type: models.sequelize.QueryTypes.SELECT});
+    return await models.sequelize.query('select pb.*, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt, dt.name as deliveryType, a.guestFl from purchaseBaskets pb ' +
+        ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id ' +
+        ' inner join accounts a on pb.accountFk = a.id ' +
+        ' where pb.deleteFl = false ' +
+        ' and pb.status = :completed ',
+        { replacements: { completed: 'Completed' }, type: models.sequelize.QueryTypes.SELECT });
 }
 
 async function updatePurchaseBasketWithOrderId(purchaseBasketId, orderId) {
@@ -86,6 +90,19 @@ async function updatePurchaseBasketWithOrderId(purchaseBasketId, orderId) {
     })
 }
 
+async function getOrderDetailsInLastMonth() {
+
+    const result = await models.sequelize.query('SELECT sum(total) as total, count(id) as count ' +
+        ' FROM purchasebaskets ' +
+        ' WHERE purchaseDttm >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ' +
+        ' and status = :status ', { replacements: { status: 'Completed' }, type: models.sequelize.QueryTypes.SELECT });
+
+    if (result.length == 0)
+        return { total: 0, count: 0 };
+    else
+        return result[0];
+}
+
 module.exports = {
     createPurchaseBasket,
     completePurchaseBasket,
@@ -93,6 +110,6 @@ module.exports = {
     getSuccessfulOrdersForAccountId,
     getSuccessfulOrderForAccountIdAndPurchaseBasketId,
     getAllCompletedOrders,
-    updatePurchaseBasketWithOrderId
-
+    updatePurchaseBasketWithOrderId,
+    getOrderDetailsInLastMonth
 }

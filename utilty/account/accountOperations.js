@@ -384,6 +384,19 @@ async function findForgottenPasswordById(id) {
     })
 }
 
+async function getNewCustomersInTheLastWeek() {
+    const result = await models.sequelize.query('SELECT count(id) as count ' +
+            ' FROM accounts ' +
+            ' WHERE created_At >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK) ' +
+            ' and accountTypeFk = :accountTypeId ', {replacements:{accountTypeId: 2}, type: models.sequelize.QueryTypes.SELECT});
+    
+    if(result.length == 0)
+        return 0;
+    
+    return result[0].count;
+
+}
+
 module.exports = {
     updateAccount,
     complete2FaSetupForAccountId,
@@ -408,5 +421,6 @@ module.exports = {
     getForgottenPassword,
     getForgottenPasswordById,
     findForgottenPasswordById,
-    updateForgottenPasswordAsUsed
+    updateForgottenPasswordAsUsed,
+    getNewCustomersInTheLastWeek
 }

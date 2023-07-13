@@ -17,8 +17,13 @@ const models = require('../models');
 exports.getAdminDashboardPage = async function(req, res) {
     var message = req.session.message;
     req.session.message = undefined;
+
+    const orderDetailsInLastMonth = await orderOperations.getOrderDetailsInLastMonth();
+    const newCustomersInTheLastWeek = await accountOperations.getNewCustomersInTheLastWeek();
     res.render('adminDashboard', { user: req.user,
         message: message,
+        orderDetailsInLastMonth: orderDetailsInLastMonth,
+        newCustomersInTheLastWeek: newCustomersInTheLastWeek,
         companyDetails: companyInfo.getCompanyDetails()});
 }
 

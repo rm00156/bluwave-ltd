@@ -26,6 +26,8 @@ function removeFileGroupItem(e) {
 
 function uploadPicture(e) {
 
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'block';
     var fileInput = document.getElementById('picture');
 
     // Retrieve the selected file

@@ -33,7 +33,9 @@ function validatePhoneNumber() {
 function checkout(e) {
 
     e.preventDefault();
-
+    const buttonElement = document.getElementById('submit');
+    console.log(buttonElement)
+    buttonElement.disabled = true;
     const selectedDelivery = document.querySelector('input[name="flexRadioDefault"]:checked');
     const deliveryName = selectedDelivery.getAttribute('data-delivery-name');
     const deliveryPrice = selectedDelivery.getAttribute('data-price');
@@ -85,6 +87,8 @@ function checkout(e) {
     } else {
         $('#buyError').text('To purchase you must be using a secure connection. Make sure the url for this site includes https:// and not http://');
     }
+
+    buttonElement.disabled = false;
 }
 
 function getSelectedDeliveryOption() {

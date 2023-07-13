@@ -52,10 +52,10 @@ html(land="en")
                                         div
                                             h4.mb-0.fs-5 Earnings
                                         .icon-shape.icon-md.bg-light-danger.text-dark-danger.rounded-circle
-                                            i.bi.bi-currency-dollar.fs-5
+                                            i.bi.bi-currency-pound.fs-5
                                     // project number
                                     .lh-1
-                                        h1.mb-2.fw-bold.fs-2 $93,438.78
+                                        h1.mb-2.fw-bold.fs-2 £#{(parseFloat(orderDetailsInLastMonth.total)).toFixed(2)}
                                         span Monthly revenue
                         .col-lg-4.col-12.mb-6
                             // card
@@ -70,10 +70,9 @@ html(land="en")
                                             i.bi.bi-cart.fs-5
                                     // project number
                                     .lh-1
-                                        h1.mb-2.fw-bold.fs-2 42,339
+                                        h1.mb-2.fw-bold.fs-2 #{orderDetailsInLastMonth.count}
                                         span
-                                            span.text-dark.me-1 35+
-                                            | New Sales
+                                            span Monthly orders
                         .col-lg-4.col-12.mb-6
                             // card
                             .card.h-100.card-lg
@@ -82,17 +81,16 @@ html(land="en")
                                     // heading
                                     .d-flex.justify-content-between.align-items-center.mb-6
                                         div
-                                            h4.mb-0.fs-5 Customer
+                                            h4.mb-0.fs-5 New Customers
                                         .icon-shape.icon-md.bg-light-info.text-dark-info.rounded-circle
                                             i.bi.bi-people.fs-5
                                     // project number
                                     .lh-1
-                                        h1.mb-2.fw-bold.fs-2 39,354
+                                        h1.mb-2.fw-bold.fs-2 #{newCustomersInTheLastWeek}
                                         span
-                                            span.text-dark.me-1 30+
-                                            | new in 2 days
+                                            span Last week
                     // row
-                    .row
+                    //- .row
                         .col-xl-8.col-lg-6.col-md-12.col-12.mb-6
                             // card
                             .card.h-100.card-lg
@@ -150,7 +148,7 @@ html(land="en")
                                                     span.text-dark Income 3,271
                                                     |                                                     (86%)
                     // row
-                    .row
+                    //- .row
                         .col-xl-6.col-lg-6.col-md-12.col-12.mb-6
                             // card
                             .card.h-100.card-lg
@@ -226,7 +224,7 @@ html(land="en")
                                                 p.mb-0
                                                     a.link-info(href='#!') View Performance
                     // row
-                    .row
+                    //- .row
                         .col-xl-12.col-lg-12.col-md-12.col-12.mb-6
                             .card.h-100.card-lg
                                 // heading
