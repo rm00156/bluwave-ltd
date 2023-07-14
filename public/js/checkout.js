@@ -1,4 +1,5 @@
-var stripe = Stripe('pk_test_5cQWxxaMq14oogwEPGeNiiCG00naQUtjyS');
+// var stripe = Stripe('pk_test_5cQWxxaMq14oogwEPGeNiiCG00naQUtjyS');
+var stripe = Stripe('pk_live_aQTkfvwiROZzVl4MdtcFbrqh00Xcze97Y4');
 $(function(){
 
     $('.delivery-options').on('change', getSelectedDeliveryOption);
