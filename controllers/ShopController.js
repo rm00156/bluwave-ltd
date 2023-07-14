@@ -4,10 +4,10 @@ const basketOperations = require('../utilty/basket/basketOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const deliveryOperations = require('../utilty/delivery/deliveryOperations');
 const queueOperations = require('../utilty/queue/queueOperations');
+const accountOperations = require('../utilty/account/accountOperations');
 const models = require('../models');
 const stripe = require('stripe')(process.env.STRIPE_KEY);
 const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
-
 async function getShopTypePage(req, res) {
 
     const type = req.query.type;
@@ -459,6 +459,11 @@ async function sessionCompleted(req, res) {
         try {
             await orderOperations.completePurchaseBasket(purchaseBasketId, now);
             await queueOperations.addSendPurchaseEmail(purchaseBasketId);
+
+            const orderDetails = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId);
+            const text = `${orderDetails.fullName} just made order of £${(parseFloat(orderDetails.total)).toFixed(2)}`;
+            const link = `/admin_dashboard/order/${orderDetails.id}`;
+            await accountOperations.createNotificationForAdminAccounts(text, link);
         }
         catch (err) {
             console.log(err);

@@ -4,7 +4,9 @@
  * Module dependencies.
  */
 
-var app = require('../app');
+const socketIO = require('socket.io');
+
+var {app, setSocket} = require('../app');
 var debug = require('debug')('nodejs:server');
 var http = require('http');
 /**
@@ -19,6 +21,17 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+const io = socketIO(server);
+io.on('connection', (socket) => {
+  console.log('A client connected');
+  
+    setSocket(socket);
+  socket.on('disconnect', () => {
+    console.log('A client disconnected');
+  });
+});
+
+
 
 /**
  * Listen on provided port, on all network interfaces.

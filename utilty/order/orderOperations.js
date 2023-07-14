@@ -97,9 +97,6 @@ async function getOrderDetailsInLastMonth() {
         ' WHERE purchaseDttm >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ' +
         ' and status = :status ', { replacements: { status: 'Completed' }, type: models.sequelize.QueryTypes.SELECT });
 
-    if (result.length == 0)
-        return { total: 0, count: 0 };
-    else
         return result[0];
 }
 

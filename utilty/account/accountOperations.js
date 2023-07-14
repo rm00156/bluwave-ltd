@@ -296,11 +296,11 @@ async function createForgottenPasswordRequest(accountId) {
     const token = utiltyHelper.generateNumberCode();
 
     const forgottenPassword = await getForgottenPasswordByToken(token);
-    if(forgottenPassword == null) {
+    if (forgottenPassword == null) {
         return await models.forgottenPassword.create({
             accountFk: accountId,
             createdDttm: Date.now(),
-            expirationDttm: utiltyHelper.dateXAmountFromNow(60*60*1000),
+            expirationDttm: utiltyHelper.dateXAmountFromNow(60 * 60 * 1000),
             usedFl: false,
             token: token,
             deleteFl: false,
@@ -334,9 +334,9 @@ async function updateForgottenPasswordAsUsed(forgettenPasswordId) {
         usedFl: true,
         versionNo: models.sequelize.literal('versionNo + 1')
     }, {
-            where: {
-                id: forgettenPasswordId
-            }
+        where: {
+            id: forgettenPasswordId
+        }
     })
 }
 
@@ -386,15 +386,84 @@ async function findForgottenPasswordById(id) {
 
 async function getNewCustomersInTheLastWeek() {
     const result = await models.sequelize.query('SELECT count(id) as count ' +
-            ' FROM accounts ' +
-            ' WHERE created_At >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK) ' +
-            ' and accountTypeFk = :accountTypeId ', {replacements:{accountTypeId: 2}, type: models.sequelize.QueryTypes.SELECT});
-    
-    if(result.length == 0)
+        ' FROM accounts ' +
+        ' WHERE created_At >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK) ' +
+        ' and accountTypeFk = :accountTypeId ', { replacements: { accountTypeId: 2 }, type: models.sequelize.QueryTypes.SELECT });
+
+    if (result.length == 0)
         return 0;
-    
+
     return result[0].count;
 
+}
+
+async function getNotificationsForAccount(accountId, limit) {
+    const query = {
+        where: {
+            accountFk: accountId,
+            deleteFl: false,
+        }, order: [
+            ['createdDttm', 'DESC']
+        ]
+    };
+
+    if(limit) {
+        query['limit'] = limit
+    };
+    return await models.notification.findAll(query)
+}
+
+async function getAllActiveAdminAccounts() {
+    return await models.account.findAll({
+        where:{
+            accountTypeFk: 1,
+            deleteFl: false
+        }
+    })
+}
+
+async function createNotificationForAdminAccounts(text, link) {
+
+    const accounts = await getAllActiveAdminAccounts();
+    
+    for(var i = 0; i < accounts.length; i++) { 
+        const account = accounts[i];
+        await models.notification.create({
+            accountFk: account.id,
+            createdDttm: Date.now(),
+            link: link,
+            text: text,
+            deleteFl: false,
+            versionNo: 1
+        });
+    }
+}
+
+async function getNotificationById(id) {
+    return await models.notification.findOne({
+        where: {
+            id: id,
+            deleteFl: false
+        }
+    })
+}
+
+async function deleteNotificationById(id) {
+    const notification = await getNotificationById(id);
+
+    if(notification != null)
+        await notification.destroy();
+}
+
+async function deleteAllNotificationsForAccount(accountId) {
+    const notifications = await getNotificationsForAccount(accountId);
+
+    for(var i = 0; i < notifications.length; i++) {
+
+        const notification = notifications[i];
+
+        await notification.destroy();
+    }
 }
 
 module.exports = {
@@ -422,5 +491,10 @@ module.exports = {
     getForgottenPasswordById,
     findForgottenPasswordById,
     updateForgottenPasswordAsUsed,
-    getNewCustomersInTheLastWeek
+    getNewCustomersInTheLastWeek,
+    getNotificationsForAccount,
+    createNotificationForAdminAccounts,
+    deleteNotificationById,
+    deleteAllNotificationsForAccount,
+    getNotificationById
 }

@@ -1,4 +1,5 @@
 const express = require('express');
+require('express-async-errors');
 const isDevelopment = process.env.NODE_ENV === undefined;
 if (isDevelopment) {
   require('dotenv').config(); // Load variables from .env file
@@ -18,7 +19,16 @@ require('./passport_setup')(passport);
 const app = express();
 
 const models = require('./models');
+let socket;
+
+function setSocket(ioSocket) {
+  socket = ioSocket;
+}
 models.sequelize.sync().then(function() {
+
+  models.notification.afterCreate((instance, options) => {
+    socket.emit('notification', {notification: instance});
+  })
 }).catch(function(err) {
 
     console.log(err, "Database connection to reece has failed!")
@@ -56,16 +66,11 @@ app.use(passport.session());
 app.use(flash());
 app.use('/', indexRouter);
 
-app.use(function(err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-  
-    // render the error page
-    res.status(err.status || 500);
-    console.log(err)
-    req.app.get('env') === 'development' ? res.render('error') : res.redirect('/404');
-    
-  });
+app.use((req, res) => {
+  req.app.get('env') === 'development' ? res.render('error') : res.redirect('/404');
+});
 
-module.exports = app;
+module.exports = {
+  app,
+  setSocket
+}

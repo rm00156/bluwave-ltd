@@ -96,4 +96,7 @@ router.post('/reset_password', getUser, isCustomer, homeController.resetPassword
 router.get('/password_reset', getUser, isCustomer, homeController.passwordResetPage);
 router.get('/forgotten_password_email_sent', getUser, isCustomer, homeController.passwordEmailSentPage);
 
-module.exports = router;
+router.get('/get_notifications', isAdmin, adminRequire2faSetup, adminDashboardController.getNotifications);
+router.delete('/delete_notification', isAdmin, adminRequire2faSetup, adminDashboardController.deleteNotification);
+router.delete('/delete_all_notifications', isAdmin, adminRequire2faSetup, adminDashboardController.deleteNotifications);
+module.exports = router
