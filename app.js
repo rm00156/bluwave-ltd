@@ -19,6 +19,7 @@ require('./passport_setup')(passport);
 const app = express();
 
 const models = require('./models');
+const companyInfo = require('./utilty/company/companyInfo');
 let socket;
 
 function setSocket(ioSocket) {
@@ -74,8 +75,11 @@ app.use((req, res, next) => {
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
-  req.app.get('env') === 'production' ? res.render('404',{user:req.user}) : '';
+  if (req.app.get('env') === 'production') {
+    return res.render('404',{user:req.user, companyDetails: companyInfo.getCompanyDetails()});
+  } 
 
+  return res.json(error);
 });
 
 
