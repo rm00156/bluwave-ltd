@@ -1,12 +1,7 @@
 const models = require('../../models');
-const aws = require('aws-sdk');
+const {Upload} = require("@aws-sdk/lib-storage");
+const {S3Client} = require("@aws-sdk/client-s3");
 const { Op } = require('sequelize');
-
-aws.config.update({
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    region: process.env.S3_REGION
-});
 
 async function getAllActiveProductTypes() {
     return await models.productType.findAll({
@@ -209,7 +204,15 @@ async function getOptionsForOptionTypeId(optionTypeId) {
 }
 
 async function uploadPictures(folder, productName, files) {
-    const s3 = new aws.S3();
+    const s3 = new S3Client({
+        region: process.env.S3_REGION,
+        credentials: {
+            accessKeyId: process.env.S3_ACCESS_KEY_ID,
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+        },
+        endpoint: 'https://s3.eu-west-2.amazonaws.com',
+        
+    });
     const date = Date.now();
     var s3PathMap = new Map();
 
@@ -219,7 +222,7 @@ async function uploadPictures(folder, productName, files) {
         var blob = value.data;
         var extension = value.mimeType == 'image/jpeg' ? 'jpg' : 'png';
         var fileName = 'picture' + index;
-        var s3Path = process.env.S3_BUCKET_PATH + '/' + folder + productName + '/' + date + '_' + fileName + '.' + extension;
+        var s3Path = process.env.S3_BUCKET_PATH + '/' + folder + productName + '/' + date + '_' + encodeURIComponent(fileName) + '.' + extension;
         var params = {
             Bucket: process.env.S3_BUCKET,
             Body: blob,
@@ -227,8 +230,10 @@ async function uploadPictures(folder, productName, files) {
             ACL:'public-read'
         };
 
-        const s3UploadPromise = s3.upload(params).promise();
-        
+        const s3UploadPromise = new Upload({
+            client: s3,
+            params
+        }).done();
         await s3UploadPromise;
         s3PathMap.set(index, s3Path);
 

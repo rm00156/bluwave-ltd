@@ -1,33 +1,29 @@
 const models = require('../../models');
 const Sequelize = require('sequelize');
 const productOperations = require('../products/productOperations');
-const aws = require('aws-sdk');
+const {Upload} = require("@aws-sdk/lib-storage");
+const {S3Client} = require("@aws-sdk/client-s3");
 
-aws.config.update({
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
-    accessKeyId: process.env.S3_ACCESS_KEY_ID,
-    region: process.env.S3_REGION
-});
 
 async function getActiveBasketItemsForAccount(accountId) {
 
     const basketItems = await models.sequelize.query(' select b.*, b.price, p.name, p.image1Path, q.quantity from basketItems b ' +
-            ' inner join products p on b.productFk = p.id ' +
-            ' inner join quantities q on b.quantityFk = q.id ' +
-            ' where b.accountFk = :accountId ' +
-            ' and (b.purchaseBasketFk is null or b.purchaseBasketFk = (select id from purchaseBaskets where id = b.purchaseBasketFk and status != :completed )) ' +
-            ' and b.deleteFl = false ' +
-            ' and p.deleteFl = false' , {replacements: {accountId: accountId, completed: 'Completed'}, type: models.sequelize.QueryTypes.SELECT});
+        ' inner join products p on b.productFk = p.id ' +
+        ' inner join quantities q on b.quantityFk = q.id ' +
+        ' where b.accountFk = :accountId ' +
+        ' and (b.purchaseBasketFk is null or b.purchaseBasketFk = (select id from purchaseBaskets where id = b.purchaseBasketFk and status != :completed )) ' +
+        ' and b.deleteFl = false ' +
+        ' and p.deleteFl = false', { replacements: { accountId: accountId, completed: 'Completed' }, type: models.sequelize.QueryTypes.SELECT });
 
     var totalCost = 0;
     var revisedBasketItems = []
-    for(var i = 0; i < basketItems.length; i++) {
+    for (var i = 0; i < basketItems.length; i++) {
         var basketItem = basketItems[i];
         totalCost = totalCost + parseFloat(basketItem.price);
 
         const option = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.optionGroupFk);
         const quantities = await productOperations.getQuantitiesForProduct(basketItem.productFk);
-        if(basketItem.fileGroupFk != null) {
+        if (basketItem.fileGroupFk != null) {
             const fileGroupItems = await getFileGroupItemByFileGroupId(basketItem.fileGroupFk);
             basketItem['fileGroupItems'] = fileGroupItems;
         }
@@ -36,7 +32,7 @@ async function getActiveBasketItemsForAccount(accountId) {
         revisedBasketItems.push(basketItem);
 
     }
-    return {basketItems: revisedBasketItems, totalCost: totalCost.toFixed(2)};
+    return { basketItems: revisedBasketItems, totalCost: totalCost.toFixed(2) };
 }
 
 async function createBasketItem(accountId, productId, optionGroupId, quantityId, price) {
@@ -89,14 +85,14 @@ async function removeBasketItem(basketItemId) {
     const purchaseBasketId = basketItem.purchaseBasketFk;
     const fileGroupId = basketItem.fileGroupFk;
     const optionGroupId = basketItem.optionGroupFk;
-    
+
     await basketItem.destroy();
-    if(purchaseBasketId != null) {
+    if (purchaseBasketId != null) {
         const purchaseBasket = await getPurchaseBasketById(purchaseBasketId);
         await purchaseBasket.destroy();
     }
 
-    if(fileGroupId != null) {
+    if (fileGroupId != null) {
         const fileGroup = await getFileGroupById(fileGroupId);
         const fileGroupItems = await getFileGroupItemByFileGroupId(fileGroup.id);
 
@@ -138,17 +134,23 @@ async function updateQuantityPriceForBasketItem(basketItemId, quantityId) {
         '     SELECT COUNT(DISTINCT ogi2.optionFk) ' +
         '     FROM optionGroupItems ogi2 ' +
         '     WHERE ogi2.optionGroupFk = :optionGroupId ' +
-        ' )', {replacements: {optionGroupId: basketItem.optionGroupFk, productId: basketItem.productFk},
-            type: models.sequelize.QueryTypes.SELECT}); 
+        ' )', {
+            replacements: { optionGroupId: basketItem.optionGroupFk, productId: basketItem.productFk },
+        type: models.sequelize.QueryTypes.SELECT
+    });
     optionGroupIdForProductPriceRow = optionGroupIdForProductPriceRow[0].id;
 
     const priceMatrixRowQuantityPrices = await models.sequelize.query('select pq.* from priceMatrixRowQuantityPrices pq ' +
-                ' inner join priceMatrixRows pr on pq.priceMatrixRowFk = pr.id ' +
-                ' inner join priceMatrices pm on pr.priceMatrixFk = pm.id ' +
-                ' where pr.optionGroupFk = :optionGroupId ' +
-                ' and pq.quantityFk = :quantityId ' +
-                ' and pm.deleteFl = false ', {replacements:{optionGroupId: optionGroupIdForProductPriceRow,
-                                            quantityId: quantityId}, type: models.sequelize.QueryTypes.SELECT});
+        ' inner join priceMatrixRows pr on pq.priceMatrixRowFk = pr.id ' +
+        ' inner join priceMatrices pm on pr.priceMatrixFk = pm.id ' +
+        ' where pr.optionGroupFk = :optionGroupId ' +
+        ' and pq.quantityFk = :quantityId ' +
+        ' and pm.deleteFl = false ', {
+            replacements: {
+                optionGroupId: optionGroupIdForProductPriceRow,
+                quantityId: quantityId
+            }, type: models.sequelize.QueryTypes.SELECT
+    });
 
     const priceMatrixRowQuantityPrice = priceMatrixRowQuantityPrices[0];
 
@@ -161,7 +163,7 @@ async function updateQuantityPriceForBasketItem(basketItemId, quantityId) {
             id: basketItemId
         }
     });
-        
+
 }
 
 async function createFileGroup() {
@@ -183,36 +185,46 @@ async function createFileGroupItem(fileGroupId, path, fileName) {
 
 async function uploadDesignForBasketItem(file, basketItemId) {
 
-    const s3 = new aws.S3();
+    const s3 = new S3Client({
+        region: process.env.S3_REGION,
+        credentials: {
+            accessKeyId: process.env.S3_ACCESS_KEY_ID,
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+        },
+        endpoint: 'https://s3.eu-west-2.amazonaws.com',
+        
+    });
     const date = Date.now();
 
-    
-    var s3Path = process.env.S3_BUCKET_PATH + '/BasketItem/' + date + '_' + file.name
+
+    var s3Path = process.env.S3_BUCKET_PATH + '/BasketItem/' + date + '_' + encodeURIComponent(file.name);
     var params = {
         Bucket: process.env.S3_BUCKET,
         Body: file.data,
         Key: 'BasketItem/' + date + '_' + file.name,
-        ACL:'public-read'
+        ACL: 'public-read'
     };
 
-    const s3UploadPromise = s3.upload(params).promise();
+    const s3UploadPromise = new Upload({
+        client: s3,
+        params
+    }).done();
     await s3UploadPromise;
 
     const basketItem = await getBasketItem(basketItemId);
     var fileGroupFk = basketItem.fileGroupFk;
-    if(fileGroupFk == null)
-    {
+    if (fileGroupFk == null) {
         const fileGroup = await createFileGroup();
         fileGroupFk = fileGroup.id;
         await models.basketItem.update({
             fileGroupFk: fileGroupFk,
             versionNo: models.sequelize.literal('versionNo + 1')
         }, {
-             where: {
+            where: {
                 id: basketItemId
-             }
+            }
         })
-    } 
+    }
 
     await createFileGroupItem(fileGroupFk, s3Path, file.name);
 }
@@ -221,11 +233,11 @@ async function getFileGroupItemsForBasketItem(basketItem) {
 
     const fileGroupFk = basketItem.fileGroupFk;
 
-    if(fileGroupFk == null)
+    if (fileGroupFk == null)
         return [];
-    
+
     return await models.fileGroupItem.findAll({
-        where:{
+        where: {
             fileGroupFk: fileGroupFk
         }
     });
@@ -244,7 +256,7 @@ async function removeFileGroupItem(fileGroupItemId, basketItemId) {
 
     const fileGroupItems = await getFileGroupItemByFileGroupId(fileGroupId);
 
-    if(fileGroupItems.length == 0) {
+    if (fileGroupItems.length == 0) {
         await models.basketItem.update({
             fileGroupFk: null,
             versionNo: models.sequelize.literal('versionNo + 1')
@@ -258,18 +270,18 @@ async function removeFileGroupItem(fileGroupItemId, basketItemId) {
 
 async function updateBasketItemsToAccount(accountId, basketItemIds) {
     await models.basketItem.update({
-            accountFk: accountId
-        },
-        { 
+        accountFk: accountId
+    },
+        {
             where: {
                 id: { [Sequelize.Op.in]: basketItemIds }
             }
-        } 
-      )
+        }
+    )
 }
 
 async function getAllBasketItemsForCheckout(accountId) {
-    
+
     const getActiveBasketItemsDetails = await getActiveBasketItemsForAccount(accountId);
     const basketItems = getActiveBasketItemsDetails.basketItems;
 
@@ -291,7 +303,7 @@ function getSubtotalFromBasketItems(basketItems) {
 
 
 async function setPurchaseBasketForBasketItem(basketItemId, purchaseBasketId) {
-    
+
     await models.basketItem.update({
         purchaseBasketFk: purchaseBasketId,
         versionNo: models.sequelize.literal('versionNo + 1')
@@ -304,21 +316,23 @@ async function setPurchaseBasketForBasketItem(basketItemId, purchaseBasketId) {
 
 async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchaseBasketId) {
     const result = await models.sequelize.query('select b.*, p.name as productName, q.quantity, ot.optionType, o.name as optionName from basketItems b ' +
-            ' inner join purchasebaskets pb on b.purchaseBasketFk = pb.id ' + 
-            ' inner join products p on b.productFk = p.id ' +
-            ' inner join optionGroupItems ogi on ogi.optionGroupFk = b.optionGroupFk ' + 
-            ' inner join options o on ogi.optionFk = o.id ' +
-            ' inner join optionTypes ot on o.optionTypeFk = ot.id ' +
-            ' inner join quantities q on b.quantityFk = q.id ' +
-            ' where pb.id = :purchaseBasketId ', {replacements:{purchaseBasketId: purchaseBasketId}, 
-                type: models.sequelize.QueryTypes.SELECT});
+        ' inner join purchasebaskets pb on b.purchaseBasketFk = pb.id ' +
+        ' inner join products p on b.productFk = p.id ' +
+        ' inner join optionGroupItems ogi on ogi.optionGroupFk = b.optionGroupFk ' +
+        ' inner join options o on ogi.optionFk = o.id ' +
+        ' inner join optionTypes ot on o.optionTypeFk = ot.id ' +
+        ' inner join quantities q on b.quantityFk = q.id ' +
+        ' where pb.id = :purchaseBasketId ', {
+            replacements: { purchaseBasketId: purchaseBasketId },
+        type: models.sequelize.QueryTypes.SELECT
+    });
 
     const basketItems = [];
-    for(var i = 0; i < result.length; i++) {
+    for (var i = 0; i < result.length; i++) {
         var basketItem = result[i];
 
         const option = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.optionGroupFk);
-        if(basketItem.fileGroupFk != null) {
+        if (basketItem.fileGroupFk != null) {
             const fileGroupItems = await getFileGroupItemByFileGroupId(basketItem.fileGroupFk);
             basketItem['fileGroupItems'] = fileGroupItems;
         }

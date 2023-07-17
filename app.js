@@ -66,9 +66,19 @@ app.use(passport.session());
 app.use(flash());
 app.use('/', indexRouter);
 
-app.use((req, res) => {
-  req.app.get('env') === 'development' ? res.render('error') : res.redirect('/404');
+app.use((req, res, next) => {
+  const error = new Error('Not Found');
+  error.status = 404;
+  next(error);
 });
+
+app.use((error, req, res, next) => {
+  res.status(error.status || 500);
+  req.app.get('env') === 'production' ? res.render('404',{user:req.user}) : '';
+
+});
+
+
 
 module.exports = {
   app,
