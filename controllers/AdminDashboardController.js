@@ -90,7 +90,7 @@ exports.getProductsPage = async function (req, res) {
 
 exports.getAddProductPage = async function (req, res) {
     const productTypes = await productOperations.getAllActiveProductTypes();
-    const optionTypes = await productOperations.getAllOptionTypes();
+    const optionTypes = await productOperations.getAllOptionTypesWithOptions();
     const quantities = await productOperations.getAllQuantities();
     const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
     var message = req.session.message;
@@ -519,9 +519,67 @@ exports.deleteNotification = async function (req, res) {
 }
 
 exports.deleteNotifications = async function (req, res) {
-    
     await accountOperations.deleteAllNotificationsForAccount(req.user.id);
     res.status(200).json({});
+}
+
+exports.getOptionTypesPage = async function (req, res) {
+
+    const optionTypes = await productOperations.getAllOptionTypes();
+    const message = req.session.message;
+    req.session.message = undefined;
+    res.render('adminOptionTypes', {
+        user: req.user,
+        optionTypes: optionTypes,
+        message: message,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.getOptionTypePage = async function (req, res) {
+
+    const id = req.params.id;
+
+    const optionType = await productOperations.getOptionTypeById(id);
+    const options = await productOperations.getOptionsForOptionTypeId(id);
+    const message = req.session.message;
+    req.session.message = undefined;
+    res.render('adminOptionType', {
+        user: req.user,
+        optionType: optionType,
+        options: options,
+        message: message,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.addOption = async function (req, res) {
+
+    const optionTypeId = req.body.optionTypeId;
+    const option = req.body.option;
+
+    const existingOption = await productOperations.getOptionByNameAndType(option, optionTypeId);
+
+    if (existingOption)
+        return res.status(400).json({ error: 'Option with this name already exists for this Option Type.' });
+
+    await productOperations.createOption(option, optionTypeId);
+    req.session.message = 'Option created!';
+    return res.status(201).json({});
+}
+
+exports.addOptionType = async function (req, res) {
+
+    const optionType = req.body.optionType;
+
+    const existingOptionType = await productOperations.getOptionTypeByName(optionType);
+
+    if (existingOptionType)
+        return res.status(400).json({ error: 'Option Type with this name already exists.' });
+
+    await productOperations.createOptionType(optionType);
+    req.session.message = 'Option Type created!';
+    return res.status(201).json({});
 }
 
 function getTimeDifference(date) {
@@ -623,7 +681,7 @@ async function getNotificationDetails(accountId) {
     const numberOfNotifications = notifications.length;
     notifications = notifications.slice(0, 3);
     notifications = notifications.map(n => {
-        return {id: n.id, link: n.link, text: n.text, longAgo: getTimeDifference(n.createdDttm) };
+        return { id: n.id, link: n.link, text: n.text, longAgo: getTimeDifference(n.createdDttm) };
     })
 
     return { numberOfNotifications: numberOfNotifications, notifications: notifications };

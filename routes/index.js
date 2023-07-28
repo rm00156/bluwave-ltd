@@ -39,6 +39,9 @@ router.post('/create_product', isAdmin, adminRequire2faSetup, adminDashboardCont
 router.post('/edit_product', isAdmin, adminRequire2faSetup, adminDashboardController.editProduct);
 router.post('/admin_dashboard/product_type/edit_product_type', isAdmin, adminRequire2faSetup, adminDashboardController.editProductType);
 router.get('/get_option_types_and_option_for_product', adminDashboardController.getOptionTypesAndOptionForProduct);
+router.post('/admin_dashboard/option/add', isAdmin, adminRequire2faSetup, adminDashboardController.addOption)
+router.post('/admin_dashboard/option_type/add', isAdmin, adminRequire2faSetup, adminDashboardController.addOptionType)
+
 
 router.post('/accept_cookie', homeController.acceptCookie);
 router.get('/logout', isLoggedIn, loginController.logout);
@@ -71,6 +74,8 @@ router.get('/admin_dashboard/account/:id/emails', isAdmin, adminRequire2faSetup,
 
 router.get('/admin_dashboard/order/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountOrderPage);
 router.get('/admin_dashboard/orders', isAdmin, adminRequire2faSetup, adminDashboardController.getOrdersPage);
+router.get('/admin_dashboard/option_types', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypesPage)
+router.get('/admin_dashboard/option_type/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypePage)
 
 router.get('/get_delivery_types', isAdmin, adminRequire2faSetup,adminDashboardController.getDeliveryTypes);
 router.get('/get_delivery_type',  isAdmin, adminRequire2faSetup,adminDashboardController.getDeliveryType);

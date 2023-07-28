@@ -104,6 +104,12 @@ async function getAllOptionTypes() {
     })
 }
 
+async function getAllOptionTypesWithOptions() {
+    return await models.sequelize.query('select distinct ot.* from optiontypes ot ' +
+        ' inner join options o on o.optionTypeFk = ot.id ',
+        {type:models.sequelize.QueryTypes.SELECT});
+}
+
 async function getAllQuantities() {
     return await models.quantity.findAll({
         order: [['quantity', 'ASC']],
@@ -639,6 +645,57 @@ async function searchProductsByName(search) {
                 {replacements:{search: '%' + search + '%'}, type: models.sequelize.QueryTypes.SELECT});
 }
 
+async function getOptionTypeById(id) {
+    return await models.optionType.findOne({
+        where: {
+            id: id
+        }
+    })
+}
+
+async function getOptionByName(name) {
+    return await models.option.findOne({
+        where: {
+            name: name
+        }
+    })
+}
+
+async function getOptionByNameAndType(name, optionTypeId) {
+    return await models.option.findOne({
+        where: {
+            name: name,
+            optionTypeFk: optionTypeId
+        }
+    })
+}
+
+async function createOption(name, optionTypeId) {
+
+    return models.option.create({
+        name: name,
+        optionTypeFk: optionTypeId,
+        deleteFl: false,
+        versionNo: 1
+    })
+}
+
+async function getOptionTypeByName(optionType) {
+    return models.optionType.findOne({
+        where: {
+            optionType: optionType
+        }
+    })
+}
+
+async function createOptionType(optionType) {
+    return models.optionType.create({
+        optionType: optionType,
+        deleteFl: false,
+        versionNo: 1
+    })
+}
+
 module.exports = {
     parseOptionTypesAndOption,
     getAllProductWithLowestPriceDetails,
@@ -678,5 +735,12 @@ module.exports = {
     getOptionGroupById,
     getOptionGroupItemsByOptionGroupId,
     searchProductTypesByName,
-    searchProductsByName
+    searchProductsByName,
+    getOptionTypeById,
+    getOptionByName,
+    createOption,
+    getAllOptionTypesWithOptions,
+    getOptionTypeByName,
+    createOptionType,
+    getOptionByNameAndType
   };
