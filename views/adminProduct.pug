@@ -274,7 +274,7 @@ html(land="en")
                                                     select.form-control#quantities(required multiple)
                                                         each quantity in quantities
                                                             option(value=quantity.id selected=(selectedQuantities.map(q => q.id).includes(quantity.id))) #{quantity.quantity}
-
+                                            input#matrixRows(type="hidden" value=matrixRows)
                                             .mb-3.col-lg-12.mt-5
                                                 .col-sm-12
                                                     label.form-label.mb-2 Price Matrix
@@ -294,7 +294,7 @@ html(land="en")
                                                                         
                                                                         each item in row 
                                                                             td
-                                                                                input.form-control.quantity(data-quantityid=item.quantityFk data-priceMatrixRowQuantityPriceId = item.priceMatrixRowQuantityPriceId type="text" required value=item.price)
+                                                                                input.form-control.quantity(data-quantityid=item.quantityFk data-priceMatrixRowQuantityPriceId = item.priceMatrixRowQuantityPriceId data-optiongroupid=item.optionGroupFk type="text" required value=item.price)
 
                                             #delivery-container
                                                 input#totalProductDelivery(type="hidden" value=productDeliveries.length)
@@ -321,7 +321,7 @@ html(land="en")
                                             .mb-3.col-sm-6.offset-sm-3
                                                 .d-grid
                                                     button.btn.btn-primary#createProduct(type='submit')
-                                                        | Edit Product
+                                                        | Save Changes
                        
 
 
