@@ -297,8 +297,29 @@ function handleRemoveSelectClick(event) {
     const container = document.getElementById('option-container');
     const removeButton = event.target;
     const inputRow = removeButton.parentNode.parentNode;
-    console.log(removeButton);
-    console.log(inputRow);
+    const rows = container.getElementsByClassName('row');
+
+    const rowsCount = rows.length;
+    const lastRow = rows[rowsCount - 2];
+    console.log(lastRow)
+    const plusButtonDiv = lastRow.getElementsByClassName('col-sm-1')[rowsCount == 2 ? 0 : 1];
+
+    if (plusButtonDiv.childElementCount === 0) {
+        const label = document.createElement('label');
+        label.classList.add('form-label');
+        label.classList.add('text-white');
+        label.append('Options')
+        const plusButton = document.createElement('button');
+        plusButton.textContent = '+';
+        plusButton.classList.add('add-btn');
+        plusButton.classList.add('btn');
+        plusButton.classList.add('btn-primary');
+        plusButton.type = 'button';
+
+        plusButton.addEventListener('click', handleAddSelectClick);
+        plusButtonDiv.append(label);
+        plusButtonDiv.append(plusButton);
+    }
     // Remove the input row from the container
     container.removeChild(inputRow);
     createPriceMatrix();
@@ -349,7 +370,10 @@ function handleAddSelectClick(event) {
     column2.classList.add('col-sm-5');
 
     const column3 = document.createElement('div');
-    column3.classList.add('col-sm-2');
+    column3.classList.add('col-sm-1');
+
+    const column4 = document.createElement('div');
+    column4.classList.add('col-sm-1');
 
     const label1 = document.createElement('label');
     label1.classList.add('form-label');
@@ -395,12 +419,26 @@ function handleAddSelectClick(event) {
     label3.classList.add('text-white');
     label3.append('Options')
 
+    const label4 = document.createElement('label');
+    label4.classList.add('form-label');
+    label4.classList.add('text-white');
+    label4.append('Options')
+
+    // Create a plus button for the new input row
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.classList.add('remove-btn-select');
+    removeButton.classList.add('btn');
+    removeButton.classList.add('btn-danger');
+    removeButton.type="button";
+
     // Create a plus button for the new input row
     const plusButton = document.createElement('button');
     plusButton.textContent = '+';
     plusButton.classList.add('add-btn-select');
     plusButton.classList.add('btn');
     plusButton.classList.add('btn-primary');
+    plusButton.type="button";
 
     // // Append the new input and plus button to the new input row
     column1.append(label1);
@@ -414,26 +452,31 @@ function handleAddSelectClick(event) {
 
     column3.append(label3);
     column3.appendChild(document.createElement('br'));
-    column3.appendChild(plusButton);
+    column3.appendChild(removeButton);
     newInputRow.appendChild(column3);
 
-    // // Append the new input row to the container
-    container.insertBefore(newInputRow, inputRow.nextSibling);
+    column4.append(label4);
+    column4.appendChild(document.createElement('br'));
+    column4.appendChild(plusButton);
+    newInputRow.appendChild(column4);
 
-    // // Change the original add button to a remove button
-    addButton.textContent = 'Remove';
-    addButton.classList.remove('add-btn-select');
-    addButton.classList.add('remove-btn-select');
-    addButton.classList.add('btn-danger');
-    addButton.type = 'button'
+    // // Append the new input row to the container
+    container.append(newInputRow);
+
+    // // // Change the original add button to a remove button
+    // addButton.textContent = 'Remove';
+    // addButton.classList.remove('add-btn-select');
+    // addButton.classList.add('remove-btn-select');
+    // addButton.classList.add('btn-danger');
+    // addButton.type = 'button'
 
     // // Attach the remove button click event
-    addButton.removeEventListener('click', handleAddSelectClick);
-    addButton.addEventListener('click', handleRemoveSelectClick);
-
+    removeButton.addEventListener('click', handleRemoveSelectClick);
+    addButton.parentNode.innerHTML = '';
     // // Attach the add button click event to the new input row
     plusButton.addEventListener('click', handleAddSelectClick);
     // rowCount++;
+
     $('.optionTypes').on('change', getOptions);
     $('.options').on('click', selectedOptions);
     createPriceMatrix();

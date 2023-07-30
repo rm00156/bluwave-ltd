@@ -74,8 +74,8 @@ router.get('/admin_dashboard/account/:id/emails', isAdmin, adminRequire2faSetup,
 
 router.get('/admin_dashboard/order/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountOrderPage);
 router.get('/admin_dashboard/orders', isAdmin, adminRequire2faSetup, adminDashboardController.getOrdersPage);
-router.get('/admin_dashboard/option_types', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypesPage)
-router.get('/admin_dashboard/option_type/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypePage)
+router.get('/admin_dashboard/option_types', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypesPage);
+router.get('/admin_dashboard/option_type/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypePage);
 
 router.get('/get_delivery_types', isAdmin, adminRequire2faSetup,adminDashboardController.getDeliveryTypes);
 router.get('/get_delivery_type',  isAdmin, adminRequire2faSetup,adminDashboardController.getDeliveryType);
