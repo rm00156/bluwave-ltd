@@ -329,6 +329,7 @@ async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
         ' inner join priceMatrixrows pr2 on pq2.priceMatrixRowFk = pr2.id ' +
         ' inner join priceMatrices pm2 on pr2.priceMatrixFk = pm2.id ' +
         ' where pm2.productFk = p.id ' +
+        ' and pm2.deleteFl = false ' +
         ' order by pq2.price asc limit 1 ) ' +
         ' and pm.deleteFl = false ', { type: models.sequelize.QueryTypes.SELECT});
 }
