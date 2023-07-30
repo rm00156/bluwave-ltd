@@ -16,17 +16,16 @@ function initialiseFileMap() {
 }
 
 function handleAddClick(event) {
-    if(rowCount == 6)
+    if (rowCount == 6)
         return;
     const container = document.getElementById('container');
     const addButton = event.target;
-    const inputRow = addButton.parentNode;
 
     // Create a new input row
     const newInputRow = document.createElement('div');
     newInputRow.classList.add('row');
     newInputRow.classList.add('mb-3');
-    
+
     const leftRow = document.createElement('div');
     leftRow.classList.add('col-sm-10');
 
@@ -59,11 +58,11 @@ function handleAddClick(event) {
     plusButton.classList.add('btn');
     plusButton.classList.add('btn-primary');
     plusButton.type = 'button';
-    
+
     // Append the new input and plus button to the new input row
     leftRow.appendChild(newInput);
     newInputRow.appendChild(leftRow);
-    
+
 
     rightRow.appendChild(removeButton);
     rightRow2.appendChild(plusButton);
@@ -83,7 +82,7 @@ function handleAddClick(event) {
     // // Attach the remove button click event
     // addButton.removeEventListener('click', handleAddClick);
     // 
-    
+
     addButton.parentNode.removeChild(addButton)
 
     // Attach the add button click event to the new input row
@@ -93,20 +92,20 @@ function handleAddClick(event) {
 }
 
 function handleAddDeliveryClick(event) {
-    if(deliveryRowCount == 6)
+    if (deliveryRowCount == 6)
         return;
 
     const deliveryOptionsElement = event.target.parentNode.parentNode;
     const deliveryPriceElement = deliveryOptionsElement.getElementsByClassName('delivery-price')[0];
-    if(deliveryPriceElement.value == '')
+    if (deliveryPriceElement.value == '')
         return;
 
     $.ajax({
-        type:'get',
-        url:'/get_delivery_types',
-        success: function(response, xhr, status) {
+        type: 'get',
+        url: '/get_delivery_types',
+        success: function (response, xhr, status) {
 
-            if(status.status == 200) {
+            if (status.status == 200) {
 
                 const previousSelectElement = deliveryOptionsElement.getElementsByClassName('delivery-select')[0];
                 selectedDeliveryIds.push(previousSelectElement.selectedOptions[0].value);
@@ -115,13 +114,13 @@ function handleAddDeliveryClick(event) {
                 const row = document.createElement('div');
                 row.classList.add('row');
                 row.classList.add('mb-3');
-            
+
                 const deliveryOptionColumn = document.createElement('div');
                 deliveryOptionColumn.classList.add('col-sm-5');
-            
+
                 const deliveryOptionColumnLabel = document.createElement('label');
                 deliveryOptionColumnLabel.classList.add('form-label');
-            
+
                 const selectDeliveryOption = document.createElement('select');
                 selectDeliveryOption.classList.add('form-control');
                 selectDeliveryOption.classList.add('delivery-select');
@@ -132,15 +131,15 @@ function handleAddDeliveryClick(event) {
                 const deliveryTypes = response.deliveryTypes.filter(d => !selectedDeliveryIds.includes(d.id.toString()));
 
                 deliveryTypes.forEach((deliveryType, index) => {
-                    if(index == 0) {
+                    if (index == 0) {
                         selectDeliveryOption.setAttribute('data-current-deliverytypeid', deliveryType.id);
                         const selects = deliveryContainer.getElementsByClassName('delivery-select');
                         selects.forEach(s => {
-                        
-                            if(s != selectDeliveryOption) {
+
+                            if (s != selectDeliveryOption) {
                                 s.options.forEach(o => {
-                                    
-                                    if(o.value == deliveryType.id) {
+
+                                    if (o.value == deliveryType.id) {
                                         s.removeChild(o)
                                     }
                                 });
@@ -171,12 +170,12 @@ function handleAddDeliveryClick(event) {
                 inputPriceElement.classList.add('delivery-price');
                 inputPriceElement.type = 'text';
                 inputPriceElement.required = true;
-                inputPriceElement.addEventListener('input', function() {
+                inputPriceElement.addEventListener('input', function () {
                     validateIsNumber(this);
-                  });
-                inputPriceElement.addEventListener('change', function() {
+                });
+                inputPriceElement.addEventListener('change', function () {
                     validateDecimal(this);
-                  });
+                });
 
                 deliveryOptionColumn2.append(deliveryPriceColumnLabel);
                 deliveryOptionColumn2.append(inputPriceElement);
@@ -205,7 +204,7 @@ function handleAddDeliveryClick(event) {
                 deliveryOptionColumn3.append(button);
 
                 row.append(deliveryOptionColumn3);
-            
+
                 deliveryContainer.append(row);
 
                 addButton.textContent = 'Remove';
@@ -220,7 +219,7 @@ function handleAddDeliveryClick(event) {
                 deliveryRowCount++;
             }
         }
-    })    
+    })
 }
 
 // Function to handle the remove button click event
@@ -228,8 +227,8 @@ function handleRemoveDeliveryClick(event) {
     const container = document.getElementById('delivery-container');
     const removeButton = event.target;
     const inputRow = removeButton.parentNode.parentNode;
-    
-    
+
+
     const select = inputRow.getElementsByClassName('delivery-select')[0];
     const selectId = select.selectedOptions[0].value;
     selectedDeliveryIds = selectedDeliveryIds.filter(d => d != selectId.toString());
@@ -238,11 +237,11 @@ function handleRemoveDeliveryClick(event) {
     deliveryRowCount--;
 
     $.ajax({
-        type:'get',
-        url:'/get_delivery_types',
-        success: function(response, xhr, status) {
+        type: 'get',
+        url: '/get_delivery_types',
+        success: function (response, xhr, status) {
 
-            if(status.status == 200) {
+            if (status.status == 200) {
                 const deliveryTypes = response.deliveryTypes;
 
                 const selects = document.getElementsByName('delivery[]');
@@ -273,12 +272,15 @@ function handleRemoveClick(event) {
     container.removeChild(inputRow);
     rowCount--;
 
-    if(rowCount == 1) {
-        const row = container.getElementsByClassName('row')[0];
-        console.log(container.getElementsByClassName('row'))
-        console.log(row)
-        const plusButtonDiv = row.getElementsByClassName('col-sm-1')[0];
+    const rows = container.getElementsByClassName('row');
 
+    const rowsCount = rows.length;
+    const lastRow = rows[rowsCount - 1];
+    console.log(container.getElementsByClassName('row'))
+    console.log(lastRow)
+    const plusButtonDiv = lastRow.getElementsByClassName('col-sm-1')[rowCount == 1 ? 0 : 1];
+
+    if (plusButtonDiv.childElementCount === 0) {
         const plusButton = document.createElement('button');
         plusButton.textContent = '+';
         plusButton.classList.add('add-btn');
@@ -303,20 +305,20 @@ function handleRemoveSelectClick(event) {
 }
 
 function handleAddSelectClick(event) {
-    
+
     const container = document.getElementById('option-container');
     const addButton = event.target;
     const inputRow = addButton.parentNode;
 
     const errorMessages = inputRow.parentNode.getElementsByClassName('text-danger');
-    if(errorMessages.length > 0) {
-        for(var i = 0; i < errorMessages.length; i++) {
+    if (errorMessages.length > 0) {
+        for (var i = 0; i < errorMessages.length; i++) {
             errorMessages[i].remove();
         }
     }
-    
+
     var selectedOptionText = inputRow.parentNode.getElementsByClassName('selectedOptions')[0];
-    if(selectedOptionText.value == '') {
+    if (selectedOptionText.value == '') {
         const error = document.createElement('p');
         error.classList.add('text-danger');
         error.append('Please select options before creating a new row');
@@ -325,21 +327,21 @@ function handleAddSelectClick(event) {
         return;
     }
 
-    var selectsArray = $('select[name="select[]"]').serializeArray().map(function(item) {
+    var selectsArray = $('select[name="select[]"]').serializeArray().map(function (item) {
         return item.value;
     });
-    
+
     var optionTypes = JSON.parse($('#optionTypes').val());
     optionTypes = optionTypes.filter(o => !selectsArray.includes((o.id).toString()));
-    
-    if(optionTypes.length == 0)
+
+    if (optionTypes.length == 0)
         return;
 
     // Create a new input row
     const newInputRow = document.createElement('div');
     newInputRow.classList.add('row');
     newInputRow.classList.add('mb-3');
-    
+
     const column1 = document.createElement('div');
     column1.classList.add('col-sm-5');
 
@@ -364,7 +366,7 @@ function handleAddSelectClick(event) {
     option.value = 0;
     newSelect.append(option);
 
-    for(var i = 0; i < optionTypes.length; i++) {
+    for (var i = 0; i < optionTypes.length; i++) {
         const optionType = optionTypes[i];
         const option = document.createElement('option');
         option.value = optionType.id;
@@ -392,7 +394,7 @@ function handleAddSelectClick(event) {
     label3.classList.add('form-label');
     label3.classList.add('text-white');
     label3.append('Options')
-    
+
     // Create a plus button for the new input row
     const plusButton = document.createElement('button');
     plusButton.textContent = '+';
@@ -441,7 +443,7 @@ function picture1Error() {
     $('#picture1Error').text('');
 
     const picture1 = fileMap.get(1);
-    if(picture1 == null) {
+    if (picture1 == null) {
         $('#picture1Error').text('Make sure the main picture has been set');
         return true
     }
@@ -452,8 +454,8 @@ function picture1Error() {
 function arrayFileMap() {
     var array = [];
     fileMap.forEach((value, key) => {
-        if(value != null) {
-            var item = { picture: key, blob: value};
+        if (value != null) {
+            var item = { picture: key, blob: value };
             array.push(item);
         }
     });
@@ -464,13 +466,13 @@ function arrayFileMap() {
 function createProduct(e) {
 
     const form = document.getElementById('form');
-    if(form.checkValidity()) {
+    if (form.checkValidity()) {
         e.preventDefault();
-        
+
 
         // do additional check
         // files, 
-        if(picture1Error()) {
+        if (picture1Error()) {
             return;
         }
 
@@ -483,21 +485,21 @@ function createProduct(e) {
             row.cells.forEach(cell => {
 
                 const optionId = cell.getAttribute('data-optionid');
-                if(optionId != undefined) {
+                if (optionId != undefined) {
                     optionIdGroup.push(optionId);
                 }
-                
+
                 const inputs = cell.getElementsByClassName('quantity');
-                if(inputs.length > 0) {
-                    const input = inputs[0]; 
+                if (inputs.length > 0) {
+                    const input = inputs[0];
                     const quantityId = input.getAttribute('data-quantityid');
-                    quantityGroup.push({id: quantityId, price: input.value});
+                    quantityGroup.push({ id: quantityId, price: input.value });
                 }
-                
+
             });
-            rowJson.push({optionIdGroup: optionIdGroup, quantityGroup: quantityGroup});
+            rowJson.push({ optionIdGroup: optionIdGroup, quantityGroup: quantityGroup });
         })
-        
+
 
         const filesAsArray = arrayFileMap();
         const rowJsonStringified = JSON.stringify(rowJson);
@@ -516,11 +518,11 @@ function createProduct(e) {
 
         var options = [];
         var optionsList = document.getElementsByName('options[]');
-    
+
         optionsList.forEach(selectedOptions => {
 
-            selectedOptions.forEach(selectedOption=> {
-                if(selectedOption.selected)
+            selectedOptions.forEach(selectedOption => {
+                if (selectedOption.selected)
                     options.push(selectedOption.value);
             })
         })
@@ -531,7 +533,7 @@ function createProduct(e) {
         var deleteFl = false;
 
         for (var i = 0; i < statusList.length; i++) {
-            if(statusList[i].value == 'deactive' && statusList[i].checked == true)
+            if (statusList[i].value == 'deactive' && statusList[i].checked == true)
                 deleteFl = true;
         }
 
@@ -543,7 +545,7 @@ function createProduct(e) {
         });
 
         const deliveryOptions = createSelectedDeliveryOptionsList();
-    
+
         data.append('deliveryOptions', JSON.stringify(deliveryOptions));
         data.append('rows', rowJsonStringified);
         data.append('productName', productName);
@@ -556,59 +558,59 @@ function createProduct(e) {
         data.append('quantities', quantities);
         data.append('deleteFl', deleteFl);
 
-        request.addEventListener('load', function(response){
-            
+        request.addEventListener('load', function (response) {
+
             return window.location = '/admin_dashboard/product/add_product';
-        
+
 
             // var job = data.currentTarget.response;
-            
+
             // jobs[job.id] = {id: job.id, state: "queued", totalSteps:job.totalSteps, productItemNumber: productItemNumber, productNumber: job.productNumber, productVariantId: job.productVariantId};
         });
 
-        request.open('post','/create_product');
+        request.open('post', '/create_product');
         request.send(data);
 
     } else {
         console.log('invalid')
         picture1Error();
     }
-    
 
-    
+
+
 }
 
 function handleChangeSelect(e) {
     console.log(e);
-    var selectsArray = $('select[name="select[]"]').serializeArray().map(function(item) {
+    var selectsArray = $('select[name="select[]"]').serializeArray().map(function (item) {
         return item.value;
-      });
-    
+    });
+
     console.log()
 }
 
 function getOptions(e) {
-    
+
     var optionsElement = (e.currentTarget.parentNode.parentNode).getElementsByClassName('options');
     while (optionsElement[0].options.length > 0) {
         optionsElement[0].remove(0);
     }
     var selectedOption = e.currentTarget.selectedOptions[0];
 
-    var data = {optionTypeId: selectedOption.value};
-    
+    var data = { optionTypeId: selectedOption.value };
+
     $.ajax({
         type: 'get',
         url: '/getOptionsForOptionType',
         data: data,
-        success: function(response, xhr) {
-            if(xhr.status == 404) {
+        success: function (response, xhr) {
+            if (xhr.status == 404) {
                 window.location = '/admin_dashboard';
                 console.log('error with getting options by option Type')
             } else {
 
                 var options = response;
-                for(var i = 0; i < options.length; i++) {
+                for (var i = 0; i < options.length; i++) {
                     var option = options[i];
                     var newOption = document.createElement('option');
                     newOption.value = option.id;
@@ -618,12 +620,12 @@ function getOptions(e) {
                     newOption.selected = false;
                     optionsElement[0].append(newOption);
                 }
-                
+
                 optionsElement[0].parentNode.getElementsByClassName('selectedOptions')[0].value = '';
                 createPriceMatrix();
                 // [0].text = '';
                 // createPriceMatrix();
-                
+
             }
 
         }
@@ -631,23 +633,23 @@ function getOptions(e) {
 }
 
 function selectedOptions(e) {
-   
+
     var selectedOptions = e.currentTarget.selectedOptions;
     var text = '';
-    for(var i = 0; i < selectedOptions.length; i++) {
+    for (var i = 0; i < selectedOptions.length; i++) {
         var selectedOption = selectedOptions[i];
         text = text + selectedOption.text + ', ';
     }
 
-    text = text.substring(0, text.length -2);
+    text = text.substring(0, text.length - 2);
 
     var selectedOptionsInput = (e.currentTarget.parentNode).getElementsByClassName('selectedOptions');
     selectedOptionsInput[0].value = text;
 
     var quantities = document.querySelectorAll("select[id='quantities']")[0].selectedOptions;
-    if(quantities.length > 0)
+    if (quantities.length > 0)
         createPriceMatrix();
-    
+
 }
 
 function createPriceMatrix() {
@@ -663,19 +665,19 @@ function createPriceMatrix() {
     });
     //todo another condition check all optiontypes have selectd ioptions
 
-    if(selectedOptions.length == 0)
+    if (selectedOptions.length == 0)
         return;
-    
+
     const map = new Map();
-   
+
     selectedOptions.forEach(selectedOption => {
         selectedOptionsOptionTypes.add(selectedOption[0].getAttribute('data-optiontypeid'));
 
         var optionType = selectedOption[0].getAttribute('data-optiontype');
-        
+
         selectedOption.forEach(op => {
-            var option = {option: op.text, id: op.value}
-            if(map.has(optionType)) {
+            var option = { option: op.text, id: op.value }
+            if (map.has(optionType)) {
                 var listOfOptions = map.get(optionType);
                 listOfOptions.push(option);
                 map.set(optionType, listOfOptions);
@@ -683,10 +685,10 @@ function createPriceMatrix() {
                 map.set(optionType, [option]);
             }
         })
-        
+
     })
     // console.log(map)
-    
+
     var optionTypes = document.querySelectorAll("select[name='select[]']");//.filter(o => o.selected);
     var selectedOptionTypes = [];
     optionTypes.forEach(optionType => {
@@ -694,24 +696,24 @@ function createPriceMatrix() {
         selectedOptionTypes.push(optionType.selectedOptions);
     })
 
-    if(selectedOptionsOptionTypes.size != selectedOptionTypes.length)
+    if (selectedOptionsOptionTypes.size != selectedOptionTypes.length)
         return;
 
     const columns = [];
-   
-    
-    for(var j = 0; j < selectedOptionTypes.length; j++) {
+
+
+    for (var j = 0; j < selectedOptionTypes.length; j++) {
         var selectedOptionType = selectedOptionTypes[j][0];
         var selectedOptionTypeText = selectedOptionType.text;
 
-        columns.push({columnName:selectedOptionTypeText, id: selectedOptionType.value, type:'OptionType' });
-        
+        columns.push({ columnName: selectedOptionTypeText, id: selectedOptionType.value, type: 'OptionType' });
+
     }
 
     var quantities = document.querySelectorAll("select[id='quantities']")[0].selectedOptions;
-    for(var k = 0; k < quantities.length; k++) {
+    for (var k = 0; k < quantities.length; k++) {
         var quantity = quantities[k];
-        columns.push({columnName: quantity.text, id: quantity.value, type: 'Quantity'});
+        columns.push({ columnName: quantity.text, id: quantity.value, type: 'Quantity' });
     }
 
     const table = document.createElement('table');
@@ -720,7 +722,7 @@ function createPriceMatrix() {
     table.classList.add('table-striped');
     const thead = document.createElement('thead');
     thead.classList.add('text-center')
-    
+
     columns.forEach(column => {
 
         const th = document.createElement('th');
@@ -734,7 +736,7 @@ function createPriceMatrix() {
     map.forEach((value, key) => {
         lists.push(value);
     });
-        
+
     const combinations = generateCombinations(lists);
 
     populateTable(table, combinations, quantities);
@@ -744,32 +746,32 @@ function createPriceMatrix() {
 function generateCombinations(lists) {
     // Base case: If there are no lists, return an empty combination
     if (lists.length === 0) {
-      return [[]];
+        return [[]];
     }
-  
+
     // Get the first list from the array
     const currentList = lists[0];
-  
+
     // Get the remaining lists
     const remainingLists = lists.slice(1);
-  
+
     // Generate combinations for the remaining lists
     const remainingCombinations = generateCombinations(remainingLists);
-  
+
     // Generate combinations for the current list
     const combinations = [];
     for (let option of currentList) {
-      for (let combination of remainingCombinations) {
-        // Combine the current option with each combination from the remaining lists
-        const newCombination = [option, ...combination];
-  
-        // Add the new combination to the combinations array
-        combinations.push(newCombination);
-      }
+        for (let combination of remainingCombinations) {
+            // Combine the current option with each combination from the remaining lists
+            const newCombination = [option, ...combination];
+
+            // Add the new combination to the combinations array
+            combinations.push(newCombination);
+        }
     }
-  
+
     return combinations;
-  }
+}
 
 function populateTable(table, combinations, quantities) {
 
@@ -784,7 +786,7 @@ function populateTable(table, combinations, quantities) {
             const cell = document.createElement('td');
             cell.append(item.option);
             cell.setAttribute('data-optionid', item.id);
-            
+
             row.append(cell);
         });
 
@@ -799,12 +801,12 @@ function populateTable(table, combinations, quantities) {
             input.required = true;
             // input.step = '0.01';
             // input.min = '0';
-            input.addEventListener('input', function() {
+            input.addEventListener('input', function () {
                 validateIsNumber(this);
-              });
-            input.addEventListener('change', function() {
+            });
+            input.addEventListener('change', function () {
                 validateDecimal(this);
-              });
+            });
 
             cell.append(input);
             row.append(cell);
@@ -817,7 +819,7 @@ function populateTable(table, combinations, quantities) {
     return table;
 }
 
-  function validateDecimal(input) {
+function validateDecimal(input) {
     const value = input.value;
     // Parse the input value as a floating-point number
     const number = parseFloat(value);
@@ -832,20 +834,20 @@ function populateTable(table, combinations, quantities) {
         // Update the input value with the rounded number
         input.value = roundedNumber;
     }
-  }
-  
-  function validateIsNumber(input) {
+}
+
+function validateIsNumber(input) {
     const value = input.value;
-  
+
     const regex = /^\d*\.?\d{0,2}$/;
-  
+
     if (!regex.test(value)) {
-      // Invalid input, clear the value or display an error message
-      input.value = '';
-      // Alternatively, you can display an error message to the user
-      // and prevent form submission until a valid value is entered.
+        // Invalid input, clear the value or display an error message
+        input.value = '';
+        // Alternatively, you can display an error message to the user
+        // and prevent form submission until a valid value is entered.
     }
-  }
+}
 
 function addPicture(event) {
 
@@ -855,8 +857,8 @@ function addPicture(event) {
     $('#' + input.id + 'Error').text('');
     if (selectedFiles.length > 0) {
         $('#' + input.id + 'Error').text('File Selected');
-    } 
-} 
+    }
+}
 
 function removePicture(event) {
     const button = event.currentTarget;
@@ -876,106 +878,104 @@ function removePicture(event) {
     // const input = button.parentNode.getElementsByClassName('picture')[0];
 }
 
-function setupCropWindow(event)
-{
+function setupCropWindow(event) {
     const input = event.currentTarget;
     var file = $('#' + input.id).prop('files');
     // const canvas = document.getElementById("canvas");
     // const ctx = canvas.getContext("2d");
     console.log(file);
-    if(file.length == 0)
-    {
+    if (file.length == 0) {
         resetLabel(input);
         // $('#' + input.id + 'Error').text('No picture has been selected for upload');
-        
+
     }
-    else if(file[0].size > 10240000)
-    {
+    else if (file[0].size > 10240000) {
         resetLabel(input);
 
-        $('#' + input.id + 'Error').text('The picture must not exceed size of 10MB');    
+        $('#' + input.id + 'Error').text('The picture must not exceed size of 10MB');
     }
-    else
-    {   
+    else {
         file = file[0];
         console.log(file)
-        $('#overlay').attr('style','display:block;z-index:99999');
-        $('#gif').attr('style','display:flex;justify-content: center');
-        
+        $('#overlay').attr('style', 'display:block;z-index:99999');
+        $('#gif').attr('style', 'display:flex;justify-content: center');
+
         url = URL.createObjectURL(file);
         var e = document.getElementById('uploadedImageForCrop');
-          // 272
-          basic = new Croppie(e,{
-              viewport: {
-                  width: 200,
-                  height: 200
-              },
-              enableOrientation:true,
-              enableExif:true });
-      
-          basic.bind({
-              url: url
-          })
+        // 272
+        basic = new Croppie(e, {
+            viewport: {
+                width: 200,
+                height: 200
+            },
+            enableOrientation: true,
+            enableExif: true
+        });
 
-          $('#rotate').on('click',function(e){
-              basic.rotate(parseInt(e.currentTarget.getAttribute('data-deg')));
-          });
+        basic.bind({
+            url: url
+        })
 
-          $('#gif').attr('style','display:none');
-          var confirmCropElement = document.getElementById('confirmCrop');
-          confirmCropElement.setAttribute('data-picture', input.id);
+        $('#rotate').on('click', function (e) {
+            basic.rotate(parseInt(e.currentTarget.getAttribute('data-deg')));
+        });
+
+        $('#gif').attr('style', 'display:none');
+        var confirmCropElement = document.getElementById('confirmCrop');
+        confirmCropElement.setAttribute('data-picture', input.id);
     }
 }
-  
-function confirmCrop(event)
-{
+
+function confirmCrop(event) {
     // var canvas = document.getElementById('canvas');
     // var ctx = canvas.getContext("2d");
     const pictureAttribute = event.currentTarget.getAttribute('data-picture');
     const pictureElement = document.getElementById(pictureAttribute);
     const labelElement = pictureElement.parentNode.getElementsByClassName('label')[0];
     const container = labelElement.parentNode;
-    basic.result({type:'blob',
-        size:'original',
-        quality:0.90,
-        format:'jpeg'}).then(function(blob) {
+    basic.result({
+        type: 'blob',
+        size: 'original',
+        quality: 0.90,
+        format: 'jpeg'
+    }).then(function (blob) {
 
-            var position = Number(pictureAttribute.replace('picture', ''));
-            fileMap.set(position, blob);
-            // $('#uploadedImageForCrop').empty();
-            // $('#cropSection').attr('style','display:none');
-            $('#overlay').attr('style','display:none');
-            // $('#canvas').attr('style','display:block;width:100%');
-            var uri = URL.createObjectURL(blob);
-            
-            labelElement.classList.remove('dropzone')
-            labelElement.style.backgroundImage = "url('" + uri + "')";
-            labelElement.style.backgroundSize = 'cover';
-            labelElement.style.backgroundPosition = 'center';
-            labelElement.textContent = '';
+        var position = Number(pictureAttribute.replace('picture', ''));
+        fileMap.set(position, blob);
+        // $('#uploadedImageForCrop').empty();
+        // $('#cropSection').attr('style','display:none');
+        $('#overlay').attr('style', 'display:none');
+        // $('#canvas').attr('style','display:block;width:100%');
+        var uri = URL.createObjectURL(blob);
 
-            const button = document.createElement('button');
-            button.classList.add('small-button');
-            button.classList.add('btn');
-            button.classList.add('btn-danger');
-            button.addEventListener('click', removePicture)
-            button.append('X');
-            container.append(button);
-            basic.destroy();
-            $('#reset').on('click', function(){
-                
-                
-            });
+        labelElement.classList.remove('dropzone')
+        labelElement.style.backgroundImage = "url('" + uri + "')";
+        labelElement.style.backgroundSize = 'cover';
+        labelElement.style.backgroundPosition = 'center';
+        labelElement.textContent = '';
 
-            // $('#confirmPicture').on('click', confirmPicture);
+        const button = document.createElement('button');
+        button.classList.add('small-button');
+        button.classList.add('btn');
+        button.classList.add('btn-danger');
+        button.addEventListener('click', removePicture)
+        button.append('X');
+        container.append(button);
+        basic.destroy();
+        $('#reset').on('click', function () {
 
-        })
+
+        });
+
+        // $('#confirmPicture').on('click', confirmPicture);
+
+    })
 }
 
 function resetLabel(input) {
     // todo need a map of pictures
     const labelElement = input.parentNode.getElementsByClassName('label')[0];
-    
+
     labelElement.classList.add('dropzone')
     labelElement.style.backgroundImage = "";
     labelElement.style.backgroundSize = '';
@@ -985,7 +985,7 @@ function resetLabel(input) {
     var position = Number((input.id).replace('picture', ''));
     fileMap.set(position, null);
     var labelText = '';
-    switch(input.id) {
+    switch (input.id) {
         case 'picture1': labelText = 'Add Main Picture';
             break;
         case 'picture2': labelText = 'Add Picture 2';
@@ -1002,12 +1002,12 @@ function resetLabel(input) {
 
 function setUpDeliveryPrice(input) {
 
-    input.addEventListener('input', function() {
+    input.addEventListener('input', function () {
         validateIsNumber(this);
-      });
-    input.addEventListener('change', function() {
+    });
+    input.addEventListener('change', function () {
         validateDecimal(this);
-      });
+    });
 }
 
 function createSelectedDeliveryOptionsList() {
@@ -1021,14 +1021,14 @@ function createSelectedDeliveryOptionsList() {
         const deliverySection = select.parentNode.parentNode;
 
         const price = deliverySection.getElementsByClassName('delivery-price')[0].value;
-        results.push({deliveryId: deliveryId, price: price});
+        results.push({ deliveryId: deliveryId, price: price });
     });
 
     return results;
 }
 
 function updateAllDeliverySelects(e) {
-    
+
     const select = e.currentTarget;
     const previousDeliveryTypeId = select.getAttribute('data-current-deliverytypeid');
 
@@ -1037,32 +1037,32 @@ function updateAllDeliverySelects(e) {
     select.setAttribute('data-current-deliverytypeid', newValue);
 
     const deliveryContainer = select.parentNode.parentNode.parentNode;
-    
-    
-    
+
+
+
     $.ajax({
         type: 'get',
         url: '/get_delivery_type',
-        data: {id: previousDeliveryTypeId},
-        success: function(response, xhr, status) {
-            if(status.status == 200) {
+        data: { id: previousDeliveryTypeId },
+        success: function (response, xhr, status) {
+            if (status.status == 200) {
 
                 const deliveryType = response.deliveryType;
                 const deliveryTypeName = deliveryType.name;
                 const selects = deliveryContainer.getElementsByClassName('delivery-select');
                 selects.forEach(s => {
-                    if(s != select) {
-                        
+                    if (s != select) {
+
                         s.options.forEach(o => {
-                            if(o.value == newValue) {
+                            if (o.value == newValue) {
                                 s.removeChild(o);
                             };
                         });
-            
+
                         const option = document.createElement('option');
                         option.value = previousDeliveryTypeId;
                         option.text = deliveryTypeName;
-            
+
                         s.append(option);
                     }
                 })
@@ -1072,7 +1072,7 @@ function updateAllDeliverySelects(e) {
 }
 
 // Attach the add button click event to the initial input row
-$(function(){
+$(function () {
 
     const addButton = document.querySelector('.add-btn');
     addButton.addEventListener('click', handleAddClick);
@@ -1086,10 +1086,10 @@ $(function(){
     const deliveryPriceInput = this.documentElement.getElementsByClassName('delivery-price')[0];
     setUpDeliveryPrice(deliveryPriceInput);
     $('#createProduct').on('click', createProduct);
-    
+
     $('.optionTypes').on('change', getOptions);
     $('.options').on('click', selectedOptions);
-    
+
     $('#quantities').on('change', createPriceMatrix);
     // $('.picture').on('change', addPicture);
     $('.picture').on('change', setupCropWindow);

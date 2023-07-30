@@ -173,20 +173,20 @@ html(land="en")
                                                     .col-sm-10
                                                         
                                                         input.form-control(type='text' required name='input[]' value=product.descriptionPoint1)
-                                                    .col-sm-2
-                                                        if(product.descriptionPoint2 != null)
-                                                            button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
-                                                        else
+                                                    .col-sm-1
+                                                        if(product.descriptionPoint2 == null)
                                                             button.btn.btn-primary.add-btn(type='button') +
+                                                    .col-sm-1 
+
                                                 if(product.descriptionPoint2)
                                                     .row.mb-3
                                                         .col-sm-10
                                                             
                                                             input.form-control(type='text' required name='input[]' value=product.descriptionPoint2)
-                                                        .col-sm-2
-                                                            if(product.descriptionPoint3 != null)
-                                                                button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
-                                                            else
+                                                        .col-sm-1
+                                                            button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
+                                                        .col-sm-1
+                                                            if(product.descriptionPoint3 == null)
                                                                 button.btn.btn-primary.add-btn(type='button') +
 
                                                 if(product.descriptionPoint3)
@@ -194,10 +194,10 @@ html(land="en")
                                                         .col-sm-10
                                                             
                                                             input.form-control(type='text' required name='input[]' value=product.descriptionPoint3)
-                                                        .col-sm-2
-                                                            if(product.descriptionPoint4 != null)
-                                                                button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
-                                                            else
+                                                        .col-sm-1
+                                                            button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
+                                                        .col-sm-1
+                                                            if(product.descriptionPoint4 == null)
                                                                 button.btn.btn-primary.add-btn(type='button') +
                                                 
                                                 if(product.descriptionPoint4)
@@ -205,10 +205,10 @@ html(land="en")
                                                         .col-sm-10
                                                             
                                                             input.form-control(type='text' required name='input[]' value=product.descriptionPoint4)
-                                                        .col-sm-2
-                                                            if(product.descriptionPoint5 != null)
-                                                                button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
-                                                            else
+                                                        .col-sm-1
+                                                            button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
+                                                        .col-sm-1
+                                                            if(product.descriptionPoint5 == null)
                                                                 button.btn.btn-primary.add-btn(type='button') +
 
                                                 if(product.descriptionPoint5)
@@ -216,18 +216,19 @@ html(land="en")
                                                         .col-sm-10
                                                             
                                                             input.form-control(type='text' required name='input[]' value=product.descriptionPoint5)
-                                                        .col-sm-2
-                                                            if(product.descriptionPoint6 != null)
-                                                                button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
-                                                            else
+                                                        .col-sm-1
+                                                            button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
+                                                        .col-sm-1
+                                                            if(product.descriptionPoint6 == null)
                                                                 button.btn.btn-primary.add-btn(type='button') +
 
                                                 if(product.descriptionPoint6)
                                                     .row.mb-3
                                                         .col-sm-10
                                                             input.form-control(type='text' required name='input[]' value=product.descriptionPoint6)
-                                                        .col-sm-2
-                                                            button.btn.btn-primary.add-btn(type='button') +
+                                                        .col-sm-1
+                                                            button.btn.btn-primary.description-point.remove-btn.btn-danger(type='button') Remove
+                                                        .col-sm-1
                                             //- .mb-3.col-lg-6 
                                                 label.form-label Description Bullet Point 1
                                                 .input-row

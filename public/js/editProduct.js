@@ -235,7 +235,10 @@ function handleAddClick(event) {
     leftRow.classList.add('col-sm-10');
 
     const rightRow = document.createElement('div');
-    rightRow.classList.add('col-sm-2');
+    rightRow.classList.add('col-sm-1');
+
+    const rightRow2 = document.createElement('div');
+    rightRow2.classList.add('col-sm-1');
 
     // Create a new input field
     const newInput = document.createElement('input');
@@ -244,6 +247,14 @@ function handleAddClick(event) {
     newInput.name = 'input[]';
     newInput.required = true;
 
+    // Create a plus button for the new input row
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.classList.add('remove-btn');
+    removeButton.classList.add('btn');
+    removeButton.classList.add('btn-danger');
+    removeButton.type = 'button';
+    removeButton.addEventListener('click', handleRemoveClick);
 
     // Create a plus button for the new input row
     const plusButton = document.createElement('button');
@@ -257,22 +268,26 @@ function handleAddClick(event) {
     leftRow.appendChild(newInput);
     newInputRow.appendChild(leftRow);
 
-    rightRow.appendChild(plusButton);
+    rightRow.appendChild(removeButton);
+    rightRow2.appendChild(plusButton);
     newInputRow.appendChild(rightRow);
+    newInputRow.appendChild(rightRow2);
 
     // Append the new input row to the container
-    container.insertBefore(newInputRow, inputRow.nextSibling);
+    container.append(newInputRow);
 
-    // Change the original add button to a remove button
-    addButton.textContent = 'Remove';
-    addButton.classList.remove('add-btn');
-    addButton.classList.add('remove-btn');
-    addButton.classList.add('btn-danger');
-    addButton.type = 'button';
+    // // Change the original add button to a remove button
+    // addButton.textContent = 'Remove';
+    // addButton.classList.remove('add-btn');
+    // addButton.classList.add('remove-btn');
+    // addButton.classList.add('btn-danger');
+    // addButton.type = 'button';
 
-    // Attach the remove button click event
-    addButton.removeEventListener('click', handleAddClick);
-    addButton.addEventListener('click', handleRemoveClick);
+    // // Attach the remove button click event
+    // addButton.removeEventListener('click', handleAddClick);
+    // addButton.addEventListener('click', handleRemoveClick);
+
+    addButton.parentNode.removeChild(addButton)
 
     // Attach the add button click event to the new input row
     plusButton.addEventListener('click', handleAddClick);
@@ -289,6 +304,26 @@ function handleRemoveClick(event) {
     // Remove the input row from the container
     container.removeChild(inputRow);
     rowCount--;
+
+    const rows = container.getElementsByClassName('row');
+
+    const rowsCount = rows.length;
+    const lastRow = rows[rowsCount - 1];
+    console.log(container.getElementsByClassName('row'))
+    console.log(lastRow)
+    const plusButtonDiv = lastRow.getElementsByClassName('col-sm-1')[rowCount == 1 ? 0 : 1];
+
+    if (plusButtonDiv.childElementCount === 0) {
+        const plusButton = document.createElement('button');
+        plusButton.textContent = '+';
+        plusButton.classList.add('add-btn');
+        plusButton.classList.add('btn');
+        plusButton.classList.add('btn-primary');
+        plusButton.type = 'button';
+
+        plusButton.addEventListener('click', handleAddClick);
+        plusButtonDiv.append(plusButton);
+    }
 }
 
 function handleAddSelectClick(event) {
@@ -1007,7 +1042,10 @@ function updateAllDeliverySelects(e) {
 $(function () {
 
     const addButton = document.querySelector('.add-btn');
-    addButton.addEventListener('click', handleAddClick);
+    if(addButton) {
+        addButton.addEventListener('click', handleAddClick);
+    }
+    
 
     // const addSelectButton = document.querySelector('.add-btn-select');
     // addSelectButton.addEventListener('click', handleAddSelectClick);

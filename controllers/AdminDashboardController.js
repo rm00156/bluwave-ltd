@@ -240,7 +240,7 @@ exports.editProduct = async function (req, res) {
     const deleteFl = JSON.parse(req.body.deleteFl);
     const deliveryOptions = JSON.parse(req.body.deliveryOptions);
 
-    const transaction = await models.sequelize.transaction();
+    // const transaction = await models.sequelize.transaction();
 
     try {
         const s3PathMap = await productOperations.uploadPictures('Products/', productName, files);
@@ -281,11 +281,11 @@ exports.editProduct = async function (req, res) {
 
     } catch (err) {
         console.log(err);
-        await transaction.rollback();
+        // await transaction.rollback();
         req.session.message = 'Error Updating product, please contact support'
         return res.status(500).send(err);
     }
-    await transaction.commit();
+    // await transaction.commit();
 
     res.status(200).json({});
 }
