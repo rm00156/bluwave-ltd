@@ -9,7 +9,14 @@ html(land="en")
     link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
     // main
     div
-
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        
         +adminTopNavbar()
         .main-wrapper
             // navbar vertical
@@ -31,24 +38,13 @@ html(land="en")
                                             li.breadcrumb-item.active(aria-current='page') Product Types
                                 // button
                                 div
-                                    a.btn.btn-primary(href='/admin_dashboard/product/add_product_type') Add Product Type
+                                    a.btn.btn-primary(href='/admin_dashboard/add_product_type') Add Product Type
                     // row
                     .row
                         .col-xl-12.col-12.mb-5
                             // card
                             .card.h-100.card-lg
-                                //- .px-6.py-6
-                                    .row.justify-content-between
-                                        // form
-                                        .col-lg-4.col-md-6.col-12.mb-2.mb-lg-0
-                                            form.d-flex(role='search')
-                                                input.form-control(type='search' placeholder='Search Products' aria-label='Search')
-                                        // select option
-                                        .col-lg-2.col-md-4.col-12
-                                            select.form-select
-                                                option(selected='') Status
-                                                option(value='active') Active
-                                                option(value='deactive') Deactive
+                                
                                 // card body
                                 .card-body.p-0(style="padding: 20px !important")
                                     // table
@@ -80,38 +76,36 @@ html(land="en")
                                                                 span.badge.bg-light-primary.text-dark-primary Active
                                                             else 
                                                                 span.span.badge.bg-light-danger.text-dark-danger Deactive
+        //- #addProductTypeModal.modal.fade(tabindex='-1' aria-labelledby='addProductTypeModalLabel' aria-hidden='true')
+            .modal-dialog
+                .modal-content
+                    // modal body
+                    .modal-body.p-6
+                        .d-flex.justify-content-between.mb-5
+                            // heading
+                            div
+                                h5#addProductTypeModalLabel.h6.mb-1 Add Product Type
+                            div
+                                // button
+                                button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                        // row
+                        form#form(method="/" action='post')
+                            .row.g-3
+                                // col
+                                .col-12
+                                    label.mb-2 Product Type
+                                    input.form-control#productType(type="text" required)
+                                    p.text-danger#error
+                                // button
+                                .col-12.text-end
+                                    button.btn.btn-outline-primary(style="margin-right:10px" type='button' data-bs-dismiss='modal') Cancel
+                                    button.btn.btn-primary#addProductType(type='submit') Add Product Type                                                   
                                                         
-                                                        //- td
-                                                            .dropdown
-                                                                a.text-reset(href='#' data-bs-toggle='dropdown' aria-expanded='false')
-                                                                    i.feather-icon.icon-more-vertical.fs-5
-                                                                ul.dropdown-menu
-                                                                    li
-                                                                        a.dropdown-item(href='#')
-                                                                            i.bi.bi-trash.me-3
-                                                                            | Delete
-                                                                    li
-                                                                        a.dropdown-item(href='#')
-                                                                            i.bi.bi-pencil-square.me-3
-                                                                            | Edit
-                                                
-                                //- .border-top.d-md-flex.justify-content-between.align-items-center.px-6.py-6
-                                    span Showing 1 to 8 of 12 entries
-                                    nav.mt-2.mt-md-0
-                                        ul.pagination.mb-0
-                                            li.page-item.disabled
-                                                a.page-link(href='#!') Previous
-                                            li.page-item
-                                                a.page-link.active(href='#!') 1
-                                            li.page-item
-                                                a.page-link(href='#!') 2
-                                            li.page-item
-                                                a.page-link(href='#!') 3
-                                            li.page-item
-                                                a.page-link(href='#!') Next
+                                
 
 
 
         +adminScripts()
         script(src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
         script(src="/js/adminProductTypes.js")
+        script(src="/js/adminDashboard.js")

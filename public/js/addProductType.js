@@ -1,4 +1,4 @@
-var pictureJson = {path: $('#bannerPath').val() , blob: null, remove: false};
+var pictureJson = {path: null , blob: null, remove: true};
 
 function removePicture(event) {
     const button = event.currentTarget;
@@ -13,7 +13,6 @@ function removePicture(event) {
 
     // Dispatch the event on the file input element
     input.dispatchEvent(newEvent);
-    
 }
 
 function resetLabel(input) {
@@ -38,7 +37,7 @@ function setupCropWindow(event)
     console.log(file);
     if(file.length == 0)
     {
-        resetLabel(input);      
+        resetLabel(input);        
     }
     else if(file[0].size > 10240000)
     {
@@ -80,6 +79,8 @@ function setupCropWindow(event)
 
 function confirmCrop(event)
 {
+    // var canvas = document.getElementById('canvas');
+    // var ctx = canvas.getContext("2d");
     const pictureAttribute = event.currentTarget.getAttribute('data-picture');
     const pictureElement = document.getElementById(pictureAttribute);
     const labelElement = pictureElement.parentNode.getElementsByClassName('label')[0];
@@ -90,8 +91,10 @@ function confirmCrop(event)
         format:'jpeg'}).then(function(blob) {
 
             pictureJson = {path: pictureJson.path, blob, remove: false };
-
+            // $('#uploadedImageForCrop').empty();
+            // $('#cropSection').attr('style','display:none');
             $('#overlay').attr('style','display:none');
+            // $('#canvas').attr('style','display:block;width:100%');
             var uri = URL.createObjectURL(blob);
             
             labelElement.classList.remove('dropzone')
@@ -118,50 +121,38 @@ function confirmCrop(event)
         })
 }
 
-function editProductType(e) {
-
+function addProductType(e) {
     $('#error').text('');
     const form = document.getElementById('form');
     if(form.checkValidity()) {
         e.preventDefault();
-        console.log('reece')
 
-        // do additional check
-        // files, 
+
         if(picture1Error()) {
             return;
         }
 
-        var statusList = document.getElementsByName('statusOptions');
-        var deleteFl = false;
-
-        for (var i = 0; i < statusList.length; i++) {
-            if(statusList[i].value == 'deactive' && statusList[i].checked == true)
-                deleteFl = true;
-        }
-
         const productTypeName = $('#name').val();
-        const productTypeId = $('#productTypeId').val();
 
         var data = new FormData();
         var request = new XMLHttpRequest();
         request.responseType = 'json';
 
         data.append('productTypeName', productTypeName);
-        data.append('productTypeId', productTypeId);
         data.append('bannerBlob',  pictureJson.blob);
-        data.append('bannerRemove', pictureJson.remove);
-        data.append('deleteFl', deleteFl);
 
-        request.addEventListener('load', function(response){
+        request.addEventListener('load', function(response, xhr, status){
+            
             if(request.status == 201) {
-                return window.location = '/admin_dashboard/product_type/' + $('#productTypeId').val();
+                return window.location = '/admin_dashboard/product_types';
             } else {
+                
                 $('#error').text(response.currentTarget.response.error);
             }
+            
         });
 
-        request.open('post','/admin_dashboard/product_type/edit_product_type');
+        request.open('post','/admin_dashboard/product_type/add');
         request.send(data);
 
     } else {
@@ -187,5 +178,5 @@ $(function(){
     $('#confirmCrop').on('click', confirmCrop);
     $('.picture').on('change', setupCropWindow);
     $('.small-button').on('click', removePicture);
-    $('#form').on('submit', editProductType);
+    $('#form').on('submit', addProductType);
 })

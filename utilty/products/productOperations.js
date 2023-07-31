@@ -599,7 +599,7 @@ async function getAllProductTypesWithNumberOfProducts() {
 
 async function updateProductType(productTypeDetails) {
     await models.productType.update({
-        name: productTypeDetails.productTypeName,
+        productType: productTypeDetails.productTypeName,
         bannerPath: productTypeDetails.bannerPath,
         deleteFl: productTypeDetails.deleteFl,
         versionNo: models.sequelize.literal('versionNo + 1')
@@ -607,6 +607,15 @@ async function updateProductType(productTypeDetails) {
         where: {
             id: productTypeDetails.productTypeId
         }
+    })
+}
+
+async function createProductType(productTypeDetails) {
+    return await models.productType.create({
+        productType: productTypeDetails.productType,
+        bannerPath: productTypeDetails.bannerPath,
+        deleteFl: productTypeDetails.deleteFl,
+        versionNo: 1
     })
 }
 
@@ -697,6 +706,59 @@ async function createOptionType(optionType) {
     })
 }
 
+async function getNavigationBarHeaders() {
+    return models.navigationBar.findOne({
+        where:{
+            deleteFl: false
+        }
+    })
+}
+
+async function updateNavigationBarHeaders(ids) {
+
+    await models.navigationBar.update({
+        productTypeFk1: ids[0] == 0 ? null: ids[0],
+        productTypeFk2: ids[1] == 0 ? null: ids[1],
+        productTypeFk3: ids[2] == 0 ? null: ids[2],
+        productTypeFk4: ids[3] == 0 ? null: ids[3],
+        productTypeFk5: ids[4] == 0 ? null: ids[4],
+        productTypeFk6: ids[5] == 0 ? null: ids[5],
+        productTypeFk7: ids[6] == 0 ? null: ids[6],
+        productTypeFk8: ids[7] == 0 ? null: ids[7],
+        productTypeFk9: ids[8] == 0 ? null: ids[8],
+        productTypeFk10: ids[9] == 0 ? null: ids[9],
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id: 1
+        }
+    })
+}
+
+async function getNavigationBarHeadersAndProducts() {
+
+    const navigationBarHeaders = await models.navigationBar.findOne({
+        where: {
+            deleteFl: false
+        }
+    });
+
+    const result = [];
+    for(var i = 1; i <= 10; i++) {
+
+        const productTypeId = navigationBarHeaders['productTypeFk' + i];
+
+        if(productTypeId != null) {
+
+            const productType = await getProductTypeById(productTypeId);
+            const products = await getAllProductsByProductTypeId(productTypeId);
+            result.push({name: productType.productType, products: products});
+        }
+    }
+
+    return result;
+}
+
 module.exports = {
     parseOptionTypesAndOption,
     getAllProductWithLowestPriceDetails,
@@ -743,5 +805,9 @@ module.exports = {
     getAllOptionTypesWithOptions,
     getOptionTypeByName,
     createOptionType,
-    getOptionByNameAndType
+    getOptionByNameAndType,
+    getNavigationBarHeaders,
+    updateNavigationBarHeaders,
+    getNavigationBarHeadersAndProducts,
+    createProductType
   };

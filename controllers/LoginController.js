@@ -5,13 +5,15 @@ const accountOperations = require('../utilty/account/accountOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const productOperations = require('../utilty/products/productOperations');
 
-function getAdminLoginPage(req,res)
+async function getAdminLoginPage(req,res)
 {
     req.session.attempt = 0;
     var error = req.query.error;
-    
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('adminLogin', {user:req.user,
                               error:error,
+                              allProductTypes: allProductTypes,
                               companyDetails: companyInfo.getCompanyDetails()});
 }
 
@@ -42,7 +44,12 @@ function adminLogin(req,res,next)
 
 async function adminLoginStepTwo(req,res)
 {
-    res.render('adminLoginStepTwo', {user:req.user, companyDetails: companyInfo.getCompanyDetails()});
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
+    res.render('adminLoginStepTwo', {
+            user:req.user,
+            allProductTypes: allProductTypes,
+         companyDetails: companyInfo.getCompanyDetails()});
 }
 
 function logout(req,res)
@@ -56,8 +63,10 @@ function logout(req,res)
 async function getLoginPage(req,res)
 {
     var displayCookieMessage = req.body.displayCookieMessage;
-    
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('login',{user: req.user, 
+                        allProductTypes: allProductTypes,
                         displayCookieMessage:displayCookieMessage, companyDetails: companyInfo.getCompanyDetails()});
 }
 
@@ -148,27 +157,18 @@ const render_AdminLogin = function(req,res)
 }
 
 async function render_checkoutLogin(req, res, error) {
-    const flyerProducts = await productOperations.getActiveProductsForProductTypeName('Flyers & Leaflets');
-    const businessCards = await productOperations.getActiveProductsForProductTypeName('Business Cards');
-    const brochures = await productOperations.getActiveProductsForProductTypeName('Brochures');
-    const books = await productOperations.getActiveProductsForProductTypeName('Books');
-    const rollerBanners = await productOperations.getActiveProductsForProductTypeName('Roller Banners');
-    const posters = await productOperations.getActiveProductsForProductTypeName('Posters');
-    const cards = await productOperations.getActiveProductsForProductTypeName('Cards');
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     var displayCookieMessage = req.body.displayCookieMessage;
 
     res.render('checkoutLogin', 
                 {   user: req.user, error: error, 
                     companyDetails: companyInfo.getCompanyDetails(),
-                    flyerProducts: flyerProducts,
-                    businessCards: businessCards,
-                    brochures: brochures,
-                    books: books,
-                    rollerBanners: rollerBanners,
-                    posters: posters,
-                    cards: cards,
+                    navigationBarHeaders: navigationBarHeaders,
                     basketItems: basketItems,
+                    allProductTypes: allProductTypes,
                     displayCookieMessage: displayCookieMessage});
 }
 

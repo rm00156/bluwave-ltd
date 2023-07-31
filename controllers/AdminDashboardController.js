@@ -160,9 +160,12 @@ exports.getProductPage = async function (req, res) {
 exports.getProductTypesPage = async function (req, res) {
 
     const productTypes = await productOperations.getAllProductTypesWithNumberOfProducts();
+    const message = req.session.message;
+    req.session.message = undefined;
 
     res.render('adminProductTypes', {
         user: req.user,
+        message: message,
         productTypes: productTypes,
         companyDetails: companyInfo.getCompanyDetails()
     })
@@ -306,6 +309,12 @@ exports.getProductTypePage = async function (req, res) {
 
 exports.editProductType = async function (req, res) {
     const productTypeName = req.body.productTypeName;
+
+    const existingProductType = await productOperations.getProductTypeByType(productTypeName);
+
+    if (existingProductType)
+        return res.status(400).json({ error: 'Product Type with this name already exists.' });
+
     const productTypeId = req.body.productTypeId;
     const files = req.files;
     const deleteFl = JSON.parse(req.body.deleteFl);
@@ -335,7 +344,7 @@ exports.editProductType = async function (req, res) {
         console.log(err);
         await transaction.rollback();
         req.session.message = 'Error Updating product type, please contact support'
-        return res.status(500).send(err);
+        return res.status(400).send(err);
     }
 
     await transaction.commit();
@@ -581,6 +590,142 @@ exports.addOptionType = async function (req, res) {
     req.session.message = 'Option Type created!';
     return res.status(201).json({});
 }
+
+exports.getAddProductTypePage = async function(req, res) {
+    res.render('addProductType', {
+        user: req.user,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.addProductType = async function (req, res) {
+
+    const productTypeName = req.body.productTypeName;
+
+    const existingProductType = await productOperations.getProductTypeByType(productTypeName);
+
+    if (existingProductType)
+        return res.status(400).json({ error: 'Product Type with this name already exists.' });
+
+    const files = req.files;
+    // const deleteFl = JSON.parse(req.body.deleteFl);
+
+    const transaction = await models.sequelize.transaction();
+
+    try {
+        var s3PathMap = null;
+        if (files != null) {
+            s3PathMap = await productOperations.uploadPictures('ProductTypes/', productTypeName, files);
+        }
+
+        var productTypeDetails = {
+            productType: productTypeName,
+            deleteFl: false
+        };
+
+        if (s3PathMap != null) {
+            productTypeDetails['bannerPath'] = s3PathMap.get('banner');
+        }
+
+        await productOperations.createProductType(productTypeDetails);
+        req.session.message = 'Product Type' + productTypeName + ' has been successfully created';
+
+    } catch (err) {
+        console.log(err);
+        await transaction.rollback();
+        req.session.message = 'Error Creating product type, please contact support'
+        return res.status(400).send(err);
+    }
+
+    await transaction.commit();
+    res.status(201).json({});
+}
+
+exports.getNavigationBarPage = async function(req, res) {
+
+    const message = req.session.message;
+    req.session.message = undefined;
+
+    const productTypes = await productOperations.getAllActiveProductTypes();
+    const navigationBarHeaders = await productOperations.getNavigationBarHeaders();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
+    res.render('navigationBarHeaders', {
+        user: req.user,
+        navigationBarHeaders: navigationBarHeaders,
+        productTypes: productTypes,
+        allProductTypes: allProductTypes,
+        message: message,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.setNavigationBarHeaders = async function setNavigationBarHeaders(req, res) {
+
+    const ids = [
+         Number(req.body.position1),
+         Number(req.body.position2),
+         Number(req.body.position3),
+         Number(req.body.position4),
+         Number(req.body.position5),
+         Number(req.body.position6),
+         Number(req.body.position7),
+         Number(req.body.position8),
+         Number(req.body.position9),
+         Number(req.body.position10),
+    ]
+
+    if(!checkNoDuplicateNonZeroNumbers(ids)) {
+        return res.status(400).json({error: 'You have selected a product type more than once.'})
+    }
+    const transaction = await models.sequelize.transaction();
+
+    try {
+        await productOperations.updateNavigationBarHeaders(ids);
+    } catch(err) {
+
+        console.log(err)
+        await transaction.rollback();
+        return res.status(400).json({error: 'Unable to make the update. Contact support.'})
+    }
+    
+    await transaction.commit();
+    
+    req.session.message = "Navigation Bar Headers Updated!"
+    res.status(200).json({});
+}
+
+function checkNoDuplicateNonZeroNumbers(arr) {
+    // Create a set to keep track of seen elements (excluding 0)
+    const seen = new Set();
+    // Create a set to keep track of seen non-zero elements
+    const nonZeroSeen = new Set();
+  
+    for (const num of arr) {
+      if (num === 0) {
+        // Ignore 0 and continue to the next element
+        continue;
+      }
+  
+      if (nonZeroSeen.has(num)) {
+        // If any non-zero number is already seen, return false
+        return false;
+      }
+  
+      // Add non-zero numbers to the seen set
+      nonZeroSeen.add(num);
+        if (seen.has(num)) {
+        // If any non-zero number is already seen (including 0), return false
+        return false;
+      }
+  
+      // Add all numbers (including 0) to the seen set
+      seen.add(num);
+    }
+  
+    // If the loop finishes without returning false, there are no duplicate non-zero numbers
+    return true;
+  }
 
 function getTimeDifference(date) {
     const currentDate = new Date();

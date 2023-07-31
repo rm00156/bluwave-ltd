@@ -6,26 +6,17 @@ const queueOperations = require('../utilty/queue/queueOperations');
 
 exports.getHomePage = async function(req, res) {
 
-    const flyerProducts = await productOperations.getActiveProductsForProductTypeName('Flyers & Leaflets');
-    const businessCards = await productOperations.getActiveProductsForProductTypeName('Business Cards');
-    const brochures = await productOperations.getActiveProductsForProductTypeName('Brochures');
-    const books = await productOperations.getActiveProductsForProductTypeName('Books');
-    const rollerBanners = await productOperations.getActiveProductsForProductTypeName('Roller Banners');
-    const posters = await productOperations.getActiveProductsForProductTypeName('Posters');
-    const cards = await productOperations.getActiveProductsForProductTypeName('Cards');
     const basketItems = await basketoperations.getActiveBasketItemsForAccount(req.user.id);
     var displayCookieMessage = req.body.displayCookieMessage;
 
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('home', {user: req.user,
-                        flyerProducts: flyerProducts,
-                        businessCards: businessCards,
-                        brochures: brochures,
-                        books: books,
-                        rollerBanners: rollerBanners,
-                        posters: posters,
-                        cards: cards,
                         basketItems: basketItems,
                         displayCookieMessage: displayCookieMessage,
+                        navigationBarHeaders: navigationBarHeaders,
+                        allProductTypes: allProductTypes,
                         companyDetails: companyInfo.getCompanyDetails()});
 }
 
@@ -49,9 +40,12 @@ exports.getErrorPage = function(req, res) {
         companyDetails: companyInfo.getCompanyDetails()});
 }
 
-exports.getForgotPasswordPage = function(req, res) {
+exports.getForgotPasswordPage = async function(req, res) {
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('forgotPassword', {
         user: req.user,
+        allProductTypes: allProductTypes,
         companyDetails: companyInfo.getCompanyDetails()});
 }
 

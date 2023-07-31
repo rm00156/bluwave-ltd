@@ -2,13 +2,17 @@ const companyInfo = require('../utilty/company/companyInfo');
 const{ validateCustomerUser } = require('../validators/signup');
 const { isEmpty } = require('lodash');
 const accountOperations = require('../utilty/account/accountOperations');
+const productOperations = require('../utilty/products/productOperations');
 const queueOperations = require('../utilty/queue/queueOperations');
 const passport = require('passport');
 
 exports.getSignUpPage = async function(req,res)
 {
     var displayCookieMessage = req.body.displayCookieMessage;
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('signup', {  user:req.user,
+                            allProductTypes: allProductTypes,
                             displayCookieMessage: displayCookieMessage,
                             companyDetails: companyInfo.getCompanyDetails()
     });
@@ -53,33 +57,27 @@ exports.signup = async function(req, res, next) {
 async function rerender_signup(errors,req, res)
 {
     var displayCookieMessage = req.body.displayCookieMessage;
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('signup',{errors: errors, 
             user: req.user,
+            allProductTypes: allProductTypes,
             companyDetails: companyInfo.getCompanyDetails(),
             displayCookieMessage: displayCookieMessage});
 }
 
 async function render_checkoutLogin(errors, req, res) {
-    const flyerProducts = await productOperations.getActiveProductsForProductTypeName('Flyers & Leaflets');
-    const businessCards = await productOperations.getActiveProductsForProductTypeName('Business Cards');
-    const brochures = await productOperations.getActiveProductsForProductTypeName('Brochures');
-    const books = await productOperations.getActiveProductsForProductTypeName('Books');
-    const rollerBanners = await productOperations.getActiveProductsForProductTypeName('Roller Banners');
-    const posters = await productOperations.getActiveProductsForProductTypeName('Posters');
-    const cards = await productOperations.getActiveProductsForProductTypeName('Cards');
     const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     var displayCookieMessage = req.body.displayCookieMessage;
+
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
 
     res.render('checkoutLogin', 
                 {   user: req.user, errors: errors, 
                     companyDetails: companyInfo.getCompanyDetails(),
-                    flyerProducts: flyerProducts,
-                    businessCards: businessCards,
-                    brochures: brochures,
-                    books: books,
-                    rollerBanners: rollerBanners,
-                    posters: posters,
-                    cards: cards,
+                    navigationBarHeaders: navigationBarHeaders,
                     basketItems: basketItems,
+                    allProductTypes: allProductTypes,
                     displayCookieMessage: displayCookieMessage});
 }

@@ -65,6 +65,8 @@ router.post('/checkout', getUser, isCustomer, isCheckoutAsGuest, shopController.
 router.get('/checkout_login', getUser, isCustomer, isGuest, shopController.checkoutLoginPage);
 router.post('/checkout_login', getUser, isCustomer, isGuest, loginController.checkoutLogin);
 router.post('/checkout_as_guest', getUser, isCustomer, isGuest, shopController.checkoutAsGuest);
+router.post('/admin_dashboard/product_type/add',isAdmin, adminRequire2faSetup, adminDashboardController.addProductType);
+router.get('/admin_dashboard/add_product_type', isAdmin, adminRequire2faSetup, adminDashboardController.getAddProductTypePage);
 
 router.get('/admin_dashboard/accounts', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountsPage);
 router.get('/admin_dashboard/account/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountPage);
@@ -104,4 +106,7 @@ router.get('/forgotten_password_email_sent', getUser, isCustomer, homeController
 router.get('/get_notifications', isAdmin, adminRequire2faSetup, adminDashboardController.getNotifications);
 router.delete('/delete_notification', isAdmin, adminRequire2faSetup, adminDashboardController.deleteNotification);
 router.delete('/delete_all_notifications', isAdmin, adminRequire2faSetup, adminDashboardController.deleteNotifications);
+
+router.get('/admin_dashboard/navigation_bar_options', isAdmin, adminRequire2faSetup, adminDashboardController.getNavigationBarPage);
+router.post('/set_navigation_bar_headers', isAdmin, adminRequire2faSetup, adminDashboardController.setNavigationBarHeaders);
 module.exports = router

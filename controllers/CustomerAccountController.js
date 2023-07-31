@@ -10,25 +10,15 @@ const bcrypt = require('bcrypt');
 
 exports.getOrdersPage = async function(req, res) {
 
-    const flyerProducts = await productOperations.getActiveProductsForProductTypeName('Flyers & Leaflets');
-    const businessCards = await productOperations.getActiveProductsForProductTypeName('Business Cards');
-    const brochures = await productOperations.getActiveProductsForProductTypeName('Brochures');
-    const books = await productOperations.getActiveProductsForProductTypeName('Books');
-    const rollerBanners = await productOperations.getActiveProductsForProductTypeName('Roller Banners');
-    const posters = await productOperations.getActiveProductsForProductTypeName('Posters');
-    const cards = await productOperations.getActiveProductsForProductTypeName('Cards');
     const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     const orders = await orderOperations.getSuccessfulOrdersForAccountId(req.user.id);
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
 
     res.render('accountOrders', {user: req.user,
-        flyerProducts: flyerProducts,
-        businessCards: businessCards,
-        brochures: brochures,
-        books: books,
-        rollerBanners: rollerBanners,
-        posters: posters,
-        cards: cards,
+        navigationBarHeaders: navigationBarHeaders,
         basketItems: basketItems,
+        allProductTypes: allProductTypes,
         orders: orders,
         companyDetails: companyInfo.getCompanyDetails()});
 }
@@ -36,29 +26,18 @@ exports.getOrdersPage = async function(req, res) {
 exports.getOrderPage = async function(req, res) {
 
     const orderId = req.params.id;
-    const flyerProducts = await productOperations.getActiveProductsForProductTypeName('Flyers & Leaflets');
-    const businessCards = await productOperations.getActiveProductsForProductTypeName('Business Cards');
-    const brochures = await productOperations.getActiveProductsForProductTypeName('Brochures');
-    const books = await productOperations.getActiveProductsForProductTypeName('Books');
-    const rollerBanners = await productOperations.getActiveProductsForProductTypeName('Roller Banners');
-    const posters = await productOperations.getActiveProductsForProductTypeName('Posters');
-    const cards = await productOperations.getActiveProductsForProductTypeName('Cards');
     const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(orderId);
     const shippingDetailFk = order.shippingDetailFk;
     const shippingDetail = (shippingDetailFk == null) ? null : await deliveryOperations.getShippingDetailById(shippingDetailFk);
     const orderItems = await basketOperations.getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(orderId);
     const refunds = await refundOperations.getRefundsForOrder(orderId);
-    
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
 
     res.render('accountOrder', {user: req.user,
-        flyerProducts: flyerProducts,
-        businessCards: businessCards,
-        brochures: brochures,
-        books: books,
-        rollerBanners: rollerBanners,
-        posters: posters,
-        cards: cards,
+        navigationBarHeaders: navigationBarHeaders,
+        allProductTypes: allProductTypes,
         basketItems: basketItems,
         orderItems: orderItems,
         order: order,
@@ -69,27 +48,17 @@ exports.getOrderPage = async function(req, res) {
 
 exports.getSettingsPage = async function(req, res) {
 
-    const flyerProducts = await productOperations.getActiveProductsForProductTypeName('Flyers & Leaflets');
-    const businessCards = await productOperations.getActiveProductsForProductTypeName('Business Cards');
-    const brochures = await productOperations.getActiveProductsForProductTypeName('Brochures');
-    const books = await productOperations.getActiveProductsForProductTypeName('Books');
-    const rollerBanners = await productOperations.getActiveProductsForProductTypeName('Roller Banners');
-    const posters = await productOperations.getActiveProductsForProductTypeName('Posters');
-    const cards = await productOperations.getActiveProductsForProductTypeName('Cards');
     const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     const orders = await orderOperations.getSuccessfulOrdersForAccountId(req.user.id);
     const message = req.session.message;
     req.session.message = undefined;
-    
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('accountSettings', {user: req.user,
-        flyerProducts: flyerProducts,
-        businessCards: businessCards,
-        brochures: brochures,
-        books: books,
-        rollerBanners: rollerBanners,
-        posters: posters,
-        cards: cards,
+        navigationBarHeaders: navigationBarHeaders,
         basketItems: basketItems,
+        allProductTypes: allProductTypes,
         orders: orders,
         message: message,
         companyDetails: companyInfo.getCompanyDetails()});

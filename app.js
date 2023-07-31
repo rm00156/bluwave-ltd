@@ -79,7 +79,10 @@ app.use((error, req, res, next) => {
     return res.render('404',{user:req.user, companyDetails: companyInfo.getCompanyDetails()});
   } 
 
-  return res.json(error);
+  res.locals.message = error.message;
+  res.locals.error = error;
+  
+  return res.render('error');
 });
 
 
