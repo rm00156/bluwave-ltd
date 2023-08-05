@@ -18,7 +18,7 @@ html(land="en")
         +navbar()
         main
             // section
-            section.py-lg-16.py-10(style='background: url(/img/stock_home_8.jpg)no-repeat; background-position: center; background-size: cover;')
+            section.py-lg-16.py-10(style='background: url(/img/home_banner.jpg)no-repeat; background-position: center; background-size: cover;')
                 .container
                     // row
                     .row
@@ -34,116 +34,125 @@ html(land="en")
                                             .col-auto
                                                 a.btn.btn-primary(href="/shop") Shop
 
-
-            .my-lg-14.my-8
+            section.my-lg-14.my-8
                 .container
                     // row
-                    .table-responsive-xxl.pb-6.pb-lg-0
-                        .row.flex-nowrap
-                            .col-sm-4
-                                //- .card.border-0.card-hover.shadow
-                                    a.img-zoom(href='#')
-                                        img(src='/img/flyers.jpg' alt='' style="width: 100%; height: 100%")
-                                    .position-absolute.w-100.bottom-0.py-3.px-4
-                                        a.text-blue.d-flex.align-items-center.btn-transition(href='#')
-                                            | Flyers &amp Leaflets
-                                            i.feather-icon.icon-chevron-right.fs-5
-                                .text-center.mb-10
-                                    // img
-                                    a(href='/shop?type=flyers%20%26%20leaflets')
-                                        img.card-image.shadow(src='/img/flyers2.jpg' style="height:200px;width:200px" alt='')
-                                    // text
-                                    .mt-4
-                                        h5.fs-6.mb-0
-                                            a.text-inherit(href='/shop?type=flyers%20%26%20leaflets') Flyers & Leaflets
-                            .col-sm-4
-                                //- .card.border-0.shadow
-                                    a.img-zoom(href='#')
-                                        img(src='/img/business.jpg' alt='' style="width: 100%; height: 100%")
-                                    .position-absolute.w-100.bottom-0.py-3.px-4.bg-primary
-                                        a.text-blue.d-flex.align-items-center.btn-transition.text-white(href='#')
-                                            | Business Cards
-                                            i.feather-icon.icon-chevron-right.fs-5
-                                .text-center.mb-10
-                                    // img
-                                    a(href='/shop?type=business cards')
-                                        img.card-image.shadow(src='/img/business2.jpg' style="height:200px;width:200px" alt='')
-                                    // text
-                                    .mt-4
-                                        h5.fs-6.mb-0
-                                            a.text-inherit(href='/shop?type=business cards') Business Cards
-                            .col-sm-4
-                                //- .card.border-0.shadow
-                                    a.img-zoom(href='#')
-                                        img(src='/img/notebook.jpg' alt='' style="width: 100%; height: 100%")
-                                    .position-absolute.w-100.bottom-0.py-3.px-4
-                                        a.btn.btn-primary.text-blue.d-flex.align-items-center.btn-transition(href='#')
-                                            | Books
-                                            i.feather-icon.icon-chevron-right.fs-5
+                    .row
+                        .col-md-6.col-lg-3
+                            .mb-8.mb-lg-0
+                                // img
+                                .mb-6
+                                    img(src='../assets/images/icons/clock.svg' alt='')
+                                // title
+                                h3.h5.mb-3
+                                    | Business perks
+                                // text
+                                p.mb-0.light-grey
+                                    | Get more discounts and extra support with our business plans.
+                        // col
+                        .col-md-6.col-lg-3
+                            .mb-8.mb-lg-0
+                                // img
+                                .mb-6
+                                    img(src='../assets/images/icons/gift.svg' alt='')
+                                // title
+                                h3.h5.mb-3 Next day delivery!
+                                // text
+                                p.mb-0.light-grey
+                                    | Available on selected products. Order before 12PM (GMT) Mon–Fri.*
+                                    
+                        .col-md-6.col-lg-3
+                            a.mb-8.mb-lg-0(href="#")
+                                // img
+                                .mb-6
+                                    img(src='../assets/images/icons/package.svg' alt='')
+                                // title
+                                h3.h5.mb-3 The Bluwave Promise
+                                // text
+                                p.mb-0.light-grey
+                                    | We move heaven and earth so you’re happy with your order!
+                        .col-md-6.col-lg-3
+                            .mb-8.mb-lg-0
+                                // img
+                                .mb-6
+                                    img(src='../assets/images/icons/refresh-cw.svg' alt='')
+                                // title
+                                h3.h5.mb-3 Get a feel for Bluwave
+                                // text
+                                p.mb-0
+                                    | Order a sample pack so you can feel our papers and finishes for yourself.
 
-                                .text-center.mb-10
-                                    // img
-                                    a(href='/shop?type=books')
-                                        img.card-image.shadow(src='/img/notebook2.jpg' style="height:200px;width:200px" alt='')
-                                    // text
-                                    .mt-4
-                                        h5.fs-6.mb-0
-                                            a.text-inherit(href='/shop?type=books') Books
-                .my-lg-14.my-8
+            if(homePageOptions1To4.length > 0)                        
+                section.my-lg-14.my-8(style="padding-top:4rem; background:aliceblue; padding-bottom:5rem; margin-bottom:unset !important")
                     .container
-                        .table-responsive-xxl.pb-6.pb-lg-0        
-                            .row.flex-nowrap    
-                                .col-sm-4
-                                    //- .card.border-0.shadow
-                                    //-     a.img-zoom(href='#')
-                                    //-         img(src='/img/banner.jpg' alt='' style="width: 100%; height: 100%")
-                                    //-     .position-absolute.w-100.bottom-0.py-3.px-4
-                                    //-         a.text-blue.d-flex.align-items-center.btn-transition(href='#')
-                                    //-             | Roller Banner
-                                    //-             i.feather-icon.icon-chevron-right.fs-5
-                                    .text-center.mb-10
-                                        // img
-                                        a(href='/shop?type=roller banner')
-                                            img.card-image.shadow(src='/img/banner.jpg' style="height:200px;width:200px" alt='')
-                                        // text
-                                        .mt-4
-                                            h5.fs-6.mb-0
-                                                a.text-inherit(href='/shop?type=roller banner') Roller Banner
-                                .col-sm-4
-                                    //- .card.border-0.shadow
-                                        a.img-zoom(href='#')
-                                            img(src='/img/poster.jpg' alt='' style="width: 100%; height: 100% object:fit")
-                                        .position-absolute.w-100.bottom-0.py-3.px-4
-                                            a.text-blue.d-flex.align-items-center.btn-transition(href='#')
-                                                | Posters
-                                                i.feather-icon.icon-chevron-right.fs-5
-                                    .text-center.mb-10
-                                        // img
-                                        a(href='/shop?type=posters')
-                                            img.card-image.shadow(src='/img/poster2.jpg' style="height:200px;width:200px" alt='')
-                                        // text
-                                        .mt-4
-                                            h5.fs-6.mb-0
-                                                a.text-inherit(href='/shop?type=posters') Posters
-                                .col-sm-4
-                                    //- .card.border-0.shadow
-                                        a.img-zoom(href='#')
-                                            img(src='/img/cards.jpg' alt='' style="width: 100%; height: 100%")
-                                        .position-absolute.w-100.bottom-0.py-3.px-4
-                                            a.text-blue.d-flex.align-items-center.btn-transition(href='#')
-                                                | Cards
-                                                i.feather-icon.icon-chevron-right.fs-5
-
-                                    .text-center.mb-10
-                                        // img
-                                        a(href='/shop?type=cards')
-                                            img.card-image.shadow(src='/img/cards.jpg' style="height:200px;width:200px" alt='')
-                                        // text
-                                        .mt-4
-                                            h5.fs-6.mb-0
-                                                a.text-inherit(href='/shop?type=cards') Cards
-
-
+                        // row
+                        .table-responsive-xxl.pb-6.pb-lg-0
+                            .row.flex-nowrap
+                                each option in homePageOptions1To4
+                                    div(class="col-sm-" + (homePageOptions1To4.length == 4 ? 3 : homePageOptions1To4.length == 3 ? 4 : homePageOptions1To4.length == 2 ? 6 : homePageOptions1To4.length == 1 ? 12 : ''))
+                                        .card.card-product
+                                            .card-header(style="padding:0")
+                                                // badge
+                                                .text-center.position-relative
+                                                    a(href='/shop?type=' + encodeURIComponent(option.productType.productType))
+                                                        // img
+                                                        img.img-fluid(src=option.imagePath alt='Bluwave image')
+                                            .card-body
+                                                // heading
+                                                h2.fs-6
+                                                    a.text-inherit.text-decoration-none(href='/shop?type=' + encodeURIComponent(option.productType.productType)) #{option.productType.productType}
+                                                .text-small.mb-1
+                                                    a.text-decoration-none.light-grey(href='#!')
+                                                        small
+                                                            | #{option.description}
+                                //- .col-sm-3
+                                //-     .card.card-product
+                                //-         .card-header(style="padding:0")
+                                //-             // badge
+                                //-             .text-center.position-relative
+                                //-                 a(href='/shop?type=Flyers%20and%20Leaflets')
+                                //-                     // img
+                                //-                     img.img-fluid(src='/img/flyers2.jpg' alt='Bluwave image')
+                                //-         .card-body
+                                //-             // heading
+                                //-             h2.fs-6
+                                //-                 a.text-inherit.text-decoration-none(href='/shop?type=Flyers%20and%20Leaflets') Flyers
+                                //-             .text-small.mb-1
+                                //-                 a.text-decoration-none.light-grey(href='#!')
+                                //-                     small
+                                //-                         | Unique Envelopes in sizes to match your unique printed products. Why wait until your mail is opened to impress?
+                                //- .col-sm-3
+                                //-     .card.card-product
+                                //-         .card-header(style="padding:0")
+                                //-             // badge
+                                //-             .text-center.position-relative
+                                //-                 a(href='/shop?type=Flyers%20and%20Leaflets')
+                                //-                     // img
+                                //-                     img.img-fluid(src='/img/flyers2.jpg' alt='Bluwave image')
+                                //-         .card-body
+                                //-             // heading
+                                //-             h2.fs-6
+                                //-                 a.text-inherit.text-decoration-none(href='/shop?type=Flyers%20and%20Leaflets') Flyers
+                                //-             .text-small.mb-1
+                                //-                 a.text-decoration-none.light-grey(href='#!')
+                                //-                     small
+                                //-                         | Unique Envelopes in sizes to match your unique printed products. Why wait until your mail is opened to impress?
+                                //- .col-sm-3
+                                //-     .card.card-product
+                                //-         .card-header(style="padding:0")
+                                //-             // badge
+                                //-             .text-center.position-relative
+                                //-                 a(href='/shop?type=Flyers%20and%20Leaflets')
+                                //-                     // img
+                                //-                     img.img-fluid(src='/img/flyers2.jpg' alt='Bluwave image')
+                                //-         .card-body
+                                //-             // heading
+                                //-             h2.fs-6
+                                //-                 a.text-inherit.text-decoration-none(href='/shop?type=Flyers%20and%20Leaflets') Flyers
+                                //-             .text-small.mb-1
+                                //-                 a.text-decoration-none.light-grey(href='#!')
+                                //-                     small
+                                //-                         | Unique Envelopes in sizes to match your unique printed products. Why wait until your mail is opened to impress?
             section.py-lg-16.py-10(style='background: url(/img/notebook_banner2.jpg)no-repeat; background-position: center; background-size: cover;')
                 .container
                     // row
@@ -160,9 +169,30 @@ html(land="en")
                                             .col-auto
                                                 a.btn.btn-primary(href=href='/shop?type=note books') Shop Notebooks
 
+            if(homePageOptions5To8.length > 0)
+                section.my-lg-14.my-8(style="padding-top:4rem; background:aliceblue; margin-top:unset !important; padding-bottom:5rem; margin-bottom:unset !important")
+                    .container
+                        // row
+                        .table-responsive-xxl.pb-6.pb-lg-0
+                            .row.flex-nowrap
+                                each option in homePageOptions5To8
+                                    div(class="col-sm-" + (homePageOptions5To8.length == 4 ? 3 : homePageOptions5To8.length == 3 ? 4 : homePageOptions5To8.length == 2 ? 6 : homePageOptions5To8.length == 1 ? 12 : ''))
+                                        .card.card-product
+                                            .card-header(style="padding:0")
+                                                // badge
+                                                .text-center.position-relative
+                                                    a(href='/shop?type=' + encodeURIComponent(option.productType.productType))
+                                                        // img
+                                                        img.img-fluid(src=option.imagePath alt='Bluwave image')
+                                            .card-body
+                                                // heading
+                                                h2.fs-6
+                                                    a.text-inherit.text-decoration-none(href='/shop?type=' + encodeURIComponent(option.productType.productType)) #{option.productType.productType}
+                                                .text-small.mb-1
+                                                    a.text-decoration-none.light-grey(href='#!')
+                                                        small
+                                                            | #{option.description}
 
 
-            
-
-        +footer()
-        +scripts()
+            +footer()
+            +scripts()

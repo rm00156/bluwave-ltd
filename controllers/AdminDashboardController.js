@@ -591,7 +591,7 @@ exports.addOptionType = async function (req, res) {
     return res.status(201).json({});
 }
 
-exports.getAddProductTypePage = async function(req, res) {
+exports.getAddProductTypePage = async function (req, res) {
     res.render('addProductType', {
         user: req.user,
         companyDetails: companyInfo.getCompanyDetails()
@@ -641,20 +641,20 @@ exports.addProductType = async function (req, res) {
     res.status(201).json({});
 }
 
-exports.getNavigationBarPage = async function(req, res) {
+exports.getNavigationBarPage = async function (req, res) {
 
     const message = req.session.message;
     req.session.message = undefined;
 
     const productTypes = await productOperations.getAllActiveProductTypes();
     const navigationBarHeaders = await productOperations.getNavigationBarHeaders();
-    const allProductTypes = await productOperations.getAllActiveProductTypes();
+    // const allProductTypes = await productOperations.getAllActiveProductTypes();
 
     res.render('navigationBarHeaders', {
         user: req.user,
         navigationBarHeaders: navigationBarHeaders,
         productTypes: productTypes,
-        allProductTypes: allProductTypes,
+        // allProductTypes: allProductTypes,
         message: message,
         companyDetails: companyInfo.getCompanyDetails()
     })
@@ -663,36 +663,152 @@ exports.getNavigationBarPage = async function(req, res) {
 exports.setNavigationBarHeaders = async function setNavigationBarHeaders(req, res) {
 
     const ids = [
-         Number(req.body.position1),
-         Number(req.body.position2),
-         Number(req.body.position3),
-         Number(req.body.position4),
-         Number(req.body.position5),
-         Number(req.body.position6),
-         Number(req.body.position7),
-         Number(req.body.position8),
-         Number(req.body.position9),
-         Number(req.body.position10),
+        Number(req.body.position1),
+        Number(req.body.position2),
+        Number(req.body.position3),
+        Number(req.body.position4),
+        Number(req.body.position5),
+        Number(req.body.position6),
+        Number(req.body.position7),
+        Number(req.body.position8),
+        Number(req.body.position9),
+        Number(req.body.position10),
     ]
 
-    if(!checkNoDuplicateNonZeroNumbers(ids)) {
-        return res.status(400).json({error: 'You have selected a product type more than once.'})
+    if (!checkNoDuplicateNonZeroNumbers(ids)) {
+        return res.status(400).json({ error: 'You have selected a product type more than once.' })
     }
     const transaction = await models.sequelize.transaction();
 
     try {
         await productOperations.updateNavigationBarHeaders(ids);
-    } catch(err) {
+    } catch (err) {
 
         console.log(err)
         await transaction.rollback();
-        return res.status(400).json({error: 'Unable to make the update. Contact support.'})
+        return res.status(400).json({ error: 'Unable to make the update. Contact support.' })
     }
-    
+
     await transaction.commit();
-    
+
     req.session.message = "Navigation Bar Headers Updated!"
     res.status(200).json({});
+}
+
+exports.getOptions1To4Page = async function (req, res) {
+    const message = req.session.message;
+    req.session.message = undefined;
+
+    const homePageOptions = await productOperations.getHomePageOptions();
+    const productTypes = await productOperations.getAllActiveProductTypes();
+    res.render('adminOptions1To4', {
+        user: req.user,
+        message: message,
+        homePageOptions: homePageOptions,
+        productTypes: productTypes,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.getOptions5To8Page = async function (req, res) {
+    const message = req.session.message;
+    req.session.message = undefined;
+
+    const homePageOptions = await productOperations.getHomePageOptions();
+    const productTypes = await productOperations.getAllActiveProductTypes();
+    res.render('adminOptions5To8', {
+        user: req.user,
+        message: message,
+        homePageOptions: homePageOptions,
+        productTypes: productTypes,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.updateHomePage1To4 = async function (req, res) {
+    var errors = {};
+    const ids = [
+        Number(req.body.productTypeId1),
+        Number(req.body.productTypeId2),
+        Number(req.body.productTypeId3),
+        Number(req.body.productTypeId4),
+    ]
+
+    if (!checkNoDuplicateNonZeroNumbers(ids)) {
+        errors['error'] = 'You have selected a product type more than once.';
+        return res.status(400).json(errors);
+    }
+
+    errors = await validateDetails(req.body, req.files, 1, 4);
+
+    if (!isEmpty(errors)) {
+        return res.status(400).json(errors);
+    } else {
+
+        const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Option_1_4', req.files);
+        await productOperations.setHomePageOptions1To4(req.body, s3PathMap);
+        req.session.message = "Options 1-4 Updated!";
+        res.status(200).json({})
+    }
+}
+
+exports.updateHomePage5To8 = async function (req, res) {
+    var errors = {};
+    const ids = [
+        Number(req.body.productTypeId5),
+        Number(req.body.productTypeId6),
+        Number(req.body.productTypeId7),
+        Number(req.body.productTypeId8),
+    ]
+
+    if (!checkNoDuplicateNonZeroNumbers(ids)) {
+        errors['error'] = 'You have selected a product type more than once.';
+        return res.status(400).json(errors);
+    }
+
+    errors = await validateDetails(req.body, req.files, 5, 8);
+
+    if (!isEmpty(errors)) {
+        return res.status(400).json(errors);
+    } else {
+
+        const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Option_5_8', req.files);
+        await productOperations.setHomePageOptions5To8(req.body, s3PathMap);
+        req.session.message = "Options 5-8 Updated!";
+        res.status(200).json({})
+    }
+}
+
+async function validateDetails(body, files, from , to) {
+    const errors = {};
+    const homePageOptions = await productOperations.getHomePageOptions();
+    for (var i = from; i <= to; i++) {
+        const productTypeId = body[`productTypeId${i}`];
+        const description = body[`description${i}`.trimStart()];
+        const picture = files == null ? null : files[`${i}Blob`];
+
+        if (productTypeId == 0) {
+
+            if (description != '' || picture != undefined) {
+                errors['error' + i] = "All values must be set."
+            }
+        }
+
+        if (description == '') {
+
+            if (productTypeId != 0 || picture != undefined) {
+                errors['error' + i] = "All values must be set."
+            }
+        }
+
+        if ((picture == undefined || picture == null) && homePageOptions[`imagePath${i}`] == null) {
+            if (productTypeId != 0 || description != '') {
+                errors['error' + i] = "All values must be set."
+            }
+        }
+    }
+
+    return errors;
 }
 
 function checkNoDuplicateNonZeroNumbers(arr) {
@@ -700,32 +816,32 @@ function checkNoDuplicateNonZeroNumbers(arr) {
     const seen = new Set();
     // Create a set to keep track of seen non-zero elements
     const nonZeroSeen = new Set();
-  
+
     for (const num of arr) {
-      if (num === 0) {
-        // Ignore 0 and continue to the next element
-        continue;
-      }
-  
-      if (nonZeroSeen.has(num)) {
-        // If any non-zero number is already seen, return false
-        return false;
-      }
-  
-      // Add non-zero numbers to the seen set
-      nonZeroSeen.add(num);
+        if (num === 0) {
+            // Ignore 0 and continue to the next element
+            continue;
+        }
+
+        if (nonZeroSeen.has(num)) {
+            // If any non-zero number is already seen, return false
+            return false;
+        }
+
+        // Add non-zero numbers to the seen set
+        nonZeroSeen.add(num);
         if (seen.has(num)) {
-        // If any non-zero number is already seen (including 0), return false
-        return false;
-      }
-  
-      // Add all numbers (including 0) to the seen set
-      seen.add(num);
+            // If any non-zero number is already seen (including 0), return false
+            return false;
+        }
+
+        // Add all numbers (including 0) to the seen set
+        seen.add(num);
     }
-  
+
     // If the loop finishes without returning false, there are no duplicate non-zero numbers
     return true;
-  }
+}
 
 function getTimeDifference(date) {
     const currentDate = new Date();

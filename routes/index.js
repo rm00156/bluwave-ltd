@@ -109,4 +109,10 @@ router.delete('/delete_all_notifications', isAdmin, adminRequire2faSetup, adminD
 
 router.get('/admin_dashboard/navigation_bar_options', isAdmin, adminRequire2faSetup, adminDashboardController.getNavigationBarPage);
 router.post('/set_navigation_bar_headers', isAdmin, adminRequire2faSetup, adminDashboardController.setNavigationBarHeaders);
+router.put('/admin_dashboard/home_page_option/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateHomePage1To4);
+router.put('/admin_dashboard/home_page_option_5_8/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateHomePage5To8);
+
+router.get('/admin_dashboard/options_1_4', isAdmin, adminRequire2faSetup, adminDashboardController.getOptions1To4Page)
+router.get('/admin_dashboard/options_5_8', isAdmin, adminRequire2faSetup, adminDashboardController.getOptions5To8Page)
+
 module.exports = router

@@ -61,6 +61,23 @@ mixin adminSideNav()
                                 span.nav-link-icon
                                     i.bi.bi-segmented-nav
                                 span.nav-link-text Navigation Bar Options
+
+                    li.nav-item
+                        a.nav-link.collapsed(href='#' data-bs-toggle='collapse' data-bs-target='#navHome' aria-expanded='false' aria-controls='navHome')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-house
+                                span.nav-link-text Home Page Options
+                        #navHome.collapse(data-bs-parent='#sideNavbar')
+                            ul.nav.flex-column
+                                li.nav-item
+                                    a.nav-link(href='/admin_dashboard/options_1_4')
+                                        | Set Options 1-4
+                                // Nav item
+                                li.nav-item
+                                    a.nav-link(href='/admin_dashboard/options_5_8')
+                                        | Set Options 5-8
+                    
     nav#offcanvasExample.navbar-vertical-nav.offcanvas.offcanvas-start.navbar-offcanvac(tabindex='-1')
         .navbar-vertical
             .px-4.py-5.d-flex.justify-content-between.align-items-center
@@ -124,4 +141,19 @@ mixin adminSideNav()
                                 span.nav-link-icon
                                     i.bi.bi-segmented-nav
                                 span.nav-link-text Navigation Bar Options
-            
+
+                    li.nav-item
+                        a.nav-link.collapsed(href='#' data-bs-toggle='collapse' data-bs-target='#navHome' aria-expanded='false' aria-controls='navHome')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-house
+                                span.nav-link-text Home Page Options
+                        #navHome.collapse(data-bs-parent='#sideNavbar')
+                            ul.nav.flex-column
+                                li.nav-item
+                                    a.nav-link(href='/admin_dashboard/options_1_4')
+                                        | Set Options 1-4
+                                // Nav item
+                                li.nav-item
+                                    a.nav-link(href='/admin_dashboard/options_5_8')
+                                        | Set Options 5-8

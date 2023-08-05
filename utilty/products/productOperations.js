@@ -759,6 +759,79 @@ async function getNavigationBarHeadersAndProducts() {
     return result;
 }
 
+async function setHomePageOptions1To4(optionDetails, s3PathMap) {
+
+    const data = {
+        productTypeFk1: optionDetails.productTypeId1 == 0 ? null : optionDetails.productTypeId1,
+        description1: optionDetails.productTypeId1 == 0 ? null : optionDetails.description1,
+        productTypeFk2: optionDetails.productTypeId2 == 0 ? null : optionDetails.productTypeId2,
+        description2: optionDetails.productTypeId2 == 0 ? null : optionDetails.description2,
+        productTypeFk3: optionDetails.productTypeId3 == 0 ? null : optionDetails.productTypeId3,
+        description3: optionDetails.productTypeId3 == 0 ? null : optionDetails.description3,
+        productTypeFk4: optionDetails.productTypeId4 == 0 ? null : optionDetails.productTypeId4,
+        description4: optionDetails.productTypeId4 == 0 ? null : optionDetails.description4,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }
+    s3PathMap.forEach((value, key) => {
+        data['imagePath' + key] = value;
+    });
+
+    for(var i = 1; i <= 4; i++) {
+        const productTypeId = data[`productTypeFk${i}`];
+
+        if(productTypeId == null) {
+            data[`imagePath${i}`] = null;
+        }
+    }
+
+    await models.homePageOption.update(data, {
+        where: {
+            id: 1
+        }
+    });
+}
+
+async function setHomePageOptions5To8(optionDetails, s3PathMap) {
+
+    const data = {
+        productTypeFk5: optionDetails.productTypeId5 == 0 ? null : optionDetails.productTypeId5,
+        description5: optionDetails.productTypeId5 == 0 ? null : optionDetails.description5,
+        productTypeFk6: optionDetails.productTypeId6 == 0 ? null : optionDetails.productTypeId6,
+        description6: optionDetails.productTypeId6 == 0 ? null : optionDetails.description6,
+        productTypeFk7: optionDetails.productTypeId7 == 0 ? null : optionDetails.productTypeId7,
+        description7: optionDetails.productTypeId7 == 0 ? null : optionDetails.description7,
+        productTypeFk8: optionDetails.productTypeId8 == 0 ? null : optionDetails.productTypeId8,
+        description8: optionDetails.productTypeId8 == 0 ? null : optionDetails.description8,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }
+    s3PathMap.forEach((value, key) => {
+        data['imagePath' + key] = value;
+    });
+
+    for(var i = 5; i <= 8; i++) {
+        const productTypeId = data[`productTypeFk${i}`];
+
+        if(productTypeId == null) {
+            data[`imagePath${i}`] = null;
+        }
+    }
+
+    await models.homePageOption.update(data, {
+        where: {
+            id: 1
+        }
+    });
+}
+
+
+async function getHomePageOptions() {
+    return await models.homePageOption.findOne({
+        where: {
+            id: 1
+        }
+    })
+}
+
 module.exports = {
     parseOptionTypesAndOption,
     getAllProductWithLowestPriceDetails,
@@ -809,5 +882,8 @@ module.exports = {
     getNavigationBarHeaders,
     updateNavigationBarHeaders,
     getNavigationBarHeadersAndProducts,
-    createProductType
+    createProductType,
+    setHomePageOptions5To8,
+    setHomePageOptions1To4,
+    getHomePageOptions
   };

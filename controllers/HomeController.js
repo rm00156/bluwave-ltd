@@ -11,12 +11,36 @@ exports.getHomePage = async function(req, res) {
 
     const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
     const allProductTypes = await productOperations.getAllActiveProductTypes();
+    const homePageOptions = await productOperations.getHomePageOptions();
 
+    const homePageOptions1To4 = [];
+    const homePageOptions5To8 = [];
+    for(var i = 1; i <= 4; i++) { 
+        const productTypeId = homePageOptions[`productTypeFk${i}`];
+        if(productTypeId != null) {
+            homePageOptions1To4.push({
+                productType: await productOperations.getProductTypeById(productTypeId), 
+                imagePath: homePageOptions[`imagePath${i}`],
+                description: homePageOptions[`description${i}`]})
+        }
+    }
+
+    for(var i = 5; i <= 8; i++) { 
+        const productTypeId = homePageOptions[`productTypeFk${i}`];
+        if(productTypeId != null) {
+            homePageOptions5To8.push({
+                productType: await productOperations.getProductTypeById(productTypeId), 
+                imagePath: homePageOptions[`imagePath${i}`],
+                description: homePageOptions[`description${i}`]})
+        }
+    }
     res.render('home', {user: req.user,
                         basketItems: basketItems,
                         displayCookieMessage: displayCookieMessage,
                         navigationBarHeaders: navigationBarHeaders,
                         allProductTypes: allProductTypes,
+                        homePageOptions1To4: homePageOptions1To4,
+                        homePageOptions5To8: homePageOptions5To8,
                         companyDetails: companyInfo.getCompanyDetails()});
 }
 

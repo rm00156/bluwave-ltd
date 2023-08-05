@@ -1,0 +1,233 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    include common/adminAccountSideBar.pug
+    +adminHead()
+    link(href='/assets/libs/dropzone/dist/min/dropzone.min.css' rel='stylesheet')
+    link(href='/assets/css/croppie.css' rel='stylesheet')
+    #overlay
+        .section.section-full
+            .container
+                .row.justify-content-center
+
+                    .col-md-10.col-lg-10
+                        
+                        .form-styled.bg-white(style="overflow-y: scroll;height:640px;margin-top:100px; padding:10px")
+                            div#gif(style="display: none;justify-content: center;")
+                                img(src="img/loading2.gif" style="margin:auto")
+                            
+                            
+                            div#cropSection
+                                div(style="height:400px;width:100%")
+                                    #uploadedImageForCrop(style="height:60%;width:100%")
+                                div
+                                    p(style="text-align:center") Crop image to your liking, and when everything is ok click 'Confirm Crop'
+                                    .row
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id="confirmCrop") Confirm Crop
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3.text-center(id ="rotate"  data-deg="-90" style="margin-right:5px") Rotate
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id ="cancelCrop" ) Cancel
+    
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        
+
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                .container
+                    .row.mb-8
+                        .col-md-12
+                            // page header
+                            .d-md-flex.justify-content-between.align-items-center
+                                div
+                                    h2 Home Page Options 1-4
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            
+                                            li.breadcrumb-item.active(aria-current='page') Home Page Options 1-4
+                                // button
+                    section
+                        .container
+                            // row
+                            input#homePageOptions(type="hidden" value=homePageOptions)
+                            form#form(method="put" action="/")
+                                .row.mb-3
+                                    p#error.text-danger
+                                    .col-sm-6
+                                        label.mb-3
+                                            strong Postion 1
+                                        br
+                                        p#error1.text-danger
+                                        .row.mb-3
+                                            .col-sm-6
+                                                label.mb-3 Product Type
+                                                select.form-control#position1
+                                                    option(value=0)
+                                                    each productType in productTypes 
+                                                        option(value=productType.id selected=(homePageOptions.productTypeFk1 == productType.id)) #{productType.productType}
+                                        .row.mb-3 
+                                            .col-lg-6.mt-5
+                                                // heading
+                                                label.form-label Image For Product Type
+                                                // input
+                                                .row 
+                                                    .col-12.mr-2.label-container(style="height:150px")
+                                                        if(homePageOptions.imagePath1 == null)
+                                                            label.dropzone.border-dashed.rounded-2.text-center.label(for="picture1" style="font-size:8pt !important;cursor:pointer;") Add Image
+                                                            input.picture(id="picture1" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                        else 
+                                                            label.border-dashed.rounded-2.text-center.label(for="picture1" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + homePageOptions.imagePath1 + '")')
+                                                            button.small-button.btn.btn-danger(type="button") X
+                                                            input.picture(id="picture1" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                           
+                                                        p.small.text-danger(id="picture1Error")
+                                                
+                                        .row
+                                            .col-sm-12
+                                                label.mb-3 Description
+                                                if(homePageOptions.description1 == null)
+                                                    textarea.form-control#description1(type="text" rows="4" maxlength="100")
+                                                else 
+                                                    textarea.form-control#description1(type="text" rows="4" maxlength="100") #{homePageOptions.description1}
+                                    .col-sm-6
+                                        label.mb-3
+                                            strong Postion 2
+                                        br
+                                        p#error2.text-danger
+                                        .row.mb-3
+                                            .col-sm-6
+                                                label.mb-3 Product Type
+                                                select.form-control#position2
+                                                    option(value=0)
+                                                    each productType in productTypes 
+                                                        option(value=productType.id selected=(homePageOptions.productTypeFk2 == productType.id)) #{productType.productType}
+                                        .row.mb-3 
+                                            .col-lg-6.mt-5
+                                                // heading
+                                                label.form-label Image For Product Type
+                                                // input
+                                                .row 
+                                                    .col-12.mr-2.label-container(style="height:150px")
+                                                        if(homePageOptions.imagePath2 == null)
+                                                            label.dropzone.border-dashed.rounded-2.text-center.label(for="picture2" style="font-size:8pt !important;cursor:pointer;") Add Image
+                                                            input.picture(id="picture2" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                        else 
+                                                            label.border-dashed.rounded-2.text-center.label(for="picture2" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + homePageOptions.imagePath2 + '")')
+                                                            button.small-button.btn.btn-danger(type="button") X
+                                                            input.picture(id="picture2" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                           
+                                                        p.small.text-danger(id="picture2Error")
+                                                
+                                        .row
+                                            .col-sm-12
+                                                label.mb-3 Description
+                                                if(homePageOptions.description2 == null)
+                                                    textarea.form-control#description2(type="text" rows="4" maxlength="100")
+                                                else 
+                                                    textarea.form-control#description2(type="text" rows="4" maxlength="100") #{homePageOptions.description2}
+                                .row.mb-3
+                                    .col-sm-6
+                                        label.mb-3
+                                            strong Postion 3
+                                        br
+                                        p#error3.text-danger
+                                        .row.mb-3
+                                            .col-sm-6
+                                                label.mb-3 Product Type
+                                                select.form-control#position3
+                                                    option(value=0)
+                                                    each productType in productTypes 
+                                                        option(value=productType.id selected=(homePageOptions.productTypeFk3 == productType.id)) #{productType.productType}
+                                        .row.mb-3 
+                                            .col-lg-6.mt-5
+                                                // heading
+                                                label.form-label Image For Product Type
+                                                // input
+                                                .row 
+                                                    .col-12.mr-2.label-container(style="height:150px")
+                                                        if(homePageOptions.imagePath3 == null)
+                                                            label.dropzone.border-dashed.rounded-2.text-center.label(for="picture3" style="font-size:8pt !important;cursor:pointer;") Add Image
+                                                            input.picture(id="picture3" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                        else 
+                                                            label.border-dashed.rounded-2.text-center.label(for="picture3" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + homePageOptions.imagePath3 + '")')
+                                                            button.small-button.btn.btn-danger(type="button") X
+                                                            input.picture(id="picture3" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                           
+                                                        p.small.text-danger(id="picture3Error")
+                                                
+                                        .row
+                                            .col-sm-12
+                                                label.mb-3 Description
+                                                if(homePageOptions.description3 == null)
+                                                    textarea.form-control#description3(type="text" rows="4" maxlength="100")
+                                                else 
+                                                    textarea.form-control#description3(type="text" rows="4" maxlength="100") #{homePageOptions.description3}
+                                                
+                                    .col-sm-6
+                                        label.mb-3
+                                            strong Postion 4
+                                        br
+                                        p#error4.text-danger
+                                        .row.mb-3
+                                            .col-sm-6
+                                                label.mb-3 Product Type
+                                                select.form-control#position4
+                                                    option(value=0)
+                                                    each productType in productTypes 
+                                                        option(value=productType.id selected=(homePageOptions.productTypeFk4 == productType.id)) #{productType.productType}
+                                        .row.mb-3 
+                                            .col-lg-6.mt-5
+                                                // heading
+                                                label.form-label Image For Product Type
+                                                // input
+                                                .row 
+                                                    .col-12.mr-2.label-container(style="height:150px")
+                                                        if(homePageOptions.imagePath4 == null)
+                                                            label.dropzone.border-dashed.rounded-2.text-center.label(for="picture4" style="font-size:8pt !important;cursor:pointer;") Add Image
+                                                            input.picture(id="picture4" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                        else 
+                                                            label.border-dashed.rounded-2.text-center.label(for="picture4" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + homePageOptions.imagePath4 + '")')
+                                                            button.small-button.btn.btn-danger(type="button") X
+                                                            input.picture(id="picture4" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                           
+                                                        p.small.text-danger(id="picture4Error")
+                                                
+                                        .row
+                                            .col-sm-12
+                                                label.mb-3 Description
+                                                if(homePageOptions.description4 == null)
+                                                    textarea.form-control#description4(type="text" rows="4" maxlength="100")
+                                                else 
+                                                    textarea.form-control#description4(type="text" rows="4" maxlength="100") #{homePageOptions.description4}
+                                    
+                                    
+                                .row
+                                    .col-sm-2
+                                        button#saveChanges.btn.btn-primary(type="submit") Save Changes
+
+        +adminScripts()
+        script(src='/assets/libs/quill/dist/quill.min.js')
+        script(src='/assets/js/vendors/editor.js')
+        script(src='/assets/libs/dropzone/dist/min/dropzone.min.js')
+        script(src='/assets/js/croppie.js')
+        script(src="/js/homePageOptions.js")
+        script(src="/js/adminDashboard.js")
