@@ -71,15 +71,16 @@ mixin adminSideNav()
                         #navHome.collapse(data-bs-parent='#sideNavbar')
                             ul.nav.flex-column
                                 li.nav-item
+                                    a.nav-link(href='/admin_dashboard/banner_section')
+                                        | Banner Section
+                                li.nav-item
                                     a.nav-link(href='/admin_dashboard/options_1_4')
                                         | Set Options 1-4
                                 // Nav item
                                 li.nav-item
                                     a.nav-link(href='/admin_dashboard/options_5_8')
                                         | Set Options 5-8
-                                li.nav-item
-                                    a.nav-link(href='/admin_dashboard/banner_section')
-                                        | Banner Section
+                                
                     
     nav#offcanvasExample.navbar-vertical-nav.offcanvas.offcanvas-start.navbar-offcanvac(tabindex='-1')
         .navbar-vertical
@@ -154,12 +155,13 @@ mixin adminSideNav()
                         #navHome.collapse(data-bs-parent='#sideNavbar')
                             ul.nav.flex-column
                                 li.nav-item
+                                    a.nav-link(href='/admin_dashboard/banner_section')
+                                        | Banner Section
+                                li.nav-item
                                     a.nav-link(href='/admin_dashboard/options_1_4')
                                         | Set Options 1-4
                                 // Nav item
                                 li.nav-item
                                     a.nav-link(href='/admin_dashboard/options_5_8')
                                         | Set Options 5-8
-                                li.nav-item
-                                    a.nav-link(href='/admin_dashboard/banner_section')
-                                        | Banner Section
+                                
