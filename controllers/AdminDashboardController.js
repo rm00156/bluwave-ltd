@@ -725,6 +725,61 @@ exports.getOptions5To8Page = async function (req, res) {
     })
 }
 
+exports.setHomePageBanner = async function(req, res) {
+
+    const title = req.body.title;
+    const description = req.body.description;
+    const bannerBlob = req?.files?.bannerBlob;
+    const productType = req.body.productType;
+    
+    const homePageBannerSection = await productOperations.getHomePageBannerSection();
+
+    if(productType == 0) {
+        return res.status(400).json({error: 'Product Type must be set.'});
+    }
+    if(homePageBannerSection == null) {
+        if(bannerBlob == undefined) {
+            return res.status(400).json({error: 'Banner Image must be set'});
+        }
+        const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Banner', req.files);
+        await productOperations.createHomePageBannerSection(title, productType, description, s3PathMap.get('banner'));
+        req.session.message = 'Home Page Banner Section Set Up!';
+        return res.status(201).json({});
+    }
+
+    const data = {
+        title: title,
+        description: description,
+        productTypeFk: productType,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    };
+
+    if(bannerBlob != undefined) {
+        const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Banner', req.files);
+        data['imagePath'] = s3PathMap.get('banner');
+    }
+
+    await productOperations.updateHomePageBannerSection(data);
+    req.session.message = 'Home Page Banner Section Updated!';
+    return res.status(200).json({});
+
+}
+
+exports.getBannerSectionPage = async function(req, res) {
+    const message = req.session.message;
+    req.session.message = undefined;
+    const productTypes = await productOperations.getAllActiveProductTypes();
+    const homePageBannerSection = await productOperations.getHomePageBannerSection();
+
+    res.render('adminBannerSection', {
+        user: req.user,
+        message: message,
+        productTypes: productTypes,
+        homePageBannerSection: homePageBannerSection,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
 exports.updateHomePage1To4 = async function (req, res) {
     var errors = {};
     const ids = [

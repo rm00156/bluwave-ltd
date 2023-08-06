@@ -1,0 +1,130 @@
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    link(href='/assets/libs/dropzone/dist/min/dropzone.min.css' rel='stylesheet')
+    link(href='/assets/css/croppie.css' rel='stylesheet')
+    #overlay
+        .section.section-full
+            .container
+                .row.justify-content-center
+
+                    .col-md-10.col-lg-10
+                        
+                        .form-styled.bg-white(style="overflow-y: scroll;height:640px;margin-top:100px; padding:10px")
+                            div#gif(style="display: none;justify-content: center;")
+                                img(src="img/loading2.gif" style="margin:auto")
+                            
+                            
+                            div#cropSection
+                                div(style="height:400px;width:100%")
+                                    #uploadedImageForCrop(style="height:60%;width:100%")
+                                div
+                                    p(style="text-align:center") Crop image to your liking, and when everything is ok click 'Confirm Crop'
+                                    .row
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id="confirmCrop") Confirm Crop
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3.text-center(id ="rotate"  data-deg="-90" style="margin-right:5px") Rotate
+                                        .col-lg-4.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id ="cancelCrop" ) Cancel
+    
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                .container
+                    // row
+                    .row.mb-8
+                        .col-md-12
+                            .d-md-flex.justify-content-between.align-items-center
+                                // page header
+                                div
+
+                                    h2 Home Page Banner Section
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            li.breadcrumb-item.active(aria-current='page') Home Page Banner Section
+                                // button
+                                div
+                    // row
+                    .row
+                        .col-lg-12.col-12
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    h4.mb-4.h5 Home Page Banner Section
+                                    .row
+                                        form#form(method="post" action="/")
+                                            .mb-3.col-lg-6
+                                                label.form-label Title
+                                                if(homePageBannerSection)
+                                                    input.form-control#title(type='text' value=homePageBannerSection.title required)
+                                                else 
+                                                    input.form-control#title(type='text' value= required)
+                                                p#errorTitle.text-danger
+
+                                            .mb-3.col-lg-6
+                                                label.form-label Product Type
+                                                select.form-control#productType
+                                                    option(value=0)
+                                                    if(homePageBannerSection)
+                                                        each productType in productTypes 
+                                                            option(value=productType.id selected=(homePageBannerSection.productTypeFk == productType.id)) #{productType.productType}
+                                                    else 
+                                                        each productType in productTypes 
+                                                            option(value=productType.id) #{productType.productType}
+                                                p#errorDescription.text-danger
+
+                                            .mb-3.col-lg-6
+                                                label.form-label Description
+                                                if(homePageBannerSection)
+                                                    textarea.form-control#description(type="text" rows="4" required maxlength="200") #{homePageBannerSection.description}
+                                                else 
+                                                    textarea.form-control#description(type="text" rows="4" required maxlength="200")
+                                                p#errorDescription.text-danger
+
+                                            div
+                                                .mb-3.col-lg-12.mt-5
+                                                    // heading
+                                                    label.form-label Banner Image For Product Type Page
+                                                    // input
+                                                    .row 
+                                                        .col-12.mr-2.label-container(style="height:150px")
+                                                            if(!homePageBannerSection || homePageBannerSection.imagePath == null)
+                                                                label.dropzone.border-dashed.rounded-2.text-center.label(for="picture" style="font-size:8pt !important;cursor:pointer;") Add Image
+                                                                input.picture(id="picture" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                            else 
+                                                                label.border-dashed.rounded-2.text-center.label(for="picture" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + homePageBannerSection.imagePath + '")')
+                                                                button.small-button.btn.btn-danger(type="button") X
+                                                                input.picture(id="picture" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
+                                                           
+                                                        p.small.text-danger(id="pictureError")
+                                            .row
+                                                .col-sm-2
+                                                    button#saveChanges.btn.btn-primary(type="submit") Save Changes            
+                                    
+    +adminScripts()
+    script(src='/assets/libs/quill/dist/quill.min.js')
+    script(src='/assets/js/vendors/editor.js')
+    script(src='/assets/libs/dropzone/dist/min/dropzone.min.js')
+    script(src='/assets/js/croppie.js')
+    script(src='/js/homePageBanner.js')
+    script(src="/js/adminDashboard.js")

@@ -11,6 +11,10 @@ exports.getHomePage = async function(req, res) {
 
     const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
     const allProductTypes = await productOperations.getAllActiveProductTypes();
+    const homePageBannerSection = await productOperations.getHomePageBannerSection();
+    if(homePageBannerSection != null) {
+        homePageBannerSection['productType'] = await productOperations.getProductTypeById(homePageBannerSection.productTypeFk);
+    }
     const homePageOptions = await productOperations.getHomePageOptions();
 
     const homePageOptions1To4 = [];
@@ -41,6 +45,7 @@ exports.getHomePage = async function(req, res) {
                         allProductTypes: allProductTypes,
                         homePageOptions1To4: homePageOptions1To4,
                         homePageOptions5To8: homePageOptions5To8,
+                        homePageBannerSection: homePageBannerSection,
                         companyDetails: companyInfo.getCompanyDetails()});
 }
 

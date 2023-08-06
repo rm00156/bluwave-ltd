@@ -105,69 +105,22 @@ html(land="en")
                                                     a.text-decoration-none.light-grey(href='#!')
                                                         small
                                                             | #{option.description}
-                                //- .col-sm-3
-                                //-     .card.card-product
-                                //-         .card-header(style="padding:0")
-                                //-             // badge
-                                //-             .text-center.position-relative
-                                //-                 a(href='/shop?type=Flyers%20and%20Leaflets')
-                                //-                     // img
-                                //-                     img.img-fluid(src='/img/flyers2.jpg' alt='Bluwave image')
-                                //-         .card-body
-                                //-             // heading
-                                //-             h2.fs-6
-                                //-                 a.text-inherit.text-decoration-none(href='/shop?type=Flyers%20and%20Leaflets') Flyers
-                                //-             .text-small.mb-1
-                                //-                 a.text-decoration-none.light-grey(href='#!')
-                                //-                     small
-                                //-                         | Unique Envelopes in sizes to match your unique printed products. Why wait until your mail is opened to impress?
-                                //- .col-sm-3
-                                //-     .card.card-product
-                                //-         .card-header(style="padding:0")
-                                //-             // badge
-                                //-             .text-center.position-relative
-                                //-                 a(href='/shop?type=Flyers%20and%20Leaflets')
-                                //-                     // img
-                                //-                     img.img-fluid(src='/img/flyers2.jpg' alt='Bluwave image')
-                                //-         .card-body
-                                //-             // heading
-                                //-             h2.fs-6
-                                //-                 a.text-inherit.text-decoration-none(href='/shop?type=Flyers%20and%20Leaflets') Flyers
-                                //-             .text-small.mb-1
-                                //-                 a.text-decoration-none.light-grey(href='#!')
-                                //-                     small
-                                //-                         | Unique Envelopes in sizes to match your unique printed products. Why wait until your mail is opened to impress?
-                                //- .col-sm-3
-                                //-     .card.card-product
-                                //-         .card-header(style="padding:0")
-                                //-             // badge
-                                //-             .text-center.position-relative
-                                //-                 a(href='/shop?type=Flyers%20and%20Leaflets')
-                                //-                     // img
-                                //-                     img.img-fluid(src='/img/flyers2.jpg' alt='Bluwave image')
-                                //-         .card-body
-                                //-             // heading
-                                //-             h2.fs-6
-                                //-                 a.text-inherit.text-decoration-none(href='/shop?type=Flyers%20and%20Leaflets') Flyers
-                                //-             .text-small.mb-1
-                                //-                 a.text-decoration-none.light-grey(href='#!')
-                                //-                     small
-                                //-                         | Unique Envelopes in sizes to match your unique printed products. Why wait until your mail is opened to impress?
-            section.py-lg-16.py-10(style='background: url(/img/notebook_banner2.jpg)no-repeat; background-position: center; background-size: cover;')
-                .container
-                    // row
-                    .row
-                        .col-xl-4.col-lg-6.col-md-7.offset-xl-8.offset-lg-6.offset-md-5
-                            .card.border-0.shadow
-                                .card-body.p-6
-                                    .mb-4
+            if(homePageBannerSection != null)                    
+                section.py-lg-16.py-10(style=`background: url(${homePageBannerSection.imagePath})no-repeat; background-position: center; background-size: cover;`)
+                    .container
+                        // row
+                        .row
+                            .col-xl-4.col-lg-6.col-md-7.offset-xl-8.offset-lg-6.offset-md-5
+                                .card.border-0.shadow
+                                    .card-body.p-6
+                                        .mb-4
 
-                                        h1.mt-3.mb-0.h4 Create Your Perfect Notebook Here
-                                        medium Having a notebook is more than just having a tool for writing. It is a gateway to unleashing your creativity, enhancing productivity, and capturing your thoughts and ideas. 
-                                    form
-                                        .row.g-3
-                                            .col-auto
-                                                a.btn.btn-primary(href=href='/shop?type=note books') Shop Notebooks
+                                            h1.mt-3.mb-0.h4 #{homePageBannerSection.title}
+                                            medium #{homePageBannerSection.description} 
+                                        form
+                                            .row.g-3
+                                                .col-auto
+                                                    a.btn.btn-primary(href=`/shop?type=${homePageBannerSection.productType.productType}`) Shop #{homePageBannerSection.productType.productType}
 
             if(homePageOptions5To8.length > 0)
                 section.my-lg-14.my-8(style="padding-top:4rem; background:aliceblue; margin-top:unset !important; padding-bottom:5rem; margin-bottom:unset !important")

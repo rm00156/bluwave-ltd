@@ -11,7 +11,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk1: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
@@ -30,7 +30,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk2: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
@@ -49,7 +49,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk3: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
@@ -68,7 +68,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk4: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
@@ -87,7 +87,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk5: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
@@ -106,7 +106,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk6: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
@@ -125,7 +125,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk7: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
@@ -144,7 +144,7 @@ module.exports = function (sequelize, Sequelize) {
         productTypeFk8: {
             type: Sequelize.INTEGER,
             allowNull: true,
-            referenes: {
+            references: {
                 model: 'productTypes',
                 key: 'id'
             }
