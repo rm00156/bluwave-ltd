@@ -154,7 +154,7 @@ function editProductType(e) {
         data.append('deleteFl', deleteFl);
 
         request.addEventListener('load', function(response){
-            if(request.status == 201) {
+            if(request.status == 200) {
                 return window.location = '/admin_dashboard/product_type/' + $('#productTypeId').val();
             } else {
                 $('#error').text(response.currentTarget.response.error);

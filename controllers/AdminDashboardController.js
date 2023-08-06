@@ -309,13 +309,13 @@ exports.getProductTypePage = async function (req, res) {
 
 exports.editProductType = async function (req, res) {
     const productTypeName = req.body.productTypeName;
-
+    const productTypeId = req.body.productTypeId;
     const existingProductType = await productOperations.getProductTypeByType(productTypeName);
 
-    if (existingProductType)
+    if (existingProductType && existingProductType.id != productTypeId)
         return res.status(400).json({ error: 'Product Type with this name already exists.' });
 
-    const productTypeId = req.body.productTypeId;
+    
     const files = req.files;
     const deleteFl = JSON.parse(req.body.deleteFl);
 

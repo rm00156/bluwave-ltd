@@ -39,7 +39,7 @@ html(land="en")
                         .col-lg-12
                             // page header
                             if(productType)
-                                .card.mb-4.bg-light.border-0(style='background: url(' + productType.bannerPath + ')no-repeat; background-position: center; background-size: cover;')
+                                .card.mb-4.bg-light.border-0(style=`background-image: url("${productType.bannerPath}"); background-position: center; background-size: cover;`)
                                     // card body
                                     .card-body.p-12
                                         // title
