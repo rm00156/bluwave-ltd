@@ -19,7 +19,7 @@ html(land="en")
             .mt-4
                 .container
                     // row
-                    .row
+                    .row.mb-3
                         // col
                         .col-12
                             // breadcrumb
@@ -31,6 +31,19 @@ html(land="en")
                                         li.breadcrumb-item.active(aria-current='page') #{productType.productType}
                                     else
                                         li.breadcrumb-item.active(aria-current='page') All Products
+                            
+                if(productType)
+                    .card.mb-4.bg-light.border-0(style=`background-image: url("${productType.bannerPath}"); background-position: center; background-size: cover;`)
+                        // card body
+                        .card-body(style="padding:8rem !important")
+                            // title
+                            h4.mb-0 #{productType.productType}
+                else 
+                    .card.mb-4.bg-light.border-0(style='background: url(' + + ')no-repeat; background-position: center; background-size: cover;')
+                        // card body
+                        .card-body(style="padding:8rem !important")
+                            // title
+                            h4.mb-0 All Products
             section.mt-8.mb-lg-14.mb-8
                 .container
                     // row
@@ -38,55 +51,15 @@ html(land="en")
                         // col
                         .col-lg-12
                             // page header
-                            if(productType)
-                                .card.mb-4.bg-light.border-0(style=`background-image: url("${productType.bannerPath}"); background-position: center; background-size: cover;`)
-                                    // card body
-                                    .card-body.p-12
-                                        // title
-                                        h2.mb-0.fs-1 #{productType.productType}
-                            else 
-                                .card.mb-4.bg-light.border-0(style='background: url(' + + ')no-repeat; background-position: center; background-size: cover;')
-                                    // card body
-                                    .card-body.p-12
-                                        // title
-                                        h2.mb-0.fs-1 All Products
+                            
 
                             // list icon
                             .row.mt-5.text-center 
                                 if(productType)
-                                    h4 Choose #{productType.productType} by type
+                                    h5 Choose #{productType.productType} by type
                                 else 
-                                    h4 Choose All Products by type
-                            //- .d-lg-flex.justify-content-between.align-items-center
-                                div
-                                    p.mb-3.mb-md-0
-                                        span.text-dark 24 
-                                        |  Products found
-                                // icon
-                                .d-md-flex.justify-content-between.align-items-center
-                                    div
-                                        a.text-muted.me-3(href='shop-list.html')
-                                            i.bi.bi-list-ul
-                                        a.me-3.active(href='shop-grid.html')
-                                            i.bi.bi-grid
-                                        a.me-3.text-muted(href='shop-grid-3-column.html')
-                                            i.bi.bi-grid-3x3-gap
-                                    .d-flex.mt-2.mt-lg-0
-                                        .me-2.flex-grow-1
-                                            // select option
-                                            select.form-select
-                                                option(selected='') Show: 50
-                                                option(value='10') 10
-                                                option(value='20') 20
-                                                option(value='30') 30
-                                        div
-                                            // select option
-                                            select.form-select
-                                                option(selected='') Sort by: Featured
-                                                option(value='Low to High') Price: Low to High
-                                                option(value='High to Low')  Price: High to Low
-                                                option(value='Release Date')  Release Date
-                                                option(value='Avg. Rating')  Avg. Rating
+                                    h5 Choose All Products by type
+                            
                             .row.g-4.row-cols-lg-5.row-cols-2.row-cols-md-3.mt-2
                                 // col
                                 each product in products
@@ -102,13 +75,7 @@ html(land="en")
                                                         // img
                                                         img.img-fluid(src=product.image1Path alt='Bluwave ' + product.name + ' image')
                                                     // action btn
-                                                    //- .card-product-action
-                                                        a.btn-action(href='#!' data-bs-toggle='modal' data-bs-target='#quickViewModal')
-                                                            i.bi.bi-eye(data-bs-toggle='tooltip' data-bs-html='true' title='Quick View')
-                                                        a.btn-action(href='shop-wishlist.html' data-bs-toggle='tooltip' data-bs-html='true' title='Wishlist')
-                                                            i.bi.bi-heart
-                                                        a.btn-action(href='#!' data-bs-toggle='tooltip' data-bs-html='true' title='Compare')
-                                                            i.bi.bi-arrow-left-right
+                                                    
 
                                             .card-body
                                                 
