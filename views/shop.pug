@@ -37,13 +37,15 @@ html(land="en")
                         // card body
                         .card-body(style="padding:8rem !important")
                             // title
-                            h4.mb-0 #{productType.productType}
+                            .container
+                                h4.mb-0 #{productType.productType}
                 else 
                     .card.mb-4.bg-light.border-0(style='background: url(' + + ')no-repeat; background-position: center; background-size: cover;')
                         // card body
                         .card-body(style="padding:8rem !important")
                             // title
-                            h4.mb-0 All Products
+                            .container
+                                h4.mb-0 All Products
             section.mt-8.mb-lg-14.mb-8
                 .container
                     // row
@@ -112,30 +114,6 @@ html(land="en")
                                                             |  #{product.name} >
                                                     
                                                         
-                                    
-                                // row
-                                //- .row.mt-8
-                                    .col
-                                        // nav
-                                        nav
-                                            ul.pagination
-                                                li.page-item.disabled
-                                                    a.page-link.mx-1(href='#' aria-label='Previous')
-                                                        i.feather-icon.icon-chevron-left
-                                                li.page-item
-                                                    a.page-link.mx-1.active(href='#') 1
-                                                li.page-item
-                                                    a.page-link.mx-1.text-body(href='#') 2
-                                                li.page-item
-                                                    a.page-link.mx-1.text-body(href='#') ...
-                                                li.page-item
-                                                    a.page-link.mx-1.text-body(href='#') 12
-                                                li.page-item
-                                                    a.page-link.mx-1.text-body(href='#' aria-label='Next')
-                                                        i.feather-icon.icon-chevron-right
-
-
-
 
             +footer()
             +scripts()
