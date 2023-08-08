@@ -1039,6 +1039,13 @@ function updateAllDeliverySelects(e) {
     })
 }
 
+function cancelCrop()
+{
+    basic.destroy();
+    $('#uploadedImageForCrop').empty();
+    $('#overlay').attr('style','display:none');
+}
+
 $(function () {
 
     const addButton = document.querySelector('.add-btn');
@@ -1059,6 +1066,7 @@ $(function () {
 
     $('.picture').on('change', setupCropWindow);
     $('#confirmCrop').on('click', confirmCrop);
+    $('#cancelCrop').on('click', cancelCrop);
     $('.small-button').on('click', removePicture);
     $('.description-point').on('click', handleRemoveClick);
     // setupRemovePictureButtons()

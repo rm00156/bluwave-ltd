@@ -234,12 +234,19 @@ function setHomePageOption(e) {
     } 
 }
 
+function cancelCrop()
+{
+    basic.destroy();
+    $('#uploadedImageForCrop').empty();
+    $('#overlay').attr('style','display:none');
+}
 
 $(function(){
 
     fileJsonObject = initialiseFileJsonObject();
     $('.picture').on('change', setupCropWindow);
     $('#confirmCrop').on('click', confirmCrop);
+    $('#cancelCrop').on('click', cancelCrop);
     $('.small-button').on('click', removePicture);
     $('#form').on('submit', setHomePageOption);
 })

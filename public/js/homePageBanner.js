@@ -176,10 +176,17 @@ function picture1Error() {
     return false;
 }
 
+function cancelCrop()
+{
+    basic.destroy();
+    $('#uploadedImageForCrop').empty();
+    $('#overlay').attr('style','display:none');
+}
 
 $(function () {
 
     $('#confirmCrop').on('click', confirmCrop);
+    $('#cancelCrop').on('click', cancelCrop);
     $('.picture').on('change', setupCropWindow);
     $('.small-button').on('click', removePicture);
     $('#form').on('submit', setHomePageBanner);

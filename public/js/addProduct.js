@@ -1114,6 +1114,13 @@ function updateAllDeliverySelects(e) {
     })
 }
 
+function cancelCrop()
+{
+    basic.destroy();
+    $('#uploadedImageForCrop').empty();
+    $('#overlay').attr('style','display:none');
+}
+
 // Attach the add button click event to the initial input row
 $(function () {
 
@@ -1137,6 +1144,7 @@ $(function () {
     // $('.picture').on('change', addPicture);
     $('.picture').on('change', setupCropWindow);
     $('#confirmCrop').on('click', confirmCrop);
+    $('#cancelCrop').on('click', cancelCrop);
     $('#form').on('submit', createProduct);
 
     $('.delivery-select').on('change', updateAllDeliverySelects);
