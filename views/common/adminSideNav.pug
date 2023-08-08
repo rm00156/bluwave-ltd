@@ -80,7 +80,12 @@ mixin adminSideNav()
                                 li.nav-item
                                     a.nav-link(href='/admin_dashboard/options_5_8')
                                         | Set Options 5-8
-                                
+                    li.nav-item
+                        a.nav-link(href='/')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-binoculars
+                                span.nav-link-text View Site            
                     
     nav#offcanvasExample.navbar-vertical-nav.offcanvas.offcanvas-start.navbar-offcanvac(tabindex='-1')
         .navbar-vertical
@@ -164,4 +169,11 @@ mixin adminSideNav()
                                 li.nav-item
                                     a.nav-link(href='/admin_dashboard/options_5_8')
                                         | Set Options 5-8
+
+                    li.nav-item
+                        a.nav-link(href='/')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-binoculars
+                                span.nav-link-text View Site    
                                 

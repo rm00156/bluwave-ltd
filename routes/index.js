@@ -13,11 +13,11 @@ const {getUser, isCheckoutAsGuest, isGuest} = require('../middleware/cookie');
 const {isArtworkRequired} = require('../middleware/checkout');
 const {validatePhoneNumber, isCorrectAccount} = require('../validators/checkout'); 
 
-router.get('/', getUser, isCustomer, homeController.getHomePage);
-router.get('/shop', getUser, isCustomer, shopController.getShopTypePage)
-router.get('/shop/:productName', getUser, isCustomer, shopController.getProductPage);
-router.get('/get_option_types_and_options_for_product', isCustomer, getUser, shopController.getOptionTypesAndOptionsForProductByProductId)
-router.get('/get_quantity_price_table_details', getUser, isCustomer, shopController.getQuantityPriceTableDetails);
+router.get('/', getUser, homeController.getHomePage);
+router.get('/shop', getUser, shopController.getShopTypePage)
+router.get('/shop/:productName', getUser, shopController.getProductPage);
+router.get('/get_option_types_and_options_for_product', getUser, shopController.getOptionTypesAndOptionsForProductByProductId)
+router.get('/get_quantity_price_table_details', getUser, shopController.getQuantityPriceTableDetails);
 
 router.get('/admin_dashboard', isAdmin, adminRequire2faSetup, adminDashboardController.getAdminDashboardPage);
 router.get('/admin_dashboard/create_admin_account', isAdmin, adminRequire2faSetup, adminDashboardController.getCreateAdminPage);

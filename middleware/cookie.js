@@ -1,74 +1,62 @@
 const passport = require('passport');
 const accountOperations = require('../utilty/account/accountOperations');
-exports.getUser = async function(req,res,next)
-{
+exports.getUser = async function (req, res, next) {
     var account = req.user;
-    
-    if(account)
-    {
+
+    if (account) {
         // logged in 
-        if(account.guestFl == true)
-        {
+        if (account.guestFl == true) {
             const cookie = await accountOperations.getActiveCookie(account.id);
-            
-            if(cookie == null || cookie.acceptedFl == false)
-            {
+
+            if (cookie == null || cookie.acceptedFl == false) {
                 req.body['displayCookieMessage'] = true;
             } else {
                 req.body['displayCookieMessage'] = false;
-            } 
-
-            // else {
-
-            //     await loginUsingCookie(req, next, res);
-            // }
+            }
         }
 
         next();
     }
-    else
-    {
+    else {
         // not logged in
         // // first time coming to site or first time coing to site in awhile
         var cookie = req.cookies['bluwave_ecommerce_user_data'];
-        if(cookie)
-        {
+        if (cookie) {
             await loginUsingCookie(req, next, res);
         }
-        else
-        {
+        else {
             // no cookie
 
             const email = await accountOperations.createGuestAccount(res);
-            
+
             req.body['email'] = email;
             req.body['password'] = 'welcome';
 
-            passport.authenticate('local', (err,user,info)=> {
-                if(err)
+            passport.authenticate('local', (err, user, info) => {
+                if (err)
                     return next(err);
-                                      
-                req.logIn(user,async (err)=>{
-                    
-                    if(err)
+
+                req.logIn(user, async (err) => {
+
+                    if (err)
                         return next(err);
-                    
+
                     req.body['displayCookieMessage'] = true;
                     next();
                 });
-            })(req,res,next);
+            })(req, res, next);
         }
     }
-}    
-    
-exports.isCheckoutAsGuest = async function(req, res, next) {
+}
+
+exports.isCheckoutAsGuest = async function (req, res, next) {
 
     const account = req.user;
 
-    if(account.guestFl == true) {
+    if (account.guestFl == true) {
 
         // check whether session has checkoutAsGuestFl = true
-        if(req.session.checkoutAsGuestFl == true) {
+        if (req.session.checkoutAsGuestFl == true) {
             return next();
         } else {
 
@@ -79,13 +67,13 @@ exports.isCheckoutAsGuest = async function(req, res, next) {
     return next();
 }
 
-exports.isGuest = async function(req, res, next) {
+exports.isGuest = async function (req, res, next) {
 
     const account = req.user;
-    
-    if(account.guestFl == true) {
 
-        if(req.session.checkoutAsGuestFl == true) {
+    if (account.guestFl == true) {
+
+        if (req.session.checkoutAsGuestFl == true) {
             return res.redirect('/checkout');
         } else {
             return next();
