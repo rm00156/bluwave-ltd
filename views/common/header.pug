@@ -1,6 +1,6 @@
 mixin header()
     header.py-lg-5.py-4.border-bottom.border-bottom-lg-0
-        .container
+        .container(style=(user.accountTypeFk == 1 ? "margin-top:4rem" : ""))
             if(user.accountTypeFk == 1)
                 .row#cookieDiv
                     .col-lg-12.col-md-12
