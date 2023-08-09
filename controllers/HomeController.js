@@ -65,6 +65,22 @@ exports.getTermsPage = async function(req, res) {
         companyDetails: companyInfo.getCompanyDetails()})
 }
 
+exports.getPrivacyPage = async function(req, res) {
+    
+    const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
+    var displayCookieMessage = req.body.displayCookieMessage;
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
+    res.render('privacy', {
+        user: req.user,
+        navigationBarHeaders: navigationBarHeaders,
+        basketItems: basketItems,
+        displayCookieMessage: displayCookieMessage,
+        allProductTypes: allProductTypes,
+        companyDetails: companyInfo.getCompanyDetails()})
+}
+
 exports.acceptCookie = async function(req, res)
 {
     var id = req.user.id;
