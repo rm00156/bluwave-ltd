@@ -1,12 +1,12 @@
 const companyInfo = require('../utilty/company/companyInfo');
 const productOperations = require('../utilty/products/productOperations');
 const accountOperations = require('../utilty/account/accountOperations');
-const basketoperations = require('../utilty/basket/basketOperations');
+const basketOperations = require('../utilty/basket/basketOperations');
 const queueOperations = require('../utilty/queue/queueOperations');
 
 exports.getHomePage = async function(req, res) {
 
-    const basketItems = await basketoperations.getActiveBasketItemsForAccount(req.user.id);
+    const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     var displayCookieMessage = req.body.displayCookieMessage;
 
     const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
@@ -47,6 +47,22 @@ exports.getHomePage = async function(req, res) {
                         homePageOptions5To8: homePageOptions5To8,
                         homePageBannerSection: homePageBannerSection,
                         companyDetails: companyInfo.getCompanyDetails()});
+}
+
+exports.getTermsPage = async function(req, res) {
+    
+    const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
+    var displayCookieMessage = req.body.displayCookieMessage;
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
+    res.render('terms', {
+        user: req.user,
+        navigationBarHeaders: navigationBarHeaders,
+        basketItems: basketItems,
+        displayCookieMessage: displayCookieMessage,
+        allProductTypes: allProductTypes,
+        companyDetails: companyInfo.getCompanyDetails()})
 }
 
 exports.acceptCookie = async function(req, res)
