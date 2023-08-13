@@ -861,6 +861,35 @@ async function updateHomePageBannerSection(data) {
         })
 }
 
+async function getHomePageMainBannerSection() {
+    return await models.homePageMainBannerSection.findOne({
+        where: {
+            id: 1
+        }
+    })
+}
+
+async function createHomePageMainBannerSection(title, buttonText, description, path) {
+    return await models.homePageMainBannerSection.create({
+        id: 1,
+        title: title,
+        buttonText: buttonText,
+        description: description,
+        imagePath: path,
+        deleteFl: false,
+        versionNo: 1
+    })
+}
+
+async function updateHomePageMainBannerSection(data) {
+    await models.homePageMainBannerSection.update(data, 
+        {
+            where: {
+                id: 1
+            }
+        })
+}
+
 module.exports = {
     parseOptionTypesAndOption,
     getAllProductWithLowestPriceDetails,
@@ -917,5 +946,8 @@ module.exports = {
     getHomePageOptions,
     getHomePageBannerSection,
     createHomePageBannerSection,
-    updateHomePageBannerSection
+    updateHomePageBannerSection,
+    getHomePageMainBannerSection,
+    createHomePageMainBannerSection,
+    updateHomePageMainBannerSection
   };

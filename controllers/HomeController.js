@@ -15,6 +15,9 @@ exports.getHomePage = async function(req, res) {
     if(homePageBannerSection != null) {
         homePageBannerSection['productType'] = await productOperations.getProductTypeById(homePageBannerSection.productTypeFk);
     }
+
+    const homePageMainBannerSection = await productOperations.getHomePageMainBannerSection();
+
     const homePageOptions = await productOperations.getHomePageOptions();
 
     const homePageOptions1To4 = [];
@@ -46,6 +49,7 @@ exports.getHomePage = async function(req, res) {
                         homePageOptions1To4: homePageOptions1To4,
                         homePageOptions5To8: homePageOptions5To8,
                         homePageBannerSection: homePageBannerSection,
+                        homePageMainBannerSection: homePageMainBannerSection,
                         companyDetails: companyInfo.getCompanyDetails()});
 }
 

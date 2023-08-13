@@ -54,13 +54,13 @@ html(land="en")
                                 // page header
                                 div
 
-                                    h2 Home Page Second Banner Section
+                                    h2 Home Page Main Banner Section
                                     // breacrumb
                                     nav(aria-label='breadcrumb')
                                         ol.breadcrumb.mb-0
                                             li.breadcrumb-item
                                                 a.text-inherit(href='/admin_dashboard') Dashboard
-                                            li.breadcrumb-item.active(aria-current='page') Home Page Second Banner Section
+                                            li.breadcrumb-item.active(aria-current='page') Home Page Main Banner Section
                                 // button
                                 div
                     // row
@@ -70,37 +70,32 @@ html(land="en")
                             .card.mb-6.card-lg
                                 // card body
                                 .card-body.p-6
-                                    h4.mb-4.h5 Home Page Second Banner Section
+                                    h4.mb-4.h5 Home Page Main Banner Section
                                     .row
                                         form#form(method="post" action="/")
                                             .mb-3.col-lg-6
                                                 label.form-label Title
-                                                if(homePageBannerSection)
-                                                    input.form-control#title(type='text' value=homePageBannerSection.title required)
+                                                if(homePageMainBannerSection)
+                                                    input.form-control#title(type='text' value=homePageMainBannerSection.title required)
                                                 else 
                                                     input.form-control#title(type='text' value= required)
                                                 p#errorTitle.text-danger
 
                                             .mb-3.col-lg-6
-                                                label.form-label Product Type
-                                                select.form-control#productType
-                                                    option(value=0)
-                                                    if(homePageBannerSection)
-                                                        each productType in productTypes 
-                                                            option(value=productType.id selected=(homePageBannerSection.productTypeFk == productType.id)) #{productType.productType}
-                                                    else 
-                                                        each productType in productTypes 
-                                                            option(value=productType.id) #{productType.productType}
-                                                p#errorDescription.text-danger
-
-                                            .mb-3.col-lg-6
                                                 label.form-label Description
-                                                if(homePageBannerSection)
-                                                    textarea.form-control#description(type="text" rows="4" required maxlength="200") #{homePageBannerSection.description}
+                                                if(homePageMainBannerSection)
+                                                    textarea.form-control#description(type="text" rows="4" required maxlength="200") #{homePageMainBannerSection.description}
                                                 else 
                                                     textarea.form-control#description(type="text" rows="4" required maxlength="200")
                                                 p#errorDescription.text-danger
-
+                                            
+                                            .mb-3.col-lg-6
+                                                label.form-label Button Text
+                                                if(homePageMainBannerSection)
+                                                    input.form-control#buttonText(type="text" required value=homePageMainBannerSection.buttonText)
+                                                else 
+                                                    input.form-control#buttonText(type="text" required)
+                                                p#errorButtonText.text-danger
                                             div
                                                 .mb-3.col-lg-12.mt-5
                                                     // heading
@@ -108,11 +103,11 @@ html(land="en")
                                                     // input
                                                     .row 
                                                         .col-12.mr-2.label-container(style="height:150px")
-                                                            if(!homePageBannerSection || homePageBannerSection.imagePath == null)
+                                                            if(!homePageMainBannerSection || homePageMainBannerSection.imagePath == null)
                                                                 label.dropzone.border-dashed.rounded-2.text-center.label(for="picture" style="font-size:8pt !important;cursor:pointer;") Add Image
                                                                 input.picture(id="picture" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
                                                             else 
-                                                                label.border-dashed.rounded-2.text-center.label(for="picture" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + homePageBannerSection.imagePath + '")')
+                                                                label.border-dashed.rounded-2.text-center.label(for="picture" style='font-size:8pt !important;cursor:pointer; background-size:cover; background-position:center; background-image: url("' + homePageMainBannerSection.imagePath + '")')
                                                                 button.small-button.btn.btn-danger(type="button") X
                                                                 input.picture(id="picture" type='file' style="opacity:0" accept="image/x-png,image/jpeg" )
                                                            
@@ -126,5 +121,5 @@ html(land="en")
     script(src='/assets/js/vendors/editor.js')
     script(src='/assets/libs/dropzone/dist/min/dropzone.min.js')
     script(src='/assets/js/croppie.js')
-    script(src='/js/homePageBanner.js')
+    script(src='/js/homePageMainBanner.js')
     script(src="/js/adminDashboard.js")

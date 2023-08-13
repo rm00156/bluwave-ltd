@@ -114,9 +114,10 @@ router.post('/set_navigation_bar_headers', isAdmin, adminRequire2faSetup, adminD
 router.put('/admin_dashboard/home_page_option/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateHomePage1To4);
 router.put('/admin_dashboard/home_page_option_5_8/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateHomePage5To8);
 router.post('/admin_dashboard/home_page_banner/set', isAdmin, adminRequire2faSetup, adminDashboardController.setHomePageBanner);
-
+router.post('/admin_dashboard/home_page_main_banner/set', isAdmin, adminRequire2faSetup, adminDashboardController.setHomePageMainBanner);
 
 router.get('/admin_dashboard/options_1_4', isAdmin, adminRequire2faSetup, adminDashboardController.getOptions1To4Page);
 router.get('/admin_dashboard/options_5_8', isAdmin, adminRequire2faSetup, adminDashboardController.getOptions5To8Page);
 router.get('/admin_dashboard/banner_section', isAdmin, adminRequire2faSetup, adminDashboardController.getBannerSectionPage);
+router.get('/admin_dashboard/main_banner_section', isAdmin, adminRequire2faSetup, adminDashboardController.getMainBannerSectionPage);
 module.exports = router
