@@ -43,7 +43,7 @@ const start = function () {
 
   workerQueue.process(maxJobsPerWorker, async (job) => {
 
-    if (job.data.process == 'sendFor|gottenPasswordEmail') {
+    if (job.data.process == 'sendForgottenPasswordEmail') {
       await emailOperations.sendForgottenPasswordEmail(job.data.accountId);
     } else if (job.data.process == 'sendSignupEmail') {
       await emailOperations.sendSigupEmail(job.data.accountId);

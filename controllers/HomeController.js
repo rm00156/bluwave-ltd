@@ -135,6 +135,7 @@ exports.requestForgottenPasswordEmail = async function(req, res) {
     if(account != null) {
 
         await queueOperations.addForgottenPasswordEmailJob(account.id);
+        req.session.message = 'Reset Email Sent!';
         return res.status(200).json({});
     } else {
         res.status(400).json({error: 'No Account found with this email'})
@@ -147,17 +148,19 @@ exports.resetPasswordPage = async function(req, res) {
     const token = req.params.token;
 
     const forgottenPassword = await accountOperations.getForgottenPassword(accountId, token);
-
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
     if(forgottenPassword == null) {
         // link has expired
         // or used
         // 
         return res.render('resetPassword', {
             user: req.user, error: {},
+            allProductTypes: allProductTypes,
             companyDetails: companyInfo.getCompanyDetails()})
     } else {
         return res.render('resetPassword', {
             user: req.user, forgottenPasswordId: forgottenPassword.id,
+            allProductTypes: allProductTypes,
             companyDetails: companyInfo.getCompanyDetails()})
     }
 }
@@ -185,13 +188,19 @@ exports.resetPassword = async function(req, res) {
 }
 
 exports.passwordResetPage = async function(req, res) {
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('passwordReset', {
         user: req.user,
+        allProductTypes: allProductTypes,
         companyDetails: companyInfo.getCompanyDetails()});
 }
 
 exports.passwordEmailSentPage = async function(req, res) {
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
     res.render('forgottenPasswordEmailSentPage', {
         user: req.user,
+        allProductTypes: allProductTypes,
         companyDetails: companyInfo.getCompanyDetails()});
 }

@@ -53,7 +53,7 @@ router.post('/signup/:checkout', getUser, isCustomer, signupController.signup);
 router.get('/login', getUser, isCustomer, loginController.getLoginPage);
 router.post('/login',getUser, isCustomer, loginController.login);
 router.get('/forgot_password', getUser, isCustomer, homeController.getForgotPasswordPage);
-router.post('/forgotten_password', getUser, isCustomer, homeController.requestForgottenPasswordEmail);
+router.post('/forgotten_password', getUser, homeController.requestForgottenPasswordEmail);
 
 router.post('/add_to_basket', getUser, isCustomer, shopController.addToBasket);
 router.get('/basket', getUser, isCustomer, shopController.getBasketPage);

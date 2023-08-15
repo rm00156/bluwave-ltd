@@ -382,9 +382,12 @@ exports.getAccountPage = async function (req, res) {
     if (account.guestFl == true)
         return res.redirect('/admin_dashboard/accounts');
 
+    const message = req.session.message;
+    req.session.message = undefined;
     res.render('adminAccount', {
         user: req.user,
         account: account,
+        message: message,
         companyDetails: companyInfo.getCompanyDetails()
     })
 }

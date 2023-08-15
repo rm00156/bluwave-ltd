@@ -10,6 +10,14 @@ html(land="en")
     link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
     // main
     div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+    div
 
         +adminTopNavbar()
         .main-wrapper
@@ -70,21 +78,37 @@ html(land="en")
                                                             label.form-label Phone
                                                             input.form-control(type='text' value=account.phoneNumber)
                                                         // button
-
-                                                        .mb-5 
-                                                            a.btn.btn-outline-danger(href='#') Send Reset Password Email
+                                                        if(account.accountTypeFk == 2)
+                                                            .mb-5 
+                                                                a.btn.btn-outline-danger(href='#' data-bs-toggle='modal' data-bs-target='#resetPasswordModal') Send Reset Password Email
                                                         .mb-3
                                                             button.btn.btn-primary Save Details
+        if(account.accountTypeFk == 2)
+            #resetPasswordModal.modal.fade(tabindex='-1' aria-labelledby='resetPasswordModal' aria-hidden='true')
+                .modal-dialog
+                    .modal-content
+                        // modal body
+                        .modal-body.p-6
+                            .d-flex.justify-content-between.mb-5
+                                // heading
+                                div
+                                    h5#resetPasswordModalLabel.h6.mb-1 Send Reset Password Email
+                                div
+                                    // button
+                                    button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                            // row
+                            .row.g-3
+                                // col
+                                .col-12
+                                    p.mb-2 Are you sure you want to send a reset password email for this account?
+                                    input#email(type="hidden" value=account.email)
+                                
+                                // button
+                                .col-12.text-end
+                                    button.btn.btn-outline-primary(style="margin-right:10px" type='button' data-bs-dismiss='modal') Cancel
+                                    button.btn.btn-primary#sendEmail(type='button') Send Email                                   
                                             
-                                            //- hr.my-10
-                                            //- div
-                                            //-     // heading
-                                            //-     h5.mb-4 Delete Account
-                                            //-     p.mb-2 Would you like to delete your account?
-                                            //-     p.mb-5
-                                            //-         | This account contain 12 orders, Deleting your account will remove all the order details
-                                            //-         | associated with it.
-                                            //-     // btn
-                                            //-     a.btn.btn-outline-danger(href='#') I want to delete my account
 
         +adminScripts()
+        script(src="/js/adminAccount.js")
+        script(src="/js/adminDashboard.js")
