@@ -71,17 +71,17 @@ html(land="en")
                                                             input.form-control(type='email' disabled value=account.email)
                                                         .mb-3
                                                             label.form-label Name
-                                                            input.form-control(type='text' value=account.name)
+                                                            input.form-control(type='text' disabled value=account.name)
                                                         
                                                         // input
                                                         .mb-3
                                                             label.form-label Phone
-                                                            input.form-control(type='text' value=account.phoneNumber)
+                                                            input.form-control(type='text' disabled value=account.phoneNumber)
                                                         // button
                                                         if(account.accountTypeFk == 2)
                                                             .mb-5 
                                                                 a.btn.btn-outline-danger(href='#' data-bs-toggle='modal' data-bs-target='#resetPasswordModal') Send Reset Password Email
-                                                        .mb-3
+                                                        //- .mb-3
                                                             button.btn.btn-primary Save Details
         if(account.accountTypeFk == 2)
             #resetPasswordModal.modal.fade(tabindex='-1' aria-labelledby='resetPasswordModal' aria-hidden='true')
