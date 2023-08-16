@@ -22,10 +22,7 @@ mixin accountSideBar(type)
                     a.nav-link(aria-current='page' href='/account/' + user.id + '/settings' class=(type=='settings' ? 'active' : ''))
                         i.feather-icon.icon-shopping-bag.me-2
                         | Settings
-                //- li.nav-item
-                    a.nav-link(aria-current='page' href='/admin_dashboard/account/' + user.id + '/delete' class=(type=='delete' ? 'active' : ''))
-                        i.feather-icon.icon-delete.me-2
-                        | Delete Account
+
                 // nav item
 
                 // nav item

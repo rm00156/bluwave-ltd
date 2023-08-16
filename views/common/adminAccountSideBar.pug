@@ -30,7 +30,10 @@ mixin adminAccountSideBar(type, accountType)
                 li.nav-item
                     a.nav-link(aria-current='page' href='/admin_dashboard/account/' + account.id + '/delete' class=(type=='delete' ? 'active' : ''))
                         i.feather-icon.icon-delete.me-2
-                        | Delete Account
+                        if(account.deleteFl == false)
+                            | Deactivate Account
+                        else 
+                            | Reactivate Account
                 // nav item
 
                 // nav item

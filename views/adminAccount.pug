@@ -31,7 +31,7 @@ html(land="en")
                             // page header
                             .d-md-flex.justify-content-between.align-items-center
                                 div
-                                    h2 Account - #{account.name}
+                                    h2 Account - #{account.name} - #{account.deleteFl == false ? 'Active' : 'Deactive'}
                                     // breacrumb
                                     nav(aria-label='breadcrumb')
                                         ol.breadcrumb.mb-0

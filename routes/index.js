@@ -99,6 +99,8 @@ router.get('/account/:id/settings', getUser, isCustomer, isNotGuest, customerAcc
 router.post('/edit_profile', getUser, isCustomer, isNotGuest, customerAccountController.editProfile)
 router.post('/change_password', getUser, isCustomer, isNotGuest, customerAccountController.changePassword);
 router.delete('/delete_account', getUser, isCustomer, isNotGuest, customerAccountController.deleteAccount);
+router.delete('/account/:id/deactivate', isAdmin, adminRequire2faSetup, adminDashboardController.deactivateAccount);
+router.put('/account/:id/reactivate', isAdmin, adminRequire2faSetup, adminDashboardController.reactivateAccount);
 
 router.get('/reset_password/account/:accountId/forgottenPassword/:token', getUser, isCustomer, homeController.resetPasswordPage);
 router.post('/reset_password', getUser, isCustomer, homeController.resetPassword);

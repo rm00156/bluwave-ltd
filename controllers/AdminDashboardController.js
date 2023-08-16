@@ -398,10 +398,13 @@ exports.getAccountDeletePage = async function (req, res) {
     if (account.guestFl == true)
         return res.redirect('/admin_dashboard/accounts');
     const orders = await orderOperations.getSuccessfulOrdersForAccountId(id);
+    const message = req.session.message;
+    req.session.message = undefined;
     res.render('adminAccountDelete', {
         user: req.user,
         account: account,
         orders: orders,
+        message: message,
         companyDetails: companyInfo.getCompanyDetails()
     })
 }
@@ -885,6 +888,24 @@ exports.updateHomePage5To8 = async function (req, res) {
         req.session.message = "Options 5-8 Updated!";
         res.status(200).json({})
     }
+}
+
+exports.deactivateAccount = async function(req, res) {
+
+    const accountId = req.params.id;
+
+    await accountOperations.deleteAccount(accountId);
+    req.session.message = "Account Successfully Deactivated!"
+    res.status(200).json({});
+}
+
+exports.reactivateAccount = async function(req, res) {
+
+    const accountId = req.params.id;
+
+    await accountOperations.reactivateAccount(accountId);
+    req.session.message = "Account Successfully Reactivated!"
+    res.status(200).json({});
 }
 
 async function validateDetails(body, files, from , to) {

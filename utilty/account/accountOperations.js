@@ -291,6 +291,17 @@ async function deleteAccount(accountId) {
     })
 }
 
+async function reactivateAccount(accountId) {
+    await models.account.update({
+        deleteFl: false,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id: accountId
+        }
+    })
+}
+
 async function createForgottenPasswordRequest(accountId) {
 
     const token = utiltyHelper.generateNumberCode();
@@ -496,5 +507,6 @@ module.exports = {
     createNotificationForAdminAccounts,
     deleteNotificationById,
     deleteAllNotificationsForAccount,
-    getNotificationById
+    getNotificationById,
+    reactivateAccount
 }

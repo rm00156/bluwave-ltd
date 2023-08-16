@@ -7,9 +7,15 @@ html(land="en")
     include common/scripts.pug
     +head()
     body
-        //- +header()
+
         .border-bottom.shadow-sm
-            nav.navbar.navbar-light.py-2
+            .row#cookieDiv
+                .col-lg-12.col-md-12
+                    .admin(style="text-align:center")
+                        .row
+                            .col-sm-12
+                                p(style="color:white") ADMIN LOGIN PAGE
+            nav.navbar.navbar-light.py-2(style="margin-top:3rem")
                 .container.justify-content-center.justify-content-lg-between
                     a.navbar-brand(href='/' style="width:15%")
                         img.d-inline-block.align-text-top(src=companyDetails.COMPANY_LOGO alt='' style="width:100%")

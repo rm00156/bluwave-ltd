@@ -78,15 +78,12 @@ html(land="en")
                             hr.my-10
                             div
                                 // heading
-                                h5.mb-4 Delete Account
-                                p.mb-2 Would you like to delete your account?
-                                if(orders.length > 0)
-                                    p.mb-5
-                                        | Your account contains #{orders.length} order(s). Deleting your account will remove all the order details
-                                        | associated with it.
+                                h5.mb-4 Deactivate Account
+                                p.mb-2 Would you like to deactivate your account?
+                                
                                 // btn
-                                a.btn.btn-outline-danger(href='#' data-bs-toggle='modal' data-bs-target='#deleteAccountModal') I want to delete my account
-        #deleteAccountModal.modal.fade(tabindex='-1' aria-labelledby='deleteAccountModalLabel' aria-hidden='true')
+                                a.btn.btn-outline-danger(href='#' data-bs-toggle='modal' data-bs-target='#deactivateAccountModal') I want to deactivate my account
+        #deactivateAccountModal.modal.fade(tabindex='-1' aria-labelledby='deactivateAccountModalLabel' aria-hidden='true')
             .modal-dialog
                 .modal-content
                     // modal body
@@ -94,7 +91,7 @@ html(land="en")
                         .d-flex.justify-content-between.mb-5
                             // heading
                             div
-                                h5#deleteAccountModalLabel.h6.mb-1 Delete Account
+                                h5#deactivateAccountModalLabel.h6.mb-1 Deactivate Account
                             div
                                 // button
                                 button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
@@ -102,11 +99,11 @@ html(land="en")
                         .row.g-3
                             // col
                             .col-12
-                                p Are you sure you wish to delete your account?
+                                p Are you sure you wish to deactivate your account?
                             
                             .col-12.text-end
                                 button.btn.btn-outline-primary(style="margin-right:10px" type='button' data-bs-dismiss='modal') Cancel
-                                button.btn.btn-primary#deleteAccount(type='button') Delete Account
+                                button.btn.btn-primary#deactivateAccount(type='button') Deactivate Account
     
         +footer()
         +scripts()
