@@ -27,18 +27,18 @@ mixin navbar()
                                         .col-lg-3.col-12.mb-4.mb-lg-0
                                             each productType, index in allProductTypes
                                                 if(index < 10)
-                                                    a.dropdown-item(href='/shop?type=' + encodeURIComponent(productType.productType)) #{productType.productType}
+                                                    a.dropdown-item(href='/shop/' + encodeURIComponent(productType.productType)) #{productType.productType}
                                             
 
                                         .col-lg-3.col-12.mb-4.mb-lg-0
                                             each productType, index in allProductTypes
                                                 if(index < 20 && index >= 10)
-                                                    a.dropdown-item(href='/shop?type=' + encodeURIComponent(productType.productType)) #{productType.productType}
+                                                    a.dropdown-item(href='/shop/' + encodeURIComponent(productType.productType)) #{productType.productType}
                                             
                                         .col-lg-3.col-12.mb-4.mb-lg-0
                                             each productType, index in allProductTypes
                                                 if(index < 30 && index >= 20)
-                                                    a.dropdown-item(href='/shop?type=' + encodeURIComponent(productType.productType)) #{productType.productType}
+                                                    a.dropdown-item(href='/shop/' + encodeURIComponent(productType.productType)) #{productType.productType}
                                            
                                             
                                         .col-lg-3.col-12.mb-4.mb-lg-0
@@ -57,6 +57,6 @@ mixin navbar()
                                     ul.dropdown-menu
                                         each product in navigationBarHeader.products
                                             li
-                                                a.dropdown-item(href='/shop?type=' + encodeURIComponent(product.name)) #{product.name}
+                                                a.dropdown-item(href='/shop/' + encodeURIComponent(product.name)) #{product.name}
                                     
                             

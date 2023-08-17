@@ -36,8 +36,8 @@ html(land="en")
 
             section.mt-8
                 .container
-                    .row
-                        .col-md-6
+                    .row.mb-5
+                        aside.col-md-5.sticky-div
                             .slider.slider-for
                                 div
                                     .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image1Path + '")')
@@ -133,7 +133,7 @@ html(land="en")
                                                             .col-12.col-lg-6
                                                                 h5 PLACEHOLDER
                                                 
-                        .col-md-6
+                        .col-md-7
                             .ps-lg-10.mt-6.mt-md-0
                                 // content
                                 a.mb-4.d-block(href='/shop?type=' + productType.productType) #{productType.productType}
@@ -142,9 +142,9 @@ html(land="en")
                                 .mb-4
                                     // rating
                                     // rating
-                                    medium #{product.descriptionPoint1}
+                                    medium.text-dark <b>#{product.descriptionPoint1}</b>
                                     br
-                                    medium <b>#{lowestPriceWithQuantity.quantity}</b> #{productType.productType} starts from <b>£#{lowestPriceWithQuantity.price}</b>   
+                                    medium <b class="text-dark">#{lowestPriceWithQuantity.quantity}</b> #{productType.productType} starts from <b class="text-dark">£#{lowestPriceWithQuantity.price}</b>   
                                     
                                 .mb-4
                                     // price
@@ -198,7 +198,24 @@ html(land="en")
                                     table.table#summary
 
                                     button.btn.btn-primary#addToBasket(style="width:100%") Add to Basket       
-                                
+
+            //- section.py-lg-16.py-10(style='background-color: aliceblue;')
+                .container
+                    // row
+                    .row
+                        //- .col-xl-4.col-lg-6.col-md-7
+                            .card.border-0.shadow
+                                .card-body.p-6
+                                    .mb-4
+
+                                        h1.mt-3.mb-2.h4 #{homePageMainBannerSection.title}
+                                        medium #{homePageMainBannerSection.description}
+                                    form
+                                        .row.g-3
+                                            .col-auto
+                                                a.btn.btn-primary(href="/shop") #{homePageMainBannerSection.buttonText}
+                
+                              
             
             +footer()
             +scripts()

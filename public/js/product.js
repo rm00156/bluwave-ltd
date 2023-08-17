@@ -34,9 +34,9 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
                     var options = optionsJson[optionType];
                     var optionTypeId = options[0].optionTypeId
                     optionTypes.push({optionType: optionType, id: optionTypeId});
-
+                    const disabled = options.length == 1 ? ' disabled ' : '';
                     var html = '<label class="mb-2">' + optionType + '</label>' +
-                            '<select id="' + optionTypeId +'" class="form-control" name="options[]">' 
+                            '<select id="' + optionTypeId +'" class="form-control" name="options[]"'+ disabled + '>' 
                     for(var j = 0; j < options.length; j++) {
 
                         var option = options[j];
