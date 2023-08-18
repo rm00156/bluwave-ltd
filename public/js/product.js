@@ -17,13 +17,13 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
         url: '/get_option_types_and_options_for_product',
         data: {productId: productId},
         success: function(response, xhr) {
-            if(xhr.status === 201) {
-                console.log('No data found');
-                window.location = '/';
-            } else {
+            // if(xhr.status === 201) {
+            //     console.log('No data found');
+            //     window.location = '/';
+            // } else {
 
                 var optionsJson = response;
-                console.log(optionsJson)
+                // console.log(optionsJson)
                 const keys = Object.keys(optionsJson);
 
                 for(var i = 0; i < keys.length; i++) {
@@ -50,7 +50,7 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
                 setupSelectListeners();
                 $('#' + optionTypes[0].id).trigger('change');
             }
-        }
+        // }
                 // foreach of the optionTypes add listeners
                 // which set the params to query the api to populate the quantity price table
     });

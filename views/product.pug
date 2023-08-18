@@ -199,24 +199,79 @@ html(land="en")
 
                                     button.btn.btn-primary#addToBasket(style="width:100%") Add to Basket       
 
-            //- section.py-lg-16.py-10(style='background-color: aliceblue;')
-                .container
-                    // row
-                    .row
-                        //- .col-xl-4.col-lg-6.col-md-7
-                            .card.border-0.shadow
-                                .card-body.p-6
-                                    .mb-4
+            if(templates.length > 0)
+                section(style='background-color: aliceblue;')
+                    .container
+                        // row
+                        .row
+                            .col-md-12
+                                ul#templateTab.nav.nav-pills.nav-lb-tab(role='tablist')
+                                    each template, index in templates
+                                        // nav item
+                                        li.nav-item(role='presentation')
+                                            // btn
+                                            button(id=index + 'tab' class=(index==0 ? "nav-link active" : 'nav-link') data-bs-toggle='tab' data-bs-target=`#${index}-tab-pane` type='button' role='tab' aria-controls=`${index}-tab-pane` aria-selected='true') #{template.name}
+                                
+                                    
+                                #templateTabContent.tab-content
+                                    // tab pane
+                                    each template, index in templates
+                                        div(id=`${index}-tab-pane` role='tabpanel' class=(index==0 ? "tab-pane fade show active" : 'tab-pane fade') aria-labelledby=`${index}-tab` tabindex=index)
+                                            .my-8
+                                                
+                                                .row
+                                                    .col-sm-7(style="padding-right: 3rem")
+                                                        .row.mb-2 
+                                                            .col-sm-12
+                                                                h4.mb-4 #{template.name} Desing Guidlines 
+                                                        .row 
+                                                            .col-2
+                                                                svg.svg-icon.-large.-bleedarea.artwork-guidelines__icon(viewbox='0 0 48 48' role='presentation' aria-hidden='true' data-icon-id='ui--bleed-area')
+                                                                    path(d='M2 39h44V9H2zm2-28h40v26H4z')
 
-                                        h1.mt-3.mb-2.h4 #{homePageMainBannerSection.title}
-                                        medium #{homePageMainBannerSection.description}
-                                    form
-                                        .row.g-3
-                                            .col-auto
-                                                a.btn.btn-primary(href="/shop") #{homePageMainBannerSection.buttonText}
-                
-                              
-            
+                                                            .col-10 
+                                                                h5 Bleed Area: #{template.bleedAreaWidth}mm x #{template.bleedAreaHeight}mm
+                                                                p Make sure that your background extends to fill the bleed to avoid your #{productType.productType} having white edges when trimmed.
+                                                        .row 
+                                                            .col-2
+                                                                svg.svg-icon.-large.-trim.artwork-guidelines__icon(viewbox='0 0 48 48' role='presentation' aria-hidden='true' data-icon-id='ui--trim-area')
+                                                                    path(d='M5 41h2v-4h34v4h2v-4h4v-2h-4V13h4v-2h-4V7h-2v4H7V7H5v4H1v2h4v22H1v2h4zm2-28h34v22H7z')
+
+                                                            .col-10 
+                                                                h5 Trim: #{template.trimWidth}mm x #{template.trimHeight}mm
+                                                                p This is where we aim to cut your #{productType.productType}.
+
+                                                        .row 
+                                                            .col-2
+                                                                svg.svg-icon.-large.-safearea.artwork-guidelines__icon(viewbox='0 0 48 48' role='presentation' aria-hidden='true' data-icon-id='ui--safe-area')
+                                                                    path(d='M44 37h-2v2h4v-4h-2v2zm-10.308 0h5.539v2h-5.539zm-8.307 0h5.539v2h-5.539zm-8.308 0h5.539v2h-5.539zM8.77 37h5.539v2H8.77zM6 37H4v-2H2v4h4v-2zM2 25.573h2v6.285H2zm0-9.427h2v6.285H2zm2-5.143h2v-2H2v4h2v-2zm29.692-2h5.539v2h-5.539zm-24.923 0h5.539v2H8.769zm16.615 0h5.539v2h-5.539zm-8.307 0h5.539v2h-5.539zm24.923 2h2v2h2v-4h-4v2zm2 14.57h2v6.285h-2zm0-9.427h2v6.285h-2z')
+
+                                                            .col-10 
+                                                                h5 Safe Area: #{template.safeAreaWidth}mm x #{template.safeAreaHeight}mm
+                                                                p Make sure any important aspects of your design such as text and logos are inside of the safe area, otherwise they may be cut off.
+
+                                                    .col-sm-5 
+                                                        .row 
+                                                            .col-sm-12
+                                                                h4.mb-4 Download design template
+                                                        .row 
+                                                            .col-sm-12.col-lg-5.col-md-9
+                                                                .card.border-0.shadow
+                                                                    .card-body.p-6
+
+                                                                        .row 
+                                                                            .col-6 
+                                                                                a(href=template.pdfPath download)
+                                                                                    img.mb-2(src="/img/pdf-file.png" width="100%")
+                                                                                    p.text-center.text-muted PDF
+                                                                            .col-6 
+                                                                                a(href=template.jpegPath)
+                                                                                    img.mb-2(src="/img/jpg.png" width="100%")
+                                                                                    p.text-center.text-muted JPG
+                                                                        
+                                                    
+                                                    
+                                    
             +footer()
             +scripts()
             script(src="/js/product.js")

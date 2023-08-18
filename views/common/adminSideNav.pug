@@ -88,7 +88,13 @@ mixin adminSideNav()
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-binoculars
-                                span.nav-link-text View Site            
+                                span.nav-link-text View Site   
+                    li.nav-item
+                        a.nav-link(href='/admin_dashboard/templates')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-files
+                                span.nav-link-text Templates
                     
     nav#offcanvasExample.navbar-vertical-nav.offcanvas.offcanvas-start.navbar-offcanvac(tabindex='-1')
         .navbar-vertical
@@ -182,4 +188,10 @@ mixin adminSideNav()
                                 span.nav-link-icon
                                     i.bi.bi-binoculars
                                 span.nav-link-text View Site    
-                                
+                    
+                    li.nav-item
+                        a.nav-link(href='/admin_dashboard/templates')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-files
+                                span.nav-link-text Templates

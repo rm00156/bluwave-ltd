@@ -52,6 +52,14 @@ async function getProductPage(req, res) {
 
     const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     var displayCookieMessage = req.body.displayCookieMessage;
+
+    const optionTypesAndOptions = await productOperations.getOptionTypesAndOptionsForProductByProductId(product.id);
+    const sizeOptions = optionTypesAndOptions['Size'];
+    var templates = [];
+    if(sizeOptions) {
+        // templates otherwise
+        templates = await productOperations.getTemplatesForSizeOptions(sizeOptions.map(s => s.optionId));
+    }
     res.render('product', {user: req.user, companyDetails: companyInfo.getCompanyDetails(),
                     product: product,
                     productType: productType,
@@ -59,6 +67,7 @@ async function getProductPage(req, res) {
                     basketItems: basketItems,
                     allProductTypes: allProductTypes,
                     displayCookieMessage: displayCookieMessage,
+                    templates: templates,
                     lowestPriceWithQuantity: lowestPriceWithQuantity});
 }
 
@@ -87,7 +96,7 @@ async function getOptionTypesAndOptionsForProductByProductId(req, res) {
     if(results == null)
         return res.status(204);
 
-    return res.status(201).json(results);
+    return res.status(200).json(results);
 }
 
 async function addToBasket(req, res) {

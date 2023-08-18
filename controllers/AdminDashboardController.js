@@ -171,6 +171,130 @@ exports.getProductTypesPage = async function (req, res) {
     })
 }
 
+exports.getTemplatesPage = async function (req, res) {
+
+    const templates = await productOperations.getTemplates();
+    const message = req.session.message;
+    req.session.message = undefined;
+
+    res.render('adminTemplates', {
+        user: req.user,
+        message: message,
+        templates: templates,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.getAddTemplatePage = async function (req, res) {
+    const message = req.session.message;
+    req.session.message = undefined;
+    const sizes = await productOperations.getAvailableSizeOptionsForNewTemplate();
+
+    res.render('addTemplate', {
+        user: req.user,
+        message: message,
+        sizes: sizes,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.addTemplate = async function (req, res) {
+
+    const files = req.files;
+    const s3PathMap = await productOperations.uploadPictures('Templates/', 'Size', files);
+    const body = {
+        bleedAreaWidth: req.body.bleedAreaWidth,
+        bleedAreaHeight: req.body.bleedAreaHeight,
+        trimWidth: req.body.trimWidth,
+        trimHeight: req.body.trimHeight,
+        safeAreaHeight: req.body.safeAreaHeight,
+        safeAreaWidth: req.body.safeAreaWidth,
+        deleteFl: req.body.deleteFl == 'true',
+        sizeOptionFk: req.body.size,
+        versionNo: 1,
+        pdfPath: s3PathMap.get('pdfTemplate'),
+        jpegPath: s3PathMap.get('jpgTemplate')
+    }
+
+    const transaction = await models.sequelize.transaction();
+
+    try {
+        await productOperations.createTemplate(body);
+        await transaction.commit();
+    } catch(err) {
+
+        console.log(err);
+        await transaction.rollback();
+        return res.status(400).json(err);
+    }
+    
+    req.session.message = 'Template created!';
+    res.status(201).json({});
+
+}
+
+exports.editTemplate = async function(req, res) {
+
+    const templateId = req.params.id;
+    
+    const body = {
+        bleedAreaWidth: req.body.bleedAreaWidth,
+        bleedAreaHeight: req.body.bleedAreaHeight,
+        trimWidth: req.body.trimWidth,
+        trimHeight: req.body.trimHeight,
+        safeAreaHeight: req.body.safeAreaHeight,
+        safeAreaWidth: req.body.safeAreaWidth,
+        deleteFl: req.body.deleteFl == 'true',
+        versionNo: models.sequelize.literal('versionNo + 1'),
+        // pdfPath: s3PathMap.get('pdfTemplate'),
+        // jpegPath: s3PathMap.get('jpgTemplate')
+    }
+
+    const files = req.files;
+    if(files) {
+        const s3PathMap = await productOperations.uploadPictures('Templates/', 'Size', files);
+
+        if(s3PathMap.get('pdfTemplate')) {
+            body['pdfPath'] = s3PathMap.get('pdfTemplate');
+        }
+
+        if(s3PathMap.get('jpgTemplate')) {
+            body['jpegPath'] = s3PathMap.get('jpgTemplate');
+        }
+    }
+    
+    const transaction = await models.sequelize.transaction();
+
+    try {
+        await productOperations.updateTemplate(templateId, body);
+        await transaction.commit();
+        req.session.message = 'Template updated!';
+        return res.status(200).json({});
+    } catch(err) {
+        console.log(err);
+        await transaction.rollback();
+
+        return res.status(400).json({});
+    }
+
+
+    
+}
+
+exports.getTemplatePage = async function(req, res) {
+    const id = req.params.id;
+    const template = await productOperations.getTemplate(id);
+    var message = req.session.message;
+    req.session.message = undefined;
+
+    res.render('adminTemplate', {
+        user: req.user,
+        template: template,
+        message: message,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
 exports.createProduct = async function (req, res) {
 
     const productName = req.body.productName;
@@ -315,7 +439,7 @@ exports.editProductType = async function (req, res) {
     if (existingProductType && existingProductType.id != productTypeId)
         return res.status(400).json({ error: 'Product Type with this name already exists.' });
 
-    
+
     const files = req.files;
     const deleteFl = JSON.parse(req.body.deleteFl);
 
@@ -731,21 +855,21 @@ exports.getOptions5To8Page = async function (req, res) {
     })
 }
 
-exports.setHomePageBanner = async function(req, res) {
+exports.setHomePageBanner = async function (req, res) {
 
     const title = req.body.title;
     const description = req.body.description;
     const bannerBlob = req?.files?.bannerBlob;
     const productType = req.body.productType;
-    
+
     const homePageBannerSection = await productOperations.getHomePageBannerSection();
 
-    if(productType == 0) {
-        return res.status(400).json({error: 'Product Type must be set.'});
+    if (productType == 0) {
+        return res.status(400).json({ error: 'Product Type must be set.' });
     }
-    if(homePageBannerSection == null) {
-        if(bannerBlob == undefined) {
-            return res.status(400).json({error: 'Banner Image must be set'});
+    if (homePageBannerSection == null) {
+        if (bannerBlob == undefined) {
+            return res.status(400).json({ error: 'Banner Image must be set' });
         }
         const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Banner', req.files);
         await productOperations.createHomePageBannerSection(title, productType, description, s3PathMap.get('banner'));
@@ -760,7 +884,7 @@ exports.setHomePageBanner = async function(req, res) {
         versionNo: models.sequelize.literal('versionNo + 1')
     };
 
-    if(bannerBlob != undefined) {
+    if (bannerBlob != undefined) {
         const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Banner', req.files);
         data['imagePath'] = s3PathMap.get('banner');
     }
@@ -771,18 +895,18 @@ exports.setHomePageBanner = async function(req, res) {
 
 }
 
-exports.setHomePageMainBanner = async function(req, res) {
+exports.setHomePageMainBanner = async function (req, res) {
 
     const title = req.body.title;
     const description = req.body.description;
     const bannerBlob = req?.files?.bannerBlob;
     const buttonText = req.body.buttonText;
-    
+
     const homePageMainBannerSection = await productOperations.getHomePageMainBannerSection();
 
-    if(homePageMainBannerSection == null) {
-        if(bannerBlob == undefined) {
-            return res.status(400).json({error: 'Banner Image must be set'});
+    if (homePageMainBannerSection == null) {
+        if (bannerBlob == undefined) {
+            return res.status(400).json({ error: 'Banner Image must be set' });
         }
         const s3PathMap = await productOperations.uploadPictures('HomePage/', 'MainBanner', req.files);
         await productOperations.createHomePageMainBannerSection(title, buttonText, description, s3PathMap.get('banner'));
@@ -797,7 +921,7 @@ exports.setHomePageMainBanner = async function(req, res) {
         versionNo: models.sequelize.literal('versionNo + 1')
     };
 
-    if(bannerBlob != undefined) {
+    if (bannerBlob != undefined) {
         const s3PathMap = await productOperations.uploadPictures('HomePage/', 'MainBanner', req.files);
         data['imagePath'] = s3PathMap.get('banner');
     }
@@ -808,7 +932,7 @@ exports.setHomePageMainBanner = async function(req, res) {
 
 }
 
-exports.getBannerSectionPage = async function(req, res) {
+exports.getBannerSectionPage = async function (req, res) {
     const message = req.session.message;
     req.session.message = undefined;
     const productTypes = await productOperations.getAllActiveProductTypes();
@@ -823,7 +947,7 @@ exports.getBannerSectionPage = async function(req, res) {
     })
 }
 
-exports.getMainBannerSectionPage = async function(req, res) {
+exports.getMainBannerSectionPage = async function (req, res) {
     const message = req.session.message;
     req.session.message = undefined;
     const homePageMainBannerSection = await productOperations.getHomePageMainBannerSection();
@@ -890,7 +1014,7 @@ exports.updateHomePage5To8 = async function (req, res) {
     }
 }
 
-exports.deactivateAccount = async function(req, res) {
+exports.deactivateAccount = async function (req, res) {
 
     const accountId = req.params.id;
 
@@ -899,7 +1023,7 @@ exports.deactivateAccount = async function(req, res) {
     res.status(200).json({});
 }
 
-exports.reactivateAccount = async function(req, res) {
+exports.reactivateAccount = async function (req, res) {
 
     const accountId = req.params.id;
 
@@ -908,7 +1032,7 @@ exports.reactivateAccount = async function(req, res) {
     res.status(200).json({});
 }
 
-async function validateDetails(body, files, from , to) {
+async function validateDetails(body, files, from, to) {
     const errors = {};
     const homePageOptions = await productOperations.getHomePageOptions();
     for (var i = from; i <= to; i++) {

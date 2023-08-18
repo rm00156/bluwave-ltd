@@ -44,6 +44,11 @@ router.get('/get_option_types_and_option_for_product', adminDashboardController.
 router.post('/admin_dashboard/option/add', isAdmin, adminRequire2faSetup, adminDashboardController.addOption)
 router.post('/admin_dashboard/option_type/add', isAdmin, adminRequire2faSetup, adminDashboardController.addOptionType)
 
+router.get('/admin_dashboard/templates', isAdmin, adminRequire2faSetup, adminDashboardController.getTemplatesPage);
+router.get('/admin_dashboard/add_template', isAdmin, adminRequire2faSetup, adminDashboardController.getAddTemplatePage);
+router.post('/admin_dashboard/template/add', isAdmin, adminRequire2faSetup, adminDashboardController.addTemplate);
+router.get('/admin_dashboard/template/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getTemplatePage);
+router.put('/admin_dashboard/template/:id', isAdmin, adminRequire2faSetup, adminDashboardController.editTemplate);
 
 router.post('/accept_cookie', homeController.acceptCookie);
 router.get('/logout', isLoggedIn, loginController.logout);
