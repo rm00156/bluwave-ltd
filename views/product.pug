@@ -87,26 +87,16 @@ html(land="en")
                             section.mt-lg-14.mt-8
                                 .container
                                     .row
-                                        .col-md-12
+                                        .trustpilot-widget(data-locale='en-GB' data-template-id='5419b6a8b0d04a076446a9ad' data-businessunit-id='5c8eb780df266400012deb11' data-style-height='24px' data-style-width='100%' data-theme='light')
+                                            a(href='https://uk.trustpilot.com/review/thefuneralstationery.co.uk' target='_blank') Trustpilot
+
+                                        //- .col-md-12
                                             ul#myTab.nav.nav-pills.nav-lb-tab(role='tablist')
                                                 // nav item
                                                 li.nav-item(role='presentation')
                                                     // btn
                                                     button#product-tab.nav-link.active(data-bs-toggle='tab' data-bs-target='#product-tab-pane' type='button' role='tab' aria-controls='product-tab-pane' aria-selected='true') Description
-                                                //- // nav item
-                                                //- li.nav-item(role='presentation')
-                                                //-     // btn
-                                                //-     button#details-tab.nav-link(data-bs-toggle='tab' data-bs-target='#details-tab-pane' type='button' role='tab' aria-controls='details-tab-pane' aria-selected='false') Delivery
-                                                //- // nav item
-                                                //- li.nav-item(role='presentation')
-                                                //-     // btn
-                                                //-     button#reviews-tab.nav-link(data-bs-toggle='tab' data-bs-target='#reviews-tab-pane' type='button' role='tab' aria-controls='reviews-tab-pane' aria-selected='false') Reviews
-                                                //- // nav item
-                                                //- li.nav-item(role='presentation')
-                                                //-     // btn
-                                                //-     button#sellerInfo-tab.nav-link(data-bs-toggle='tab' data-bs-target='#sellerInfo-tab-pane' type='button' role='tab' aria-controls='sellerInfo-tab-pane' aria-selected='false' disabled='')
-                                                //-         | Seller
-                                                //-         | Info
+                                                
                                             // tab content
                                             #myTabContent.tab-content
                                                 // tab pane
@@ -136,7 +126,7 @@ html(land="en")
                         .col-md-7
                             .ps-lg-10.mt-6.mt-md-0
                                 // content
-                                a.mb-4.d-block(href='/shop?type=' + productType.productType) #{productType.productType}
+                                //- a.mb-4.d-block(href='/shop?type=' + productType.productType) #{productType.productType}
                                 // heading
                                 h1.mb-1 #{product.name}
                                 .mb-4
@@ -144,7 +134,7 @@ html(land="en")
                                     // rating
                                     medium.text-dark <b>#{product.descriptionPoint1}</b>
                                     br
-                                    medium <b class="text-dark">#{lowestPriceWithQuantity.quantity}</b> #{productType.productType} starts from <b class="text-dark">£#{lowestPriceWithQuantity.price}</b>   
+                                    medium <b class="text-dark">#{lowestPriceWithQuantity.quantity}</b> #{productType.productType} from <b class="text-dark">£#{lowestPriceWithQuantity.price}</b>   
                                     
                                 .mb-4
                                     // price
