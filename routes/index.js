@@ -14,6 +14,7 @@ const {isArtworkRequired} = require('../middleware/checkout');
 const {validatePhoneNumber, isCorrectAccount} = require('../validators/checkout'); 
 
 router.get('/', getUser, homeController.getHomePage);
+router.get('/about', getUser, homeController.getAboutPage);
 router.get('/terms-conditions', getUser, homeController.getTermsPage);
 router.get('/privacy-policy', getUser, homeController.getPrivacyPage);
 router.get('/shop', getUser, shopController.getShopTypePage)
