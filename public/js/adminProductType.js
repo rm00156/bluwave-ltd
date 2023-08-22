@@ -40,11 +40,11 @@ function setupCropWindow(event)
     {
         resetLabel(input);      
     }
-    else if(file[0].size > 10240000)
+    else if(file[0].size > 100000000)
     {
         resetLabel(input);
 
-        $('#' + input.id + 'Error').text('The picture must not exceed size of 10MB');    
+        $('#' + input.id + 'Error').text('The picture must not exceed size of 100MB');    
     }
     else
     {   
