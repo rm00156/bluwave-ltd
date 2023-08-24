@@ -1,0 +1,80 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            .mt-4
+                .container
+                    // row
+                    .row.mb-3
+                        // col
+                        .col-12
+                            // breadcrumb
+                            nav(aria-label='breadcrumb')
+                                ol.breadcrumb.mb-0
+                                    li.breadcrumb-item
+                                        a(href='/') Home
+
+                                    li.breadcrumb-item.active(aria-current='page') FAQs
+                .col-md-12
+                    .card.mb-4.bg-light.border-0(style='background: url(/img/stock_home_8.jpg) no-repeat; background-position: center; background-size: cover;')
+                        // card body
+                        .card-body(style="padding:8rem !important")
+                            // title
+                            .container
+                                h4.mb-0 FAQs
+            section.my-lg-14.my-8
+                .container
+                    .row
+                                
+
+                        div
+                            // text
+                            .mb-4
+                                h3.text-center.mb-3 How Can We Help?
+                            .row 
+                                .offset-3.col-6
+                                    
+                                    form(action='#')
+                                        p.text-center Use our search bar to find all sorts of useful content.
+                                        .input-group
+                                            input.form-control.rounded.searchQuestion(type='search' autocomplete="on" style="width:100%;" placeholder='Search for help')
+                                         
+                            section.my-lg-14.my-8
+                                .container.text-center
+                                    // row
+                                    .row.mb-8
+                                        each faqsGroupedByType in faqsGroupedByTypes
+                                            .col-md-6.col-lg-4
+                                                
+                                                .mb-8.mb-lg-0
+                                                    .card
+                                                        .card-header(style="padding:5px; border-bottom:unset")
+                                                            // badge
+                                                            .text-center.position-relative
+                                                                h3 #{faqsGroupedByType.type}
+                                                        .card-body
+                                                            each faq in faqsGroupedByType.faqs
+                                                                
+                                                                .row.card.card-product(style="margin:10px") 
+                                                                    .col-12(style="margin-top: 1rem; margin-bottom: 1rem;")
+                                                                        a(href=`/faq/${faq.id}`) #{faq.question}
+                                                                        //- p(style="margin-top: 1rem") 
+                                        
+            +footer()
+            +scripts()
+
+            script(src='js/searchFaq.js')

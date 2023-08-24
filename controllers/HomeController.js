@@ -3,6 +3,7 @@ const productOperations = require('../utilty/products/productOperations');
 const accountOperations = require('../utilty/account/accountOperations');
 const basketOperations = require('../utilty/basket/basketOperations');
 const queueOperations = require('../utilty/queue/queueOperations');
+const faqOperations = require('../utilty/faq/faqOperations');
 
 exports.getHomePage = async function(req, res) {
 
@@ -115,6 +116,43 @@ exports.getPrivacyPage = async function(req, res) {
         companyDetails: companyInfo.getCompanyDetails()})
 }
 
+exports.getFaqsPage = async function(req, res) {
+    const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
+    var displayCookieMessage = req.body.displayCookieMessage;
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
+    const faqsGroupedByTypes = await faqOperations.getFaqsGroupedByType();
+
+    res.render('faqs', {
+        user: req.user,
+        navigationBarHeaders: navigationBarHeaders,
+        basketItems: basketItems,
+        displayCookieMessage: displayCookieMessage,
+        allProductTypes: allProductTypes,
+        faqsGroupedByTypes: faqsGroupedByTypes,
+        companyDetails: companyInfo.getCompanyDetails()})
+}
+
+exports.getFaqPage = async function(req, res) {
+    const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
+    var displayCookieMessage = req.body.displayCookieMessage;
+    const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
+    const allProductTypes = await productOperations.getAllActiveProductTypes();
+
+    const id = req.params.id;
+    const faq = await faqOperations.getFaq(id);
+
+    res.render('faq', {
+        user: req.user,
+        navigationBarHeaders: navigationBarHeaders,
+        basketItems: basketItems,
+        displayCookieMessage: displayCookieMessage,
+        allProductTypes: allProductTypes,
+        faq: faq,
+        companyDetails: companyInfo.getCompanyDetails()})
+}
+
 exports.acceptCookie = async function(req, res)
 {
     var id = req.user.id;
@@ -154,6 +192,16 @@ exports.searchProductOrProductTypes = async function(req, res) {
     const searchResult = [...products, ... productTypes];
 
     res.status(200).json(searchResult);
+}
+
+exports.searchQuestionsAndAnswers = async function(req, res) {
+
+    const search = req.query.search;
+
+    const questions = await faqOperations.searchQuestionsAnswers(search);
+    console.log(questions);
+    
+    res.status(200).json(questions);
 }
 
 exports.requestForgottenPasswordEmail = async function(req, res) {

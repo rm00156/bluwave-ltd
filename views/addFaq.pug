@@ -1,0 +1,103 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    link(href='/assets/libs/dropzone/dist/min/dropzone.min.css' rel='stylesheet')
+    link(href='/assets/css/croppie.css' rel='stylesheet')
+    
+    // main
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                .container
+                    // row
+                    .row.mb-8
+                        .col-md-12
+                            .d-md-flex.justify-content-between.align-items-center
+                                // page header
+                                div
+                                    h2 Add New FAQ
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard/faqs') FAQs
+                                            li.breadcrumb-item.active(aria-current='page') Add New FAQ
+                                // button
+                                div
+                                    a.btn.btn-light(href='/admin_dashboard/faqs') Back to FAQs
+                    // row
+                    .row
+                        .col-lg-12.col-12
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    h4.mb-4.h5 FAQ Information
+                                    .row
+                                        form#form(method="post" action="/admin_dashboard/faq/add")
+                                            // input
+                                            .mb-2
+                                                label.form-label  Status
+                                                br
+                                                .form-check.form-check-inline
+                                                    input#active.form-check-input(type='radio' name='statusOptions' value='active' checked='')
+                                                    label.form-check-label(for='inlineRadio1') Active
+                                                // input
+                                                .form-check.form-check-inline
+                                                    input#inlinedisRadio2.form-check-input(type='radio' name='statusOptions' value='deactive')
+                                                    label.form-check-label(for='inlineRadio2') Deactive
+                                            
+                                            .mb-3.col-lg-6
+                                                label.form-label Question Type
+                                                .row
+                                                    .col-12
+                                                        select#faqType.form-control
+                                                            each faqType in faqTypes 
+                                                                option(value=faqType.id) #{faqType.faqType}
+                                            
+                                            .mb-3.col-lg-6
+                                                label.form-label Question
+                                                .row
+                                                    .col-12
+                                                        input.form-control#question(type='text' required)
+                                                        p.text-danger#questionError
+                                            .mb-3.col-lg-6
+                                                label.form-label Answer 
+                                                .row 
+                                                    .col-12
+                                                        textarea.form-control#answer(rows="7" required)
+                                                    
+        
+                                            // button
+                                            .mb-3.col-sm-6.offset-sm-3
+                                                .d-grid
+                                                    button.btn.btn-primary#createFaq(type='submit')
+                                                        | Create FAQ
+                       
+
+
+
+        +adminScripts()
+        script(src='/assets/libs/quill/dist/quill.min.js')
+        script(src='/assets/js/vendors/editor.js')
+        script(src='/js/addFaq.js')
+        script(src="/js/adminDashboard.js")

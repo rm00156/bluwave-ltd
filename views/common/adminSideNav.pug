@@ -95,7 +95,12 @@ mixin adminSideNav()
                                 span.nav-link-icon
                                     i.bi.bi-files
                                 span.nav-link-text Templates
-                    
+                    li.nav-item
+                        a.nav-link(href='/admin_dashboard/faqs')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-question-circle
+                                span.nav-link-text FAQs
     nav#offcanvasExample.navbar-vertical-nav.offcanvas.offcanvas-start.navbar-offcanvac(tabindex='-1')
         .navbar-vertical
             .px-4.py-5.d-flex.justify-content-between.align-items-center
@@ -195,3 +200,9 @@ mixin adminSideNav()
                                 span.nav-link-icon
                                     i.bi.bi-files
                                 span.nav-link-text Templates
+                    li.nav-item
+                        a.nav-link(href='/admin_dashboard/faqs')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-question-circle
+                                span.nav-link-text FAQs

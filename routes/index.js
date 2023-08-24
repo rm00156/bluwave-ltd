@@ -18,6 +18,9 @@ router.get('/about', getUser, homeController.getAboutPage);
 router.get('/contact', getUser, homeController.getContactPage);
 router.get('/terms-conditions', getUser, homeController.getTermsPage);
 router.get('/privacy-policy', getUser, homeController.getPrivacyPage);
+router.get('/faqs', getUser, homeController.getFaqsPage);
+router.get('/faq/:id', getUser, homeController.getFaqPage);
+
 router.get('/shop', getUser, shopController.getShopTypePage)
 router.get('/shop/:productName', getUser, shopController.getProductPage);
 router.get('/get_option_types_and_options_for_product', getUser, shopController.getOptionTypesAndOptionsForProductByProductId)
@@ -51,6 +54,13 @@ router.get('/admin_dashboard/add_template', isAdmin, adminRequire2faSetup, admin
 router.post('/admin_dashboard/template/add', isAdmin, adminRequire2faSetup, adminDashboardController.addTemplate);
 router.get('/admin_dashboard/template/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getTemplatePage);
 router.put('/admin_dashboard/template/:id', isAdmin, adminRequire2faSetup, adminDashboardController.editTemplate);
+
+router.get('/admin_dashboard/faqs', isAdmin, adminRequire2faSetup, adminDashboardController.getFaqsPage);
+router.get('/admin_dashboard/add_faq', isAdmin, adminRequire2faSetup, adminDashboardController.getAddFaqPage);
+router.post('/admin_dashboard/faq/add', isAdmin, adminRequire2faSetup, adminDashboardController.addFaq);
+router.get('/admin_dashboard/faq/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getFaqPage);
+router.put('/admin_dashboard/faq/:id', isAdmin, adminRequire2faSetup, adminDashboardController.editFaq);
+
 
 router.post('/accept_cookie', homeController.acceptCookie);
 router.get('/logout', isLoggedIn, loginController.logout);
@@ -94,6 +104,8 @@ router.get('/validate_phone_number', validatePhoneNumber);
 router.post('/stripe_webhooks/checkout.session.completed', shopController.sessionCompleted);
 router.get('/purchase_successful/:id', getUser, isCustomer, isCorrectAccount, shopController.purchaseSuccessfulPage);
 router.get('/404', getUser, isCustomer, homeController.getErrorPage);
+
+router.get('/faq_search', getUser, homeController.searchQuestionsAndAnswers);
 
 router.get('/customer_search', getUser, isCustomer, homeController.searchProductOrProductTypes);
 router.get('/get_refund_types', isAdmin, adminRequire2faSetup, adminDashboardController.getRefundTypes);

@@ -9,6 +9,7 @@ const basketOperations = require('../utilty/basket/basketOperations');
 const emailOperations = require('../utilty/email/emailOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const refundOperations = require('../utilty/refund/refundOperations');
+const faqOperations = require('../utilty/faq/faqOperations');
 const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 var GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator;
@@ -185,6 +186,51 @@ exports.getTemplatesPage = async function (req, res) {
     })
 }
 
+exports.getFaqsPage = async function (req, res) {
+
+    const faqs = await faqOperations.getFaqs();
+    const message = req.session.message;
+    req.session.message = undefined;
+
+    res.render('adminFaqs', {
+        user: req.user,
+        message: message,
+        faqs: faqs,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.getAddFaqPage = async function (req, res) {
+    const faqTypes = await faqOperations.getFaqTypes();
+    const message = req.session.message;
+    req.session.message = undefined;
+
+    res.render('addFaq', {
+        user: req.user,
+        faqTypes: faqTypes,
+        message: message,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.addFaq = async function (req, res) {
+
+    const question = req.body.question;
+    const answer = req.body.answer;
+    const deleteFl = req.body.deleteFl == 'true';
+    const faqTypeId = req.body.faqTypeId;
+
+    const existingFaq = await faqOperations.getFaqByQuestion(question);
+
+    if (existingFaq != null) {
+        return res.status(400).json({})
+    }
+
+    await faqOperations.createFaq(question, answer, faqTypeId, deleteFl);
+    req.session.message = 'Question created!'
+    return res.status(201).json({});
+}
+
 exports.getAddTemplatePage = async function (req, res) {
     const message = req.session.message;
     req.session.message = undefined;
@@ -221,22 +267,22 @@ exports.addTemplate = async function (req, res) {
     try {
         await productOperations.createTemplate(body);
         await transaction.commit();
-    } catch(err) {
+    } catch (err) {
 
         console.log(err);
         await transaction.rollback();
         return res.status(400).json(err);
     }
-    
+
     req.session.message = 'Template created!';
     res.status(201).json({});
 
 }
 
-exports.editTemplate = async function(req, res) {
+exports.editTemplate = async function (req, res) {
 
     const templateId = req.params.id;
-    
+
     const body = {
         bleedAreaWidth: req.body.bleedAreaWidth,
         bleedAreaHeight: req.body.bleedAreaHeight,
@@ -251,18 +297,18 @@ exports.editTemplate = async function(req, res) {
     }
 
     const files = req.files;
-    if(files) {
+    if (files) {
         const s3PathMap = await productOperations.uploadPictures('Templates/', 'Size', files);
 
-        if(s3PathMap.get('pdfTemplate')) {
+        if (s3PathMap.get('pdfTemplate')) {
             body['pdfPath'] = s3PathMap.get('pdfTemplate');
         }
 
-        if(s3PathMap.get('jpgTemplate')) {
+        if (s3PathMap.get('jpgTemplate')) {
             body['jpegPath'] = s3PathMap.get('jpgTemplate');
         }
     }
-    
+
     const transaction = await models.sequelize.transaction();
 
     try {
@@ -270,18 +316,50 @@ exports.editTemplate = async function(req, res) {
         await transaction.commit();
         req.session.message = 'Template updated!';
         return res.status(200).json({});
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         await transaction.rollback();
 
         return res.status(400).json({});
     }
-
-
-    
 }
 
-exports.getTemplatePage = async function(req, res) {
+exports.editFaq = async function (req, res) {
+
+    const faqId = req.params.id;
+    const question = req.body.question;
+    const answer = req.body.answer;
+    const deleteFl = req.body.deleteFl == 'true';
+    const faqTypeId = req.body.faqTypeId;
+
+    const faq = await faqOperations.getFaq(faqId);
+
+    if (faq == null) {
+        return res.status(400).json({ error: 'No Question to update' })
+    }
+
+    // findQuestionName
+    const faqWithQuestion = await faqOperations.getFaqByQuestion(question);
+
+    if (faqWithQuestion && faqWithQuestion.id != faqId) {
+        return res.status(400).json({ error: 'Question Name already exists' });
+    }
+
+    const transaction = await models.sequelize.transaction();
+
+    try {
+        await faqOperations.updateFaq(question, answer, deleteFl, faqTypeId, faqId);
+        await transaction.commit();
+        req.session.message = 'Question Updated!';
+        res.status(200).json({});
+    } catch (err) {
+        console.log(err);
+        await transaction.rollback();
+        res.status(400).json({ error: err })
+    }
+}
+
+exports.getTemplatePage = async function (req, res) {
     const id = req.params.id;
     const template = await productOperations.getTemplate(id);
     var message = req.session.message;
@@ -290,6 +368,22 @@ exports.getTemplatePage = async function(req, res) {
     res.render('adminTemplate', {
         user: req.user,
         template: template,
+        message: message,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
+exports.getFaqPage = async function (req, res) {
+    const id = req.params.id;
+    const faq = await faqOperations.getFaq(id);
+    const faqTypes = await faqOperations.getFaqTypes();
+    var message = req.session.message;
+    req.session.message = undefined;
+
+    res.render('adminFaq', {
+        user: req.user,
+        faq: faq,
+        faqTypes: faqTypes,
         message: message,
         companyDetails: companyInfo.getCompanyDetails()
     })
