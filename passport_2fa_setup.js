@@ -1,5 +1,4 @@
-const bcrypt = require('bcryptjs');
-const models = require('./models');
+const utilityHelper = require('./utilty/general/utilityHelper');
 const accountOperations = require('./utilty/account/accountOperations');
 var GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator;
 var TwoFAStrategy = require('passport-2fa-totp').Strategy;
@@ -32,7 +31,7 @@ module.exports = function(passport)
         {
             return done(null, false);
         }
-        else if(!validPassword(account, password))
+        else if(!utilityHelper.validPassword(account, password))
         {
             return done(null,false);
         }
@@ -59,10 +58,4 @@ module.exports = function(passport)
         })
 
     );
-
-    const validPassword = function(account, password)
-    {
-        return bcrypt.compareSync(password, account.password);
-    }
-
 }

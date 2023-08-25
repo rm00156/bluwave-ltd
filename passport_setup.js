@@ -1,5 +1,5 @@
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
+const utilityHelper = require('./utilty/general/utilityHelper');
 const accountOperations = require('./utilty/account/accountOperations');
 var GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator;
 var TwoFAStrategy = require('passport-2fa-totp').Strategy;
@@ -37,7 +37,7 @@ module.exports= function(passport)
             req.flash('message', 'You must reset your password');
             return done(null, false);
         }
-        else if(!validPassword(account, password)){
+        else if(!utilityHelper.validPassword(account, password)){
             req.flash('message', 'Incorrect credentials');
             return done(null,false);
         }
@@ -88,7 +88,7 @@ module.exports= function(passport)
             req.flash('message', 'You must reset your password');
             return done(null, false);
         }
-        else if(!validPassword(account, password))
+        else if(!utilityHelper.validPassword(account, password))
         {
             req.flash('message', 'Incorrect credentials');
             return done(null,false);
@@ -139,7 +139,7 @@ module.exports= function(passport)
             req.flash('message', 'You must reset your password');
             return done(null, false);
         }
-        else if(!validPassword(account, password))
+        else if(!utilityHelper.validPassword(account, password))
         {
             req.flash('message', 'Incorrect credentials');
             return done(null,false);
@@ -162,9 +162,4 @@ module.exports= function(passport)
         done(null,secret,30);
         
     }))
-
-    const validPassword = function(account, password)
-    {
-        return bcrypt.compareSync(password, account.password);
-    }
 }

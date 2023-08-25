@@ -20,12 +20,13 @@ async function createAccount(accountTypeFk, email, name, phoneNumber, password) 
             deleteFl: false,
             versionNo: 1
         })
+        await transaction.commit();
     } catch (err) {
         console.log(err);
         await transaction.rollback();
-        throw 'error with account sign up';
+        throw new Error('error with account sign up');
     }
-    await transaction.commit();
+    
     return account;
 }
 

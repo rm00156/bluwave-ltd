@@ -26,3 +26,8 @@ exports.dateXAmountFromNow = function(amountInMs) {
 
     return futureDate;
 }
+
+exports.validPassword = function(account, password)
+{
+    return bcrypt.compareSync(password, account.password);
+}

@@ -2,14 +2,12 @@ var fs = require("fs");
 var path = require("path");
 var Sequelize = require("sequelize");
 var env = process.env.NODE_ENV || "development";
-// var config = require(path.join(__dirname, '..', 'config', 'config.json'))[env];
-var sequelize = new Sequelize(process.env.DATABASE_NAME, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
+var sequelize = new Sequelize(env == "test" ? process.env.TEST_DATABASE_NAME : process.env.DATABASE_NAME, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
     host: process.env.DATABASE_HOST,
     dialect: process.env.DATABASE_DIALECT
 });
 var db = {};
  
- console.log(env);
 fs
     .readdirSync(__dirname)
     .filter(function(file) {
