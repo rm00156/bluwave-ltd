@@ -1,6 +1,7 @@
 const express = require('express');
 require('express-async-errors');
 const isDevelopment = process.env.NODE_ENV === undefined || 'test';
+console.log(isDevelopment)
 if (isDevelopment) {
   require('dotenv').config(); // Load variables from .env file
 }
