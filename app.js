@@ -1,8 +1,8 @@
 const express = require('express');
 require('express-async-errors');
-const isDevelopment = (process.env.NODE_ENV === undefined || 'test');
-console.log(`environment is ${process.env.NODE_ENV}`)
-if (isDevelopment) {
+const notProduction = process.env.NODE_ENV != 'production';
+
+if (notProduction) {
   require('dotenv').config(); // Load variables from .env file
 }
 const path = require('path');
