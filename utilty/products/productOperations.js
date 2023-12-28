@@ -331,13 +331,13 @@ async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
 async function getAllProductWithLowestPriceDetails() {
 
     return await models.sequelize.query(' select distinct pq.price, pt.productType, p.* from priceMatrixRowQuantityPrices pq ' +
-        ' inner join priceMatrixrows pr on pq.priceMatrixRowFk = pr.id ' +
+        ' inner join priceMatrixRows pr on pq.priceMatrixRowFk = pr.id ' +
         ' inner join priceMatrices pm on pr.priceMatrixFk = pm.id ' +
         ' inner join products p on pm.productFk = p.id ' +
         ' inner join productTypes pt on p.productTypeFk = pt.id ' +
         ' where pq.id = ( ' +
         ' select pq2.id from priceMatrixRowQuantityPrices pq2 ' +
-        ' inner join priceMatrixrows pr2 on pq2.priceMatrixRowFk = pr2.id ' +
+        ' inner join priceMatrixRows pr2 on pq2.priceMatrixRowFk = pr2.id ' +
         ' inner join priceMatrices pm2 on pr2.priceMatrixFk = pm2.id ' +
         ' where pm2.productFk = p.id ' +
         ' and pm2.deleteFl = false ' +
