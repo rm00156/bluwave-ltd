@@ -76,9 +76,9 @@ app.use((req, res, next) => {
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
-  if (req.app.get('env') === 'production') {
-    return res.render('404',{user:req.user, companyDetails: companyInfo.getCompanyDetails()});
-  } 
+  // if (req.app.get('env') === 'production') {
+  //   return res.render('404',{user:req.user, companyDetails: companyInfo.getCompanyDetails()});
+  // } 
 
   res.locals.message = error.message;
   res.locals.error = error;
