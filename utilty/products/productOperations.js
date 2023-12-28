@@ -105,7 +105,7 @@ async function getAllOptionTypes() {
 }
 
 async function getAllOptionTypesWithOptions() {
-    return await models.sequelize.query('select distinct ot.* from optiontypes ot ' +
+    return await models.sequelize.query('select distinct ot.* from optionTypes ot ' +
         ' inner join options o on o.optionTypeFk = ot.id ',
         { type: models.sequelize.QueryTypes.SELECT });
 }

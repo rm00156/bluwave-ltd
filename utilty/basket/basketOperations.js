@@ -117,7 +117,7 @@ async function updateQuantityPriceForBasketItem(basketItemId, quantityId) {
 
     const basketItem = await getBasketItem(basketItemId);
 
-    var optionGroupIdForProductPriceRow = await models.sequelize.query('SELECT og.id FROM optiongroups og ' +
+    var optionGroupIdForProductPriceRow = await models.sequelize.query('SELECT og.id FROM optionGroups og ' +
         ' INNER JOIN optionGroupItems ogi ON og.id = ogi.optionGroupFk ' +
         ' inner join priceMatrixRows pmr on pmr.optionGroupFk = og.id ' +
         ' inner join priceMatrices pm on pmr.priceMatrixFk = pm.id ' +
@@ -316,7 +316,7 @@ async function setPurchaseBasketForBasketItem(basketItemId, purchaseBasketId) {
 
 async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchaseBasketId) {
     const result = await models.sequelize.query('select b.*, p.name as productName, q.quantity, ot.optionType, o.name as optionName from basketItems b ' +
-        ' inner join purchasebaskets pb on b.purchaseBasketFk = pb.id ' +
+        ' inner join purchaseBaskets pb on b.purchaseBasketFk = pb.id ' +
         ' inner join products p on b.productFk = p.id ' +
         ' inner join optionGroupItems ogi on ogi.optionGroupFk = b.optionGroupFk ' +
         ' inner join options o on ogi.optionFk = o.id ' +

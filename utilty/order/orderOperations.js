@@ -93,7 +93,7 @@ async function updatePurchaseBasketWithOrderId(purchaseBasketId, orderId) {
 async function getOrderDetailsInLastMonth() {
 
     const result = await models.sequelize.query('SELECT sum(total) as total, count(id) as count ' +
-        ' FROM purchasebaskets ' +
+        ' FROM purchaseBaskets ' +
         ' WHERE purchaseDttm >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH) ' +
         ' and status = :status ', { replacements: { status: 'Completed' }, type: models.sequelize.QueryTypes.SELECT });
 
