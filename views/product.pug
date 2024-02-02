@@ -1,0 +1,268 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        
+        +header()
+        +navbar()
+        main
+            .mt-4
+                .container
+                    // row
+                    .row
+                        // col
+                        .col-12
+                            // breadcrumb
+                            nav(aria-label='breadcrumb')
+                                ol.breadcrumb.mb-0
+                                    li.breadcrumb-item
+                                        a(href='/') Home
+
+                                    li.breadcrumb-item
+                                        a(href="/shop?type=" + productType.productType) #{productType.productType}
+
+                                    li.breadcrumb-item.active(aria-current='page') #{product.name}
+
+            section.mt-8
+                .container
+                    .row.mb-5
+                        aside.col-md-5.sticky-div
+                            .slider.slider-for
+                                div
+                                    .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image1Path + '")')
+                                        // img
+                                        // img
+                                        img(src=product.image1Path alt='')
+                                if(product.image2Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image2Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image2Path alt='')
+                                if(product.image3Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image3Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image3Path alt='')
+                                if(product.image4Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image4Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image4Path alt='')
+                                if(product.image5Path)
+                                    div
+                                        .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image5Path + '")')
+                                            // img
+                                            // img
+                                            img(src=product.image5Path alt='')
+                            .slider.slider-nav.mt-4
+                                div
+                                    img.w-100(src=product.image1Path alt='')
+                                if(product.image2Path)
+                                    div
+                                        img.w-100(src=product.image2Path alt='')
+                                if(product.image3Path)
+                                    div
+                                        img.w-100(src=product.image3Path alt='')
+                                if(product.image4Path)
+                                    div
+                                        img.w-100(src=product.image4Path alt='')
+                                if(product.image5Path)
+                                    div
+                                        img.w-100(src=product.image5Path alt='')
+                            
+                            section.mt-lg-14.mt-8
+                                .container
+                                    .row
+                                        .trustpilot-widget(data-locale='en-GB' data-template-id='5419b6a8b0d04a076446a9ad' data-businessunit-id='5c8eb780df266400012deb11' data-style-height='24px' data-style-width='100%' data-theme='light')
+                                            a(href='https://uk.trustpilot.com/review/thefuneralstationery.co.uk' target='_blank') Trustpilot
+
+                                        //- .col-md-12
+                                            ul#myTab.nav.nav-pills.nav-lb-tab(role='tablist')
+                                                // nav item
+                                                li.nav-item(role='presentation')
+                                                    // btn
+                                                    button#product-tab.nav-link.active(data-bs-toggle='tab' data-bs-target='#product-tab-pane' type='button' role='tab' aria-controls='product-tab-pane' aria-selected='true') Description
+                                                
+                                            // tab content
+                                            #myTabContent.tab-content
+                                                // tab pane
+                                                #product-tab-pane.tab-pane.fade.show.active(role='tabpanel' aria-labelledby='product-tab' tabindex='0')
+                                                    .my-8
+                                                        .mb-5
+                                                            // text
+                                                            //- h4.mb-1 #MAIN_DESCRIPTION_TITLE
+                                                            p.mb-0 #{product.description}
+                                                        .mb-5
+                                                            //- h5.mb-1 Storage Tips
+                                                            //- p.mb-0
+                                                            //-     | Nisi, tellus iaculis urna bibendum in lacus, integer. Id imperdiet vitae varius sed
+                                                            //-     | magnis eu
+                                                            //-     | nisi nunc sit. Vel, varius habitant ornare ac rhoncus. Consequat risus facilisis ante ipsum
+                                                            //-     | netus risus adipiscing sagittis sed.Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                                        
+                                                // tab pane
+                                                //- #details-tab-pane.tab-pane.fade(role='tabpanel' aria-labelledby='details-tab' tabindex='0')
+                                                    .my-8
+                                                        .row
+                                                            .col-12
+                                                                h4.mb-4 Delivery Details
+                                                            .col-12.col-lg-6
+                                                                h5 PLACEHOLDER
+                                                
+                        .col-md-7
+                            .ps-lg-10.mt-6.mt-md-0
+                                // content
+                                //- a.mb-4.d-block(href='/shop?type=' + productType.productType) #{productType.productType}
+                                // heading
+                                h1.mb-1 #{product.name}
+                                .mb-4
+                                    // rating
+                                    // rating
+                                    medium.text-dark <b>#{product.descriptionPoint1}</b>
+                                    br
+                                    medium <b class="text-dark">#{lowestPriceWithQuantity.quantity}</b> #{productType.productType} from <b class="text-dark">£#{lowestPriceWithQuantity.price}</b>   
+                                    
+                                .mb-4
+                                    // price
+                                    large.fw-bold.text-dark #{product.subDescriptionTitle}
+                                    //- span.text-decoration-line-through.text-muted   $35
+                                    //- span
+                                        small.fs-6.ms-2.text-danger
+                                            | 26%
+                                            | Off
+                                    br
+                                    medium #{product.subDescription}
+                                    br
+                                    br
+                                    ul(style="padding-left:1rem !important")
+                                        li.text-decoration-none.text-muted
+                                            medium #{product.descriptionPoint1}
+                                        if(product.descriptionPoint2)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint2}
+
+                                        if(product.descriptionPoint3)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint3}
+
+                                        if(product.descriptionPoint4)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint4}
+
+                                        if(product.descriptionPoint5)
+                                            li.text-decoration-none.text-muted
+                                                medium #{product.descriptionPoint5}
+                                    
+
+                                .mb-4
+                                    input#productId(type="hidden" value=product.id)
+                                    input#productType(type="hidden" value=productType.productType)
+                                    large.fw-bold.text-dark Customise your #{product.name}
+                                    br
+                                    br
+                                    #optionsSection
+                                .mb-4
+                                    large.fw-bold.text-dark Select your Quantity 
+                                    .col-12
+                                        #quantityPriceTableSection
+                                        
+                                
+                                .mb-4
+                                    large.fw-bold.text-dark Summary
+                                    // table
+                                    #summaryTableSection
+                                    table.table#summary
+
+                                    button.btn.btn-primary#addToBasket(style="width:100%") Add to Basket       
+
+            if(templates.length > 0)
+                section(style='background-color: aliceblue;')
+                    .container
+                        // row
+                        .row
+                            .col-md-12
+                                ul#templateTab.nav.nav-pills.nav-lb-tab(role='tablist')
+                                    each template, index in templates
+                                        // nav item
+                                        li.nav-item(role='presentation')
+                                            // btn
+                                            button(id=index + 'tab' class=(index==0 ? "nav-link active" : 'nav-link') data-bs-toggle='tab' data-bs-target=`#${index}-tab-pane` type='button' role='tab' aria-controls=`${index}-tab-pane` aria-selected='true') #{template.name}
+                                
+                                    
+                                #templateTabContent.tab-content
+                                    // tab pane
+                                    each template, index in templates
+                                        div(id=`${index}-tab-pane` role='tabpanel' class=(index==0 ? "tab-pane fade show active" : 'tab-pane fade') aria-labelledby=`${index}-tab` tabindex=index)
+                                            .my-8
+                                                
+                                                .row
+                                                    .col-sm-7(style="padding-right: 3rem")
+                                                        .row.mb-2 
+                                                            .col-sm-12
+                                                                h4.mb-4 #{template.name} Desing Guidlines 
+                                                        .row 
+                                                            .col-2
+                                                                svg.svg-icon.-large.-bleedarea.artwork-guidelines__icon(viewbox='0 0 48 48' role='presentation' aria-hidden='true' data-icon-id='ui--bleed-area')
+                                                                    path(d='M2 39h44V9H2zm2-28h40v26H4z')
+
+                                                            .col-10 
+                                                                h5 Bleed Area: #{template.bleedAreaWidth}mm x #{template.bleedAreaHeight}mm
+                                                                p Make sure that your background extends to fill the bleed to avoid your #{productType.productType} having white edges when trimmed.
+                                                        .row 
+                                                            .col-2
+                                                                svg.svg-icon.-large.-trim.artwork-guidelines__icon(viewbox='0 0 48 48' role='presentation' aria-hidden='true' data-icon-id='ui--trim-area')
+                                                                    path(d='M5 41h2v-4h34v4h2v-4h4v-2h-4V13h4v-2h-4V7h-2v4H7V7H5v4H1v2h4v22H1v2h4zm2-28h34v22H7z')
+
+                                                            .col-10 
+                                                                h5 Trim: #{template.trimWidth}mm x #{template.trimHeight}mm
+                                                                p This is where we aim to cut your #{productType.productType}.
+
+                                                        .row 
+                                                            .col-2
+                                                                svg.svg-icon.-large.-safearea.artwork-guidelines__icon(viewbox='0 0 48 48' role='presentation' aria-hidden='true' data-icon-id='ui--safe-area')
+                                                                    path(d='M44 37h-2v2h4v-4h-2v2zm-10.308 0h5.539v2h-5.539zm-8.307 0h5.539v2h-5.539zm-8.308 0h5.539v2h-5.539zM8.77 37h5.539v2H8.77zM6 37H4v-2H2v4h4v-2zM2 25.573h2v6.285H2zm0-9.427h2v6.285H2zm2-5.143h2v-2H2v4h2v-2zm29.692-2h5.539v2h-5.539zm-24.923 0h5.539v2H8.769zm16.615 0h5.539v2h-5.539zm-8.307 0h5.539v2h-5.539zm24.923 2h2v2h2v-4h-4v2zm2 14.57h2v6.285h-2zm0-9.427h2v6.285h-2z')
+
+                                                            .col-10 
+                                                                h5 Safe Area: #{template.safeAreaWidth}mm x #{template.safeAreaHeight}mm
+                                                                p Make sure any important aspects of your design such as text and logos are inside of the safe area, otherwise they may be cut off.
+
+                                                    .col-sm-5 
+                                                        .row 
+                                                            .col-sm-12
+                                                                h4.mb-4 Download design template
+                                                        .row 
+                                                            .col-sm-12.col-lg-5.col-md-9
+                                                                .card.border-0.shadow
+                                                                    .card-body.p-6
+
+                                                                        .row 
+                                                                            .col-6 
+                                                                                a(href=template.pdfPath download)
+                                                                                    img.mb-2(src="/img/pdf-file.png" width="100%")
+                                                                                    p.text-center.text-muted PDF
+                                                                            .col-6 
+                                                                                a(href=template.jpegPath)
+                                                                                    img.mb-2(src="/img/jpg.png" width="100%")
+                                                                                    p.text-center.text-muted JPG
+                                                                        
+                                                    
+                                                    
+                                    
+            +footer()
+            +scripts()
+            script(src="/js/product.js")
+            

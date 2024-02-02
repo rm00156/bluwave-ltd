@@ -1,0 +1,147 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    include common/accountSideBar.pug
+    +head()
+    link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+
+        section.border-top
+            .container
+                .row.mt-5
+                    .col-xl-12.col-12.mb-5
+                        // card
+                        .card.h-100.card-lg
+                            .card-body.p-6
+                                .d-md-flex.justify-content-between
+                                    .d-flex.align-items-center.mb-2.mb-md-0
+                                        h2.mb-0 Order Number: #{order.orderNumber}
+                                    // select option
+                                    .d-md-flex
+
+                                        // button
+                                        .ms-md-3
+                                            btn.btn.btn-outline-primary.btn-sm(type="button" onclick='window.print()') Download Invoice
+                                .mt-8
+                                    .row
+                                        // address
+                                        .col-lg-4.col-md-4.col-12
+                                            .mb-6
+                                                h6 Customer Details
+                                                p.mb-1.lh-lg
+                                                    | #{order.fullName}
+                                                    br
+                                                    | #{order.email}
+                                                    br
+                                                    | #{order.phoneNumber}
+                                                
+                                        // address
+                                        .col-lg-4.col-md-4.col-12
+
+                                            .mb-6
+                                                if(shippingDetail != null)
+                                                    h6 Shipping Address
+                                                    p.mb-1.lh-lg
+                                                        | #{shippingDetail.addressLine1}
+                                                        if(shippingDetail.addressLine2 != null)
+                                                            br
+                                                            | #{shippingDetail.addressLine2}
+                                                        br
+                                                        | #{shippingDetail.city}
+                                                        br
+                                                        | #{shippingDetail.postCode}
+                                                else 
+                                                    h6 Collection
+                                        // address
+                                        .col-lg-4.col-md-4.col-12
+                                            .mb-6
+                                                h6 Order Details
+                                                p.mb-1.lh-lg
+                                                    | Order Number: 
+                                                    span.text-dark #{order.orderNumber}
+                                                    br
+                                                    |                           Order Date: 
+                                                    span.text-dark #{order.purchaseDt}
+                                                    br
+                                                    |                           Order Total: 
+                                                    span.text-dark £#{parseFloat(order.total).toFixed(2)}
+                            .row
+                                .col-12
+                                    .table-responsive
+                                        // Table
+                                        table.table.mb-0.text-nowrap.table-centered
+                                            // Table Head
+                                            thead.bg-light
+                                                tr
+                                                    th Products
+                                                    th Price
+                                                    th Quantity
+                                                    th Files
+                                                    th Cost
+                                            // tbody
+                                            tbody
+                                                each orderItem in orderItems
+                                                    tr
+                                                        td
+                                                            a.text-inherit(href='#')
+                                                                .d-flex.align-items-center
+                                                                    .ms-lg-4.mt-2.mt-lg-0
+                                                                        h5.mb-0.h6
+                                                                            | #{orderItem.productName}
+                                                                        each option in orderItem.options 
+                                                                            p.mb-0 #{option.optionType}: #{option.name}
+                                                        td
+                                                            span.text-body £#{(parseFloat(orderItem.price)/parseFloat(orderItem.quantity)).toFixed(2)}
+                                                        td 
+                                                            each fileGroupItem in orderItem.fileGroupItems 
+                                                                a(href=fileGroupItem.path) #{fileGroupItem.fileName}
+                                                                br
+                                                        td #{orderItem.quantity}
+                                                        td £#{orderItem.price}
+
+
+                                                tr
+                                                    td.border-bottom-0.pb-0
+                                                    td.border-bottom-0.pb-0
+                                                    td.border-bottom-0.pb-0
+                                                    td.fw-medium.text-dark(colspan='1')
+                                                        // text
+                                                        | Sub Total :
+                                                    td.fw-medium.text-dark
+                                                        // text
+                                                        | £#{order.subTotal}
+                                                tr
+                                                    td.border-bottom-0.pb-0
+                                                    td.border-bottom-0.pb-0
+                                                    td.border-bottom-0.pb-0
+                                                    td.fw-medium.text-dark(colspan='1')
+                                                        // text
+                                                        | #{order.deliveryType}
+                                                    td.fw-medium.text-dark
+                                                        // text
+                                                        | £#{order.deliveryPrice}
+                                                tr
+                                                    td
+                                                    td
+                                                    td
+                                                    td.fw-semi-bold.text-dark(colspan='1')
+                                                        // text
+                                                        | Total
+                                                    td.fw-semi-bold.text-dark
+                                                        // text
+                                                        | £#{(parseFloat(order.total)).toFixed(2)}
+            +footer()
+            +scripts()

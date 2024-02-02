@@ -1,0 +1,141 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            .mt-4
+                .container
+                    // row
+                    .row
+                        // col
+                        .col-12
+                            // breadcrumb
+                            nav(aria-label='breadcrumb')
+                                ol.breadcrumb.mb-0
+                                    li.breadcrumb-item
+                                        a(href='/') Home
+
+                                    li.breadcrumb-item
+                                        a(href='/shop') Shop 
+                                    li.breadcrumb-item
+                                        a(href='/basket') Basket 
+
+                                    li.breadcrumb-item.active(aria-current='page') Checkout
+
+
+            section.mb-lg-14.mb-8.mt-8
+                .container
+                    // row
+                    .row
+                        // col
+                        .col-12
+                            div
+                                .mb-8
+                                    // text
+                                    h1.fw-bold.mb-0 Checkout
+
+                    form#form(method='/' action='post')
+                        // row
+                        .row
+                            .col-lg-7.col-md-12
+                                // accordion
+                                label.mb-3(for="email") Email 
+                                input.form-control.mb-3#email(type="text" name="email" disabled value=(user.guestFl == true ? guestEmail : user.email) required) 
+
+                                label.mb-3(for="email") Full Name
+                                    span.text-danger  *
+                                input.form-control#fullName.mb-3(type="text" name="fullName" value=(user.guestFl == true ? '' : user.name) required)
+
+                                label.mb-3(for="phoneNumber") Phone Number
+                                    span.text-danger  *
+                                input.form-control#phoneNumber.mb-3(type="text" name="phoneNumber" value=(user.guestFl == true ? '' : user.phoneNumber) required) 
+                                p.text-danger#phoneNumberError
+                                hr
+                                h3 Delivery Options
+                                #flush-collapseOne.accordion-collapse.collapse.show(data-bs-parent='#accordionFlushExample')
+                                    .mt-5
+                                        .row
+                                            each deliveryOption, index in deliveryOptions
+                                                .col-lg-6.col-12.mb-4
+                                                    // form
+                                                    .card.card-body.p-6
+                                                        .form-check.mb-4
+                                                            input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' checked=(index==0) data-delivery-name=deliveryOption.name data-deliverytypeid=deliveryOption.id data-price=deliveryOption.price data-collectfl=(deliveryOption.collectFl == true ? 'true' : 'false'))
+                                                            label.form-check-label.text-dark
+                                                                | #{deliveryOption.name} -
+                                                                | <b>£#{deliveryOption.price}</b>
+                                                        // address
+                                                        if(deliveryOption.collectFl == true)
+                                                            address #{companyDetails.COMPANY_ADDRESS}
+                                                                
+                                                                br
+                                                                abbr(title='Phone') P: #{companyDetails.COMPANY_PHONE}
+                                            
+                                #addressSection                    
+                                
+                            .col-12.col-md-12.offset-lg-1.col-lg-4
+                                .mt-4.mt-lg-0
+                                    .card.shadow-sm
+                                        h5.px-6.py-4.bg-transparent.mb-0 Order Details
+                                        ul.list-group.list-group-flush
+                                            // list group item
+                                            each basketItem in basketItems.basketItems
+                                                li.list-group-item.px-4.py-3
+                                                    .row.align-items-center
+                                                        .col-2.col-md-2
+                                                            img.img-fluid(src=basketItem.image1Path alt='Ecommerce')
+                                                        .col-5.col-md-5
+                                                            h6.mb-0 #{basketItem.name}
+                                                            each option in basketItem.options
+                                                                span
+                                                                    small #{option.optionType}: #{option.name}
+                                                                    br
+                                                        .col-2.col-md-2.text-center.text-muted
+                                                            span #{basketItem.quantity}
+                                                        .col-3.text-lg-end.text-start.text-md-end.col-md-3
+                                                            span.fw-bold £#{basketItem.price}
+                                            
+                                            // list group item
+                                            li.list-group-item.px-4.py-3(style="font-size:9pt")
+                                                .row
+                                                    .d-flex.align-items-center.justify-content-between.mb-2
+                                                        .col-sm-9
+                                                            | Subtotal
+                                                        .col-sm-3.fw-bold.text-lg-end#subTotal(data-subtotal=basketItems.totalCost)
+                                                            | £#{basketItems.totalCost}
+                                                .row
+                                                    .d-flex.align-items-center.justify-content-between
+                                                        #deliverySubTotalSection(style="width:100%")
+                                                            div
+
+     
+                                            // list group item
+                                            li.list-group-item.px-4.py-3
+                                                .d-flex.align-items-center.justify-content-between.fw-bold
+                                                    div
+                                                        | Total
+                                                    div#total
+                                                        | 
+
+                                    button.btn.btn-primary.ms-2.mt-4#submit(type="submit" style="width:95%") Place Order
+
+
+
+
+            +footer()
+            +scripts()
+            script(src="https://js.stripe.com/v3/")
+            script(src="/js/checkout.js")

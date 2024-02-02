@@ -1,0 +1,71 @@
+mixin adminTopNavbar()
+    nav.navbar.navbar-expand-lg.navbar-glass
+            .container-fluid
+                .d-flex.justify-content-between.align-items-center.w-100
+                    .d-flex.align-items-center
+                        a.text-inherit.d-block.d-xl-none.me-4(data-bs-toggle='offcanvas' href='#offcanvasExample' role='button' aria-controls='offcanvasExample')
+                            svg.bi.bi-text-indent-right(xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='currentColor' viewbox='0 0 16 16')
+                                path(d='M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm10.646 2.146a.5.5 0 0 1 .708.708L11.707 8l1.647 1.646a.5.5 0 0 1-.708.708l-2-2a.5.5 0 0 1 0-.708l2-2zM2 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z')
+                        form(role='search')
+                            input.form-control(type='search' placeholder='Search' aria-label='Search')
+                    div
+                        ul.list-unstyled.d-flex.align-items-center.mb-0.ms-5.ms-lg-0
+                            li.dropdown-center
+                                a.position-relative.btn-icon.btn-ghost-secondary.btn.rounded-circle(href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    i.bi.bi-bell.fs-5
+                                    span#notificationCount.position-absolute.top-0.start-100.translate-middle.badge.rounded-pill.bg-danger.mt-2.ms-n2
+                                        | #{numberOfNotifications}
+                                        //- span.visually-hidden unread messages
+                                .dropdown-menu.dropdown-menu-end.dropdown-menu-lg.p-0.border-0
+                                    .border-bottom.p-5.d-flex.justify-content-between.align-items-center
+                                        div
+                                            h5.mb-1 Notifications
+                                            p#notificationMessage.mb-0.small You have #{numberOfNotifications} unread messages
+                                        div.text-muted#markAsRead
+                                            a.btn.btn-ghost-secondary.btn-icon.rounded-circle(href='#' data-bs-toggle='tooltip' data-bs-placement='bottom' data-bs-title='Mark all as read')
+                                                svg.bi.bi-check2-all.text-success(xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='currentColor' viewbox='0 0 16 16')
+                                                    path(d='M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z')
+                                                    path(d='m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z')
+                                    div(data-simplebar='' style='height: 250px;')
+                                        // List group
+                                        ul#notificationList.list-group.list-group-flush.notification-list-scroll.fs-6
+                                            // List group item
+                                            //- each notification in notifications
+                                                li.list-group-item.px-5.py-4.list-group-item-action
+                                                    a.text-muted(href=notification.link)
+                                                        .d-flex
+                                                            .ms-4
+                                                                p.mb-1.text-dark #{notification.text}
+                                                                    
+                                                                span
+                                                                    svg.bi.bi-clock.text-muted(xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' viewbox='0 0 16 16')
+                                                                        path(d='M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z')
+                                                                        path(d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z')
+                                                                    small.ms-2 #{notification.longAgo}
+                                            
+                                    //- .border-top.px-5.py-4.text-center
+                                        a(href='/admin_dashboard/notifications')
+                                            | View All
+                            li.dropdown.ms-4
+                                a.nav-link(href='#' role='button' data-bs-toggle='dropdown' aria-expanded='false')
+                                    span
+                                        svg.feather.feather-user(xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
+                                            path(d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2')
+                                            circle(cx='12' cy='7' r='4')
+                                .dropdown-menu.dropdown-menu-end.p-0
+                                    .lh-1.px-5.py-4.border-bottom
+                                        h5.mb-1.h6 Admin
+                                        small #{user.email}
+                                    ul.list-unstyled.px-2.py-3
+                                        li
+                                            a.dropdown-item(href='#!')
+                                                | Home
+                                        li
+                                            a.dropdown-item(href='#!')
+                                                | Profile
+                                        li
+                                            a.dropdown-item(href='#!')
+                                                | Settings
+                                    .border-top.px-2.py-3
+                                        a.dropdown-item(href='/logout') Log Out
+                                    input#adminAccountId(type="hidden" value=user.id)

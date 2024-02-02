@@ -1,0 +1,98 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+    // main
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+   
+    div
+
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                .container
+                    .row.mb-8
+                        .col-md-12
+                            // page header
+                            .d-md-flex.justify-content-between.align-items-center
+                                div
+                                    h2 Option Types
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            li.breadcrumb-item.active(aria-current='page') Option Types
+                                // button
+                                // button
+                                div
+                                    a.btn.btn-primary(href='#' data-bs-toggle='modal' data-bs-target='#addOptionTypeModal') Add Option Type
+                    .row
+                        .col-xl-12.col-12.mb-5
+                            // card
+                            .card.h-100.card-lg
+                                .card-body.p-0(style="padding: 20px !important")
+                                    // table
+                                    .table-responsive
+                                        table.table.table-centered.table-hover.text-nowrap.table-borderless.mb-0.table-with-checkbox#optionTypes(style="cursor:pointer")
+                                            thead.bg-light
+                                                tr
+                                                    th Option Type
+                                                    //- th Status 
+                                            
+                                            tbody 
+                                                each optionType in optionTypes 
+                                                    tr(data-optiontypeid=optionType.id)
+
+                                                        td 
+                                                            p.text-rest #{optionType.optionType}
+                                                        
+                                                        //- td 
+                                                            if(optionType.deleteFl == true)
+                                                                span.badge.bg-light-danger.text-dark-primary Inactive
+                                                            else 
+                                                                span.badge.bg-light-primary.text-dark-primary Active
+                                    
+        #addOptionTypeModal.modal.fade(tabindex='-1' aria-labelledby='addOptionTypeModalLabel' aria-hidden='true')
+            .modal-dialog
+                .modal-content
+                    // modal body
+                    .modal-body.p-6
+                        .d-flex.justify-content-between.mb-5
+                            // heading
+                            div
+                                h5#addOptionTypeModalLabel.h6.mb-1 Add Option Type
+                            div
+                                // button
+                                button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                        // row
+                        form#form(method="/" action='post')
+                            .row.g-3
+                                // col
+                                .col-12
+                                    label.mb-2 Option Type
+                                    input.form-control#optionType(type="text" required)
+                                    p.text-danger#error
+                                // button
+                                .col-12.text-end
+                                    button.btn.btn-outline-primary(style="margin-right:10px" type='button' data-bs-dismiss='modal') Cancel
+                                    button.btn.btn-primary#addOptionType(type='submit') Add Option Type   
+        +adminScripts()
+        script(src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
+        script(src="/js/adminOptionTypes.js")
+        script(src="/js/adminDashboard.js")

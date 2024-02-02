@@ -1,0 +1,113 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    include common/adminAccountSideBar.pug
+    
+    +adminHead()
+    link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+    div
+
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                .container
+                    .row.mb-8
+                        .col-md-12
+                            // page header
+                            .d-md-flex.justify-content-between.align-items-center
+                                div
+                                    h2 Account - #{account.name}
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard/accounts') Accounts
+                                            li.breadcrumb-item.active(aria-current='page') Account
+                                // button
+
+                    section
+                        .container
+                            // row
+                            .row
+                                +adminAccountSideBar('delete', account.accountType)
+                                .col-lg-9.col-md-8.col-12
+                                    .py-6.p-md-6.p-lg-10
+                                        // heading
+                                        
+                                        div
+                                            if(account.deleteFl == false)
+                                                // heading
+                                                h5.mb-4 Deactivate Account
+                                                p.mb-2 Would you like to deactivate your account?
+                                                a.btn.btn-outline-danger(href='#' data-bs-toggle='modal' data-bs-target='#deactivateModal') Deactivate account
+                                            else 
+                                                h5.mb-4 Reactivate Account
+                                                p.mb-2 Would you like to reactivate your account?
+                                                a.btn.btn-outline-danger(href='#' data-bs-toggle='modal' data-bs-target='#reactivateModal') Reactivate account
+        #deactivateModal.modal.fade(tabindex='-1' aria-labelledby='deactivateModal' aria-hidden='true')
+            .modal-dialog
+                .modal-content
+                    // modal body
+                    .modal-body.p-6
+                        .d-flex.justify-content-between.mb-5
+                            // heading
+                            div
+                                h5#deactivateModalLabel.h6.mb-1 Deactivate Account
+                            div
+                                // button
+                                button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                        // row
+                        .row.g-3
+                            // col
+                            .col-12
+                                p.mb-2 Are you sure you would like to deactivate this account?
+                                    
+                                input#accountId(type="hidden" value=account.id)
+                            
+                            // button
+                            .col-12.text-end
+                                button.btn.btn-outline-primary(style="margin-right:10px" type='button' data-bs-dismiss='modal') Cancel
+                                button.btn.btn-primary#deactivateAccount(type='button') Deactivate Account
+        #reactivateModal.modal.fade(tabindex='-1' aria-labelledby='reactivateModal' aria-hidden='true')
+            .modal-dialog
+                .modal-content
+                    // modal body
+                    .modal-body.p-6
+                        .d-flex.justify-content-between.mb-5
+                            // heading
+                            div
+                                h5#reactivateModalLabel.h6.mb-1 Reactivate Account
+                            div
+                                // button
+                                button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                        // row
+                        .row.g-3
+                            // col
+                            .col-12
+                                p.mb-2 Are you sure you would like to Reactivate this account?
+                                    
+                                input#accountId(type="hidden" value=account.id)
+                            
+                            // button
+                            .col-12.text-end
+                                button.btn.btn-outline-primary(style="margin-right:10px" type='button' data-bs-dismiss='modal') Cancel
+                                button.btn.btn-primary#reactivateAccount(type='button') Reactivate Account
+        +adminScripts()
+        script(src="/js/adminAccountDeactivate.js")

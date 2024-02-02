@@ -1,0 +1,157 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            // section
+            if(homePageMainBannerSection != null)
+                section.py-lg-16.py-10(style=`background: url(${homePageMainBannerSection.imagePath})no-repeat; background-position: center; background-size: cover;`)
+                    .container
+                        // row
+                        .row
+                            .col-xl-4.col-lg-6.col-md-7
+                                .card.border-0.shadow
+                                    .card-body.p-6
+                                        .mb-4
+
+                                            h1.mt-3.mb-2.h4 #{homePageMainBannerSection.title}
+                                            medium #{homePageMainBannerSection.description}
+                                        form
+                                            .row.g-3
+                                                .col-auto
+                                                    a.btn.btn-primary(href="/shop") #{homePageMainBannerSection.buttonText}
+
+
+        section.my-lg-14.my-8
+            .container.text-center
+                // row
+                .row.mb-8
+                    .col-md-6.col-lg-3
+                        .mb-8.mb-lg-0
+                            // img
+                            .mb-6
+                                img(src='../assets/images/icons/clock.svg' alt='')
+                            // title
+                            h3.h5.mb-3
+                                | Business perks
+                            // text
+                            p.mb-0.light-grey
+                                | Get more discounts and extra support with our business plans.
+                    // col
+                    .col-md-6.col-lg-3
+                        .mb-8.mb-lg-0
+                            // img
+                            .mb-6
+                                img(src='../assets/images/icons/gift.svg' alt='')
+                            // title
+                            h3.h5.mb-3 Next day delivery!
+                            // text
+                            p.mb-0.light-grey
+                                | Available on selected products. Order before 12PM (GMT) Mon–Fri.*
+
+                    .col-md-6.col-lg-3
+                        a.mb-8.mb-lg-0(href="#")
+                            // img
+                            .mb-6
+                                img(src='../assets/images/icons/package.svg' alt='')
+                            // title
+                            h3.h5.mb-3 The Bluwave Promise
+                            // text
+                            p.mb-0.light-grey
+                                | We move heaven and earth so you’re happy with your order!
+                    .col-md-6.col-lg-3
+                        .mb-8.mb-lg-0
+                            // img
+                            .mb-6
+                                img(src='../assets/images/icons/refresh-cw.svg' alt='')
+                            // title
+                            h3.h5.mb-3 Get a feel for Bluwave
+                            // text
+                            p.mb-0
+                                | Order a sample pack so you can feel our papers and finishes for yourself.
+                .row 
+                    .col-12 
+                        // TrustBox widget - Micro Review Count
+                        .trustpilot-widget(data-locale='en-GB' data-template-id='5419b6a8b0d04a076446a9ad' data-businessunit-id='5c8eb780df266400012deb11' data-style-height='24px' data-style-width='100%' data-theme='light')
+                            a(href='https://uk.trustpilot.com/review/thefuneralstationery.co.uk' target='_blank') Trustpilot
+
+        if(homePageOptions1To4.length > 0)                        
+            section.my-lg-14.my-8(style="padding-top:4rem; background:aliceblue; padding-bottom:5rem; margin-bottom:unset !important")
+                .container
+                    // row
+                    .table-responsive-xxl.pb-6.pb-lg-0
+                        .row.flex-nowrap
+                            each option in homePageOptions1To4
+                                div(class="col-sm-" + (homePageOptions1To4.length == 4 ? 3 : homePageOptions1To4.length == 3 ? 4 : homePageOptions1To4.length == 2 ? 6 : homePageOptions1To4.length == 1 ? 12 : ''))
+                                    .card.card-product
+                                        .card-header(style="padding:0")
+                                            // badge
+                                            .text-center.position-relative
+                                                a(href='/shop?type=' + encodeURIComponent(option.productType.productType))
+                                                    // img
+                                                    img.img-fluid(src=option.imagePath alt='Bluwave image')
+                                        .card-body
+                                            // heading
+                                            h2.fs-6
+                                                a.text-inherit.text-decoration-none(href='/shop?type=' + encodeURIComponent(option.productType.productType)) #{option.productType.productType}
+                                            .text-small.mb-1
+                                                a.text-decoration-none.light-grey(href='#!')
+                                                    small
+                                                        | #{option.description}
+        if(homePageBannerSection != null)                    
+            section.py-lg-16.py-10(style=`background: url(${homePageBannerSection.imagePath})no-repeat; background-position: center; background-size: cover;`)
+                .container
+                    // row
+                    .row
+                        .col-xl-4.col-lg-6.col-md-7.offset-xl-8.offset-lg-6.offset-md-5
+                            .card.border-0.shadow
+                                .card-body.p-6
+                                    .mb-4
+
+                                        h1.mt-3.mb-0.h4 #{homePageBannerSection.title}
+                                        medium #{homePageBannerSection.description} 
+                                    form
+                                        .row.g-3
+                                            .col-auto
+                                                a.btn.btn-primary(href=`/shop?type=${homePageBannerSection.productType.productType}`) Shop #{homePageBannerSection.productType.productType}
+
+        if(homePageOptions5To8.length > 0)
+            section.my-lg-14.my-8(style="padding-top:4rem; background:aliceblue; margin-top:unset !important; padding-bottom:5rem; margin-bottom:unset !important")
+                .container
+                    // row
+                    .table-responsive-xxl.pb-6.pb-lg-0
+                        .row.flex-nowrap
+                            each option in homePageOptions5To8
+                                div(class="col-sm-" + (homePageOptions5To8.length == 4 ? 3 : homePageOptions5To8.length == 3 ? 4 : homePageOptions5To8.length == 2 ? 6 : homePageOptions5To8.length == 1 ? 12 : ''))
+                                    .card.card-product
+                                        .card-header(style="padding:0")
+                                            // badge
+                                            .text-center.position-relative
+                                                a(href='/shop?type=' + encodeURIComponent(option.productType.productType))
+                                                    // img
+                                                    img.img-fluid(src=option.imagePath alt='Bluwave image')
+                                        .card-body
+                                            // heading
+                                            h2.fs-6
+                                                a.text-inherit.text-decoration-none(href='/shop?type=' + encodeURIComponent(option.productType.productType)) #{option.productType.productType}
+                                            .text-small.mb-1
+                                                a.text-decoration-none.light-grey(href='#!')
+                                                    small
+                                                        | #{option.description}
+
+
+        +footer()
+        +scripts()

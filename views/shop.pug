@@ -1,0 +1,120 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            .mt-4
+                .container
+                    // row
+                    .row.mb-3
+                        // col
+                        .col-12
+                            // breadcrumb
+                            nav(aria-label='breadcrumb')
+                                ol.breadcrumb.mb-0
+                                    li.breadcrumb-item
+                                        a(href='/') Home
+                                    if(productType)
+                                        li.breadcrumb-item.active(aria-current='page') #{productType.productType}
+                                    else
+                                        li.breadcrumb-item.active(aria-current='page') All Products
+                            
+                if(productType)
+                    .card.mb-4.bg-light.border-0(style=`background-image: url("${productType.bannerPath}"); background-position: center; background-size: cover;`)
+                        // card body
+                        .card-body(style="padding:8rem !important")
+                            // title
+                            .container
+                                h4.mb-0 #{productType.productType}
+                else 
+                    .card.mb-4.bg-light.border-0(style='background: url(' + + ')no-repeat; background-position: center; background-size: cover;')
+                        // card body
+                        .card-body(style="padding:8rem !important")
+                            // title
+                            .container
+                                h4.mb-0 All Products
+            section.mt-8.mb-lg-14.mb-8
+                .container
+                    // row
+                    .row
+                        // col
+                        .col-lg-12
+                            // page header
+                            
+
+                            // list icon
+                            .row.mt-5.text-center 
+                                if(productType)
+                                    h5 Choose #{productType.productType} by type
+                                else 
+                                    h5 Choose All Products by type
+                            
+                            .row.g-4.row-cols-lg-5.row-cols-2.row-cols-md-3.mt-2
+                                // col
+                                each product in products
+                                    .col
+                                    
+                                        // card product
+                                        .card.card-product
+                                            .card-header(style="padding:0")
+                                                // badge
+                                                .text-center.position-relative
+                                                    
+                                                    a(href='/shop/' + product.name)
+                                                        // img
+                                                        img.img-fluid(src=product.image1Path alt='Bluwave ' + product.name + ' image')
+                                                    // action btn
+                                                    
+
+                                            .card-body
+                                                
+                                                // heading
+                                                h2.fs-6
+                                                    a.text-inherit.text-decoration-none(href='/shop/' + product.name) #{product.name}
+                                                .text-small.mb-1
+                                                    //- a.text-decoration-none.text-muted(href='#!')
+                                                    //-     small
+                                                    //-         | #{product.description}
+                                                
+                                                ul(style="padding-left:1rem !important")
+                                                    li.text-decoration-none.text-muted
+                                                       small #{product.descriptionPoint1}
+                                                    if(product.descriptionPoint2)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint2}
+
+                                                    if(product.descriptionPoint3)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint3}
+
+                                                    if(product.descriptionPoint4)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint4}
+
+                                                    if(product.descriptionPoint5)
+                                                        li.text-decoration-none.text-muted
+                                                            small #{product.descriptionPoint5}
+                                                // price
+                                                .d-flex.justify-content-between.align-items-center.mt-3
+                                                    div
+                                                        a(href='/shop/' + product.name)
+                                                            |  #{product.name} >
+                                                    
+                                                        
+
+            +footer()
+            +scripts()
+            

@@ -1,0 +1,58 @@
+doctype html
+html(land="en")
+    include common/head.pug
+    include common/header.pug
+    include common/navbar.pug
+    include common/footer.pug
+    include common/scripts.pug
+    +head()
+    #preloader
+        #status
+            .bouncing-loader
+                div
+                div
+                div 
+    body
+        +header()
+        +navbar()
+        main
+            .mt-4
+                .container
+                    // row
+                    .row.mb-3
+                        // col
+                        .col-12
+                            // breadcrumb
+                            nav(aria-label='breadcrumb')
+                                ol.breadcrumb.mb-0
+                                    li.breadcrumb-item
+                                        a(href='/') Home
+                                    li.breadcrumb-item
+                                        a(href='/faqs') FAQs
+                                    li.breadcrumb-item.active(aria-current='page') #{faq.question}
+                .col-md-12
+                    .card.mb-4.bg-light.border-0(style='background: url(/img/stock_home_8.jpg) no-repeat; background-position: center; background-size: cover;')
+                        // card body
+                        .card-body(style="padding:8rem !important")
+                            // title
+                            .container
+                                h4.mb-0 FAQ
+            section.my-lg-14.my-8
+                .container
+                    .row
+                        div
+                            // text
+                            .mb-4
+                                h3.text-center.mb-3 #{faq.question}
+
+                                p.text-center #{faq.answer}
+
+                            .mb-4.text-center 
+
+                                a.btn.btn-primary.ms-2(href='/faqs') Still need help?
+
+                                        
+            +footer()
+            +scripts()
+
+            script(src='js/searchFaq.js')
