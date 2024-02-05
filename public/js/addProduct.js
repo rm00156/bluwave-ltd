@@ -842,6 +842,7 @@ function populateTable(table, combinations, quantities) {
             input.setAttribute('data-quantityid', quantity.value);
             input.type = 'text';
             input.required = true;
+            input.style = 'width:100px';
             // input.step = '0.01';
             // input.min = '0';
             input.addEventListener('input', function () {

@@ -160,6 +160,7 @@ function populateTable(table, combinations, quantities) {
             input.setAttribute('data-quantityid', quantity.value);
             input.type = 'text';
             input.required = true;
+            input.style = 'width:100px';
             if(key != null) {
                 const quantityMap = getFromMap(priceMatrixMap, key);
                 console.log(quantityMap)
