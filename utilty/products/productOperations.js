@@ -512,7 +512,7 @@ async function getPriceMatrixForProduct(productId) {
 
 async function getOptionGroupItemsForOptionGroup(optionGroupId) {
 
-    return await models.sequelize.query('select o.name, o.id, ot.optionType from optionGroupitems ogi ' +
+    return await models.sequelize.query('select o.name, o.id, ot.optionType from optionGroupItems ogi ' +
         ' inner join options o on ogi.optionFk = o.id ' +
         ' inner join optionTypes ot on o.optionTypeFk = ot.id ' +
         ' where ogi.optionGroupFk = :optionGroupId ',
