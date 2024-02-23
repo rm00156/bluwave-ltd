@@ -1729,10 +1729,15 @@ async function activateProduct(productId) {
 }
 
 async function setProductStatusComplete(productId, isComplete) {
-    await models.product.update({
+    const data = {
         versionNo: models.sequelize.literal('versionNo + 1'),
         status: isComplete ? 'Complete' : 'Incomplete',
-    }, {
+    };
+
+    if(!isComplete){
+        data['deleteFl'] = true;
+    }
+    await models.product.update(data, {
         where: {
             id: productId
         }
