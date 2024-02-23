@@ -1,3 +1,4 @@
+const { DataTypes } = require('sequelize');
 module.exports = function(sequelize, Sequelize) {
  
     var PriceMatrix = sequelize.define('priceMatrix', {
@@ -15,6 +16,11 @@ module.exports = function(sequelize, Sequelize) {
                 model: 'products',
                 key: 'id'
             }
+        },
+
+        status: {
+            type: DataTypes.ENUM('Incomplete', 'Complete'),
+            allowNull: false
         },
 
         optionTypeGroupFk: {

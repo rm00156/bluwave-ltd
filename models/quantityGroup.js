@@ -8,6 +8,15 @@ module.exports = function(sequelize, Sequelize) {
             type: Sequelize.INTEGER
         },
 
+        productFk: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            references: {
+                model: 'products',
+                key: 'id'
+            }
+        },
+
         deleteFl:{
             type: Sequelize.BOOLEAN,
             allowNull: false,

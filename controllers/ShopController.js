@@ -53,13 +53,29 @@ async function getProductPage(req, res) {
     const basketItems = await basketOperations.getActiveBasketItemsForAccount(req.user.id);
     var displayCookieMessage = req.body.displayCookieMessage;
 
-    const optionTypesAndOptions = await productOperations.getOptionTypesAndOptionsForProductByProductId(product.id);
+    const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(product.id);
     const sizeOptions = optionTypesAndOptions['Size'];
     var templates = [];
     if(sizeOptions) {
         // templates otherwise
         templates = await productOperations.getTemplatesForSizeOptions(sizeOptions.map(s => s.optionId));
     }
+
+    const edit = req.query.edit;
+    let priceMatrixOptions = null;
+    let finishingMatrixOptions = null;
+    let currentQuantityId = null;
+    if(edit) {
+        // get the options for the optiongroups for basketitem
+        const basketItem = await basketOperations.getBasketItem(edit);
+        const options = await productOperations.getOptionGroupItemsByOptionGroupId(basketItem.optionGroupFk);
+        const finishingOptions = await productOperations.getOptionGroupItemsByOptionGroupId(basketItem.finishingOptionGroupFk);
+
+        priceMatrixOptions = options.map(o => o.optionFk);
+        finishingMatrixOptions = finishingOptions.map(f => f.optionFk);
+        currentQuantityId = basketItem.quantityFk;
+    }
+
     res.render('product', {user: req.user, companyDetails: companyInfo.getCompanyDetails(),
                     product: product,
                     productType: productType,
@@ -68,6 +84,11 @@ async function getProductPage(req, res) {
                     allProductTypes: allProductTypes,
                     displayCookieMessage: displayCookieMessage,
                     templates: templates,
+                    isEdit: edit ? true : false,
+                    edit: edit,
+                    priceMatrixOptions: priceMatrixOptions,
+                    currentQuantityId: currentQuantityId,
+                    finishingMatrixOptions: finishingMatrixOptions,
                     lowestPriceWithQuantity: lowestPriceWithQuantity});
 }
 
@@ -77,10 +98,10 @@ async function getQuantityPriceTableDetails(req, res) {
     const productId = req.query.productId;
 
     const options = JSON.parse(unParsedOptions);
-
+    const finishingOptions = JSON.parse(req.query.finishingOptions);
     console.log(options);
 
-    const quantityPriceTable = await productOperations.getQuantityPriceTable(options, productId);
+    const quantityPriceTable = await productOperations.getQuantityPriceTable(options, finishingOptions, productId);
 
     if(quantityPriceTable.length == 0)
         return res.status(204).json({});
@@ -88,10 +109,10 @@ async function getQuantityPriceTableDetails(req, res) {
     return res.status(200).json(quantityPriceTable);
 }
 
-async function getOptionTypesAndOptionsForProductByProductId(req, res) {
+async function getPricingMatrixOptionTypesAndOptionsForProduct(req, res) {
     
-    const productId = req.query.productId;
-    const results = await productOperations.getOptionTypesAndOptionsForProductByProductId(productId);
+    const productId = req.params.id;
+    const results = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
 
     if(results == null)
         return res.status(204);
@@ -99,10 +120,58 @@ async function getOptionTypesAndOptionsForProductByProductId(req, res) {
     return res.status(200).json(results);
 }
 
+async function getFinishingMatrixOptionTypesAndOptionsForProduct(req, res) {
+    const productId = req.params.id;
+    const results = await productOperations.getFinishingMatrixOptionTypesAndOptionsForProduct(productId);
+
+    if(results == null)
+        return res.status(200).json({});
+
+    return res.status(200).json(results);
+}
+
+async function editBasketItem(req, res) {
+    const selectedOptions = JSON.parse(req.body.selectedOptions);
+    const selectedFinishingOptions = JSON.parse(req.body.selectedFinishingOptions);
+    const quantityId = req.body.quantityId;
+    const price = req.body.price;
+    const basketItemId = req.body.basketItemId;
+
+    const transaction = await models.sequelize.transaction();
+
+    try {
+
+        const optionGroup = await productOperations.createOptionGroup();
+        selectedOptions.forEach(async option => {
+            await productOperations.createOptionGroupItem(optionGroup.id, option.id);
+        });
+
+        if(selectedFinishingOptions.length > 0) {
+            const finishingOptionGroup = await productOperations.createOptionGroup();
+            selectedFinishingOptions.forEach(async option => {
+                await productOperations.createOptionGroupItem(finishingOptionGroup.id, option.id);
+            });
+            await basketOperations.editBasketItem(basketItemId, optionGroup.id, finishingOptionGroup.id, quantityId, price);
+        } else {
+            await basketOperations.editBasketItem(basketItemId, optionGroup.id, null, quantityId, price);
+        }
+        
+    } catch(err) {
+        console.log(err);
+        await transaction.rollback();
+        res.status(400).json({});
+    }
+
+    await transaction.commit();
+
+    res.status(200).json({});
+}
+
 async function addToBasket(req, res) {
 
     const productId = req.body.productId;
     const selectedOptions = JSON.parse(req.body.selectedOptions);
+    const selectedFinishingOptions = JSON.parse(req.body.selectedFinishingOptions);
     const quantityId = req.body.quantityId;
     const price = req.body.price;
 
@@ -115,8 +184,16 @@ async function addToBasket(req, res) {
             await productOperations.createOptionGroupItem(optionGroup.id, option.id);
         });
 
-        await basketOperations.createBasketItem(req.user.id, productId, optionGroup.id, quantityId, price);
-
+        if(selectedFinishingOptions.length > 0) {
+            const finishingOptionGroup = await productOperations.createOptionGroup();
+            selectedFinishingOptions.forEach(async option => {
+                await productOperations.createOptionGroupItem(finishingOptionGroup.id, option.id);
+            });
+            await basketOperations.createBasketItem(req.user.id, productId, optionGroup.id, finishingOptionGroup.id, quantityId, price);
+        } else {
+            await basketOperations.createBasketItem(req.user.id, productId, optionGroup.id, null, quantityId, price);
+        }
+        
     } catch(err) {
         console.log(err);
         await transaction.rollback();
@@ -453,7 +530,7 @@ module.exports = {
     getShopTypePage,
     getProductPage,
     getQuantityPriceTableDetails,
-    getOptionTypesAndOptionsForProductByProductId,
+    getPricingMatrixOptionTypesAndOptionsForProduct,
     addToBasket,
     getBasketPage,
     deleteBasketItem,
@@ -466,5 +543,7 @@ module.exports = {
     checkoutAsGuest,
     checkout,
     sessionCompleted,
-    purchaseSuccessfulPage
+    purchaseSuccessfulPage,
+    getFinishingMatrixOptionTypesAndOptionsForProduct,
+    editBasketItem
 }

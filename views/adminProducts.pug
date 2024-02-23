@@ -31,7 +31,7 @@ html(land="en")
                                             li.breadcrumb-item.active(aria-current='page') Products
                                 // button
                                 div
-                                    a.btn.btn-primary(href='/admin_dashboard/product/add_product') Create Product
+                                    a.btn.btn-primary(href='/admin_dashboard/product/0/page1') Create Product
                     // row
                     .row
                         .col-xl-12.col-12.mb-5
@@ -60,11 +60,12 @@ html(land="en")
                                                         .form-check
                                                             input#checkAll.form-check-input(type='checkbox' value='')
                                                             label.form-check-label(for='checkAll')
-                                                    th Image
-                                                    th Proudct Name
+                                                    //- th Image
+                                                    th Product Name
                                                     th Category
                                                     th Status
-                                                    th Price From
+                                                    th Activity Status
+                                                    //- th Price From
                                                     //- th
                                             tbody
                                                 each product in products
@@ -73,17 +74,22 @@ html(land="en")
                                                             .form-check
                                                                 input#productOne.form-check-input(type='checkbox' value='')
                                                                 label.form-check-label(for='productOne')
-                                                        td
+                                                        //- td
                                                             img.icon-shape.icon-md(src=product.image1Path alt='')
                                                         td
                                                             p.text-reset #{product.name}
                                                         td #{product.productType}
                                                         td
+                                                            if(product.status == 'Complete')
+                                                                span.badge.bg-light-primary.text-dark-primary Complete
+                                                            else 
+                                                                span.span.badge.bg-light-danger.text-dark-danger Incomplete
+                                                        td
                                                             if(product.deleteFl == false)
                                                                 span.badge.bg-light-primary.text-dark-primary Active
                                                             else 
                                                                 span.span.badge.bg-light-danger.text-dark-danger Deactive
-                                                        td £#{product.price}
+                                                        //- td £#{product.price}
                                                         
                                                         //- td
                                                             .dropdown

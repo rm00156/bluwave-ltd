@@ -10,6 +10,8 @@ const emailOperations = require('../utilty/email/emailOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const refundOperations = require('../utilty/refund/refundOperations');
 const faqOperations = require('../utilty/faq/faqOperations');
+const utilityHelper = require('../utilty/general/utilityHelper');
+
 const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 var GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator;
@@ -81,7 +83,7 @@ exports.setup2fa2Registration = async function (req, res, next) {
 }
 
 exports.getProductsPage = async function (req, res) {
-    const products = await productOperations.getAllProductWithLowestPriceDetails();
+    const products = await productOperations.getAllProducts();
     res.render('adminProducts', {
         user: req.user,
         companyDetails: companyInfo.getCompanyDetails(),
@@ -89,31 +91,501 @@ exports.getProductsPage = async function (req, res) {
     });
 }
 
-exports.getAddProductPage = async function (req, res) {
+// exports.getProductPage1 = async function (req, res) {
+//     const productTypes = await productOperations.getAllActiveProductTypes();
+//     const optionTypes = await productOperations.getAllOptionTypesWithOptions();
+//     const quantities = await productOperations.getAllQuantities();
+//     const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+//     const id = req.params.id;
+//     const product =  await productOperations.getProductById(id);
+
+//     var message = req.session.message;
+//     req.session.message = undefined;
+//     res.render('productPage1', {
+//         user: req.user,
+//         companyDetails: companyInfo.getCompanyDetails(),
+//         productTypes: productTypes,
+//         quantities: quantities,
+//         optionTypes: optionTypes,
+//         deliveryTypes: deliveryTypes,
+//         product: product,
+//         message: message
+//     });
+// }
+
+exports.getProductPage1 = async function (req, res) {
+    const id = req.params.id;
+    const product = await productOperations.getProductById(id);
+
     const productTypes = await productOperations.getAllActiveProductTypes();
-    const optionTypes = await productOperations.getAllOptionTypesWithOptions();
-    const quantities = await productOperations.getAllQuantities();
-    const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+    // const optionTypes = await productOperations.getAllOptionTypesWithOptions();
+    // const quantities = await productOperations.getAllQuantities();
+    // const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+    // const statuses = {};
+    let quantityGroup = null;
+    if(product) {
+        // const errors = await productOperations.validateProductInformationDetails(product);
+        // statuses['productInformation'] = isEmpty(errors);
+        quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+    }
+    
+    const priceMatrix = product ? await productOperations.getPriceMatrixForProductId(product.id) : null;
+    const finishingMatrices = product ? await productOperations.getFinishingMatricesForProductId(product.id) : [];
+    const productDeliveries = product ? await deliveryOperations.getProductDeliveriesForProduct(product.id) : [];
+    const isValid = product ? await productOperations.isProductValid(product) : {isValid: false};
     var message = req.session.message;
     req.session.message = undefined;
-    res.render('addProduct', {
+    res.render('productPage1', {
         user: req.user,
         companyDetails: companyInfo.getCompanyDetails(),
         productTypes: productTypes,
-        quantities: quantities,
-        optionTypes: optionTypes,
-        deliveryTypes: deliveryTypes,
+        product: product,
+        // statuses: statuses,
+        quantityGroup: quantityGroup,
+        priceMatrix: priceMatrix,
+        finishingMatrices: finishingMatrices,
+        productDeliveries: productDeliveries,
+        isValid: isValid.isValid,
+        // quantities: quantities,
+        //  optionTypes: optionTypes,
+        // deliveryTypes: deliveryTypes,
         message: message
     });
+}
+
+exports.getProductPage2 = async function (req, res) {
+    const id = req.params.id;
+    const product = await productOperations.getProductById(id);
+
+    if(product == null) {
+        // message
+        return res.redirect('/admin_dashboard/products');
+    }
+    // const optionTypes = await productOperations.getAllOptionTypesWithOptions();
+    const quantities = await productOperations.getAllQuantities();
+    const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(product.id);
+    
+    // const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+
+    // if product information details valid
+    // const errors = await productOperations.validateProductInformationDetails(product);
+    // const statuses = {
+    //     productInformation: isEmpty(errors)
+    // };
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+
+    const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+    const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    const isValid = await productOperations.isProductValid(product);
+    var message = req.session.message;
+    req.session.message = undefined;
+    res.render('productPage2', {
+        user: req.user,
+        companyDetails: companyInfo.getCompanyDetails(),
+        product: product,
+        quantities: quantities,
+        selectedQuantities: selectedQuantities,
+        quantityGroup: quantityGroup,
+        priceMatrix: priceMatrix,
+        finishingMatrices: finishingMatrices,
+        productDeliveries: productDeliveries,
+        isValid: isValid.isValid,
+        // optionTypes: optionTypes,
+        // statuses: statuses,
+        // deliveryTypes: deliveryTypes,
+        message: message
+    });
+}
+
+
+exports.getProductPage3 = async function (req, res) {
+    const id = req.params.id;
+    const product = await productOperations.getProductById(id);
+
+    if(product == null) {
+        // message
+        return res.redirect('/admin_dashboard/products');
+    }
+    const optionTypes = await productOperations.getOptionTypesNotUsedByFinishingMatrixForProduct(product.id);
+    
+    // const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+
+    // if product information details valid
+    // const errors = await productOperations.validateProductInformationDetails(product);
+    // const statuses = {
+    //     productInformation: isEmpty(errors)
+    // };
+
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+
+    var optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(product.id);
+    await productOperations.addAllOptionTypesToOptionTypesAndOptionJson(optionTypesAndOptions);
+    const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(product.id);
+    const selectedOptionTypes = matrixRows.length == 0 ? [] : matrixRows[0][0].options.map(o => o.optionType);
+    const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(product.id);
+
+    const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+    const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    const isValid = await productOperations.isProductValid(product);
+
+    var message = req.session.message;
+    req.session.message = undefined;
+    res.render('productPage3', {
+        user: req.user,
+        companyDetails: companyInfo.getCompanyDetails(),
+        product: product,
+        quantityGroup: quantityGroup,
+        optionTypes: optionTypes,
+        selectedOptionTypes: selectedOptionTypes,
+        optionTypesAndOptions: optionTypesAndOptions,
+        selectedQuantities: selectedQuantities,
+        matrixRows: matrixRows,
+        priceMatrix: priceMatrix,
+        finishingMatrices: finishingMatrices,
+        productDeliveries: productDeliveries,
+        isValid: isValid.isValid,
+        // statuses: statuses,
+        // deliveryTypes: deliveryTypes,
+        message: message
+    });
+}
+
+exports.getProductPage4 = async function (req, res) {
+    const id = req.params.id;
+    const product = await productOperations.getProductById(id);
+
+    if(product == null) {
+        // message
+        return res.redirect('/admin_dashboard/products');
+    }
+    const optionTypes = await productOperations.getOptionTypesNotUsedByPricingMatrixForProduct(product.id);
+    
+    
+    // const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+
+    // if product information details valid
+    // const errors = await productOperations.validateProductInformationDetails(product);
+    // const statuses = {
+    //     productInformation: isEmpty(errors)
+    // };
+
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+    // const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+
+    var optionTypesAndOptions = await productOperations.getFinishingMatrixOptionTypesAndOptionsForProduct(product.id);
+    
+    await productOperations.addAllOptionTypesToOptionTypesAndOptionToFinishingJson(optionTypesAndOptions);
+    const matrixRows = [];
+    const selectedOptionTypes = [];
+    const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(product.id);
+
+    const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+    const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    const isValid = await productOperations.isProductValid(product);
+    var message = req.session.message;
+    req.session.message = undefined;
+    res.render('productPage4', {
+        user: req.user,
+        companyDetails: companyInfo.getCompanyDetails(),
+        product: product,
+        quantityGroup: quantityGroup,
+        optionTypes: optionTypes,
+        selectedOptionTypes: selectedOptionTypes,
+        optionTypesAndOptions: optionTypesAndOptions,
+        selectedQuantities: selectedQuantities,
+        matrixRows: matrixRows,
+        priceMatrix: priceMatrix,
+        finishingMatrices: finishingMatrices,
+        productDeliveries: productDeliveries,
+        isValid: isValid.isValid,
+        // deliveryTypes: deliveryTypes,
+        message: message
+    });
+}
+
+exports.getProductPage5 = async function (req, res) {
+    const id = req.params.id;
+    const product = await productOperations.getProductById(id);
+
+    if(product == null) {
+        // message
+        return res.redirect('/admin_dashboard/products');
+    } 
+
+    const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+    const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+    const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    const isValid = await productOperations.isProductValid(product);
+
+    var message = req.session.message;
+    req.session.message = undefined;
+    res.render('productPage5', {
+        user: req.user,
+        companyDetails: companyInfo.getCompanyDetails(),
+        product: product,
+        quantityGroup: quantityGroup,
+        priceMatrix: priceMatrix,
+        finishingMatrices: finishingMatrices,
+        productDeliveries: productDeliveries,
+        deliveryTypes: deliveryTypes,
+        isValid: isValid.isValid,
+        message: message
+    });
+}
+
+exports.verifyQuantities = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+    const quantities = JSON.parse(req.query.quantities);
+
+    const verification = await productOperations.verifyQuantities(productId, quantities);
+    res.status(200).json(verification);
+}
+
+exports.getPriceMatrixRows = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(productId);
+    res.status(200).json(matrixRows);
+}
+
+exports.continuePage3 = async function (req, res) {
+    const productId = req.params.id;
+    const rows = JSON.parse(req.body.rows);
+    const options = parseCommaSeperatedText(req.body.options);
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const quantityGroups = rows.map(r => r.quantityGroup);
+    const pricesNotSet = quantityGroups.filter(q => q.prices === '');
+
+    if(pricesNotSet.length > 0) {
+        return res.status(400).json({error: 'All prices must be set to continue.'})
+    }
+    // validate row values
+    // make sure every single one is present else fail
+    
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+
+    if(priceMatrix) {
+        // update
+        await productOperations.deletePriceMatrixForProduct(productId);
+        await productOperations.createPrintingAttributes(productId, options, rows, true);
+    } else {
+        // create option group
+        // items
+        // and price matrix
+
+        await productOperations.createPrintingAttributes(productId, options, rows, true);
+    }
+
+    const updatedProduct = await productOperations.getProductById(productId);
+    const isValid = await productOperations.isProductValid(updatedProduct);
+    await productOperations.setProductStatusComplete(productId, isValid.isValid);
+
+    return res.status(200).json({});
+}
+
+exports.continuePage4 = async function (req, res) {
+    const productId = req.params.id;
+    const matrices = JSON.parse(req.body.matrices);
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const isComplete = await productOperations.isAllFinishingMatricesComplete(matrices);
+    if(!isComplete)
+        return res.status(400).json({error: 'All prices must be set to continue.'});
+
+    // const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+
+    // if(finishingMatrices.length > 0) {
+        // update
+    await productOperations.deleteFinishingPriceMatricesForProduct(product.id);
+    // } 
+    await productOperations.createFinishingMatrices(productId, matrices);
+    
+    const updatedProduct = await productOperations.getProductById(productId);
+    const isValid = await productOperations.isProductValid(updatedProduct);
+    await productOperations.setProductStatusComplete(productId, isValid.isValid);
+    res.status(200).json({});
+}
+
+exports.savePrintingAttributes = async function (req, res) {
+    const productId = req.params.id;
+    const rows = JSON.parse(req.body.rows);
+    const options = parseCommaSeperatedText(req.body.options);
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+    // need validation to determine whether its completed
+    if(priceMatrix) {
+        // update
+        await productOperations.deletePriceMatrixForProduct(productId);
+        await productOperations.createPrintingAttributes(productId, options, rows);
+    } else {
+        // create option group
+        // items
+        // and price matrix
+
+        await productOperations.createPrintingAttributes(productId, options, rows);
+    }
+
+    const updatedProduct = await productOperations.getProductById(productId);
+    const isValid = await productOperations.isProductValid(updatedProduct);
+    await productOperations.setProductStatusComplete(productId, isValid.isValid);
+
+    return res.status(200).json({});
+
+}
+
+exports.saveDeliveryOptions = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const deliveryOptions = JSON.parse(req.body.deliveryOptions);
+
+    const invalidOptions = deliveryOptions.filter(d => d.price === '');
+
+    if(invalidOptions.length > 0)
+        return res.status(400).json({error: 'All delivery option prices must be set to continue.'});
+
+    const existingDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+
+    if(existingDeliveries.length > 0) {
+        await deliveryOperations.updateProductDeliveriesForProduct(productId, deliveryOptions);
+    } else {
+        await deliveryOperations.createDeliveryOptionsForProduct(productId, deliveryOptions);
+    }
+
+    const updatedProduct = await productOperations.getProductById(productId);
+    const isValid = await productOperations.isProductValid(updatedProduct);
+    await productOperations.setProductStatusComplete(productId, isValid.isValid);
+
+    res.status(200).json({});
+
+}
+
+exports.saveFinishingAttributes = async function (req, res) {
+    const productId = req.params.id;
+    const matrices = JSON.parse(req.body.matrices);
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+
+    if(finishingMatrices.length > 0) {
+        // update
+        await productOperations.deleteFinishingPriceMatricesForProduct(product.id);
+    } 
+    await productOperations.createFinishingMatrices(productId, matrices);
+    const updatedProduct = await productOperations.getProductById(productId);
+    const isValid = await productOperations.isProductValid(updatedProduct);
+    await productOperations.setProductStatusComplete(productId, isValid.isValid);
+    
+    res.status(200).json({});
+}
+
+exports.getQuantities = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const quantities = await productOperations.getQuantitiesForProduct(product.id);
+
+    res.status(200).json(quantities)
+}
+
+exports.saveQuantities = async function (req, res) {
+    const productId = req.params.id;
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found. Contact Support'});
+    }
+
+    const quantities = parseCommaSeperatedText(req.body.quantities);
+    const override = req.body.override === 'true';
+
+    
+    const {valid, message, warning, create} = await productOperations.verifyQuantities(productId, quantities);
+    if(!override) {
+        if(!valid) {
+            return res.status(400).json({error: message});
+        }
+
+        if(warning) {
+            return res.status(400).json({error: message});
+        }     
+    }
+    
+    if(!create) {
+        // update quantities for group
+        const quantityGroup = await productOperations.getQuantityGroupForProductId(productId);
+        await productOperations.updateQuantitiesForQuantityGroup(quantityGroup, quantities);
+        // deactivate product
+        await productOperations.deactivateProduct(product.id, false);
+
+    } else {
+        // new
+        // create
+        await productOperations.createQuantityGroupAndSetQuantities(productId, quantities);
+    }
+
+    const updatedProduct = await productOperations.getProductById(productId);
+    const isValid = await productOperations.isProductValid(updatedProduct);
+    await productOperations.setProductStatusComplete(productId, isValid.isValid);
+
+    res.status(200).json({});
+
 }
 
 exports.getOptionsForOptionType = async function (req, res) {
 
     const optionTypeId = req.query.optionTypeId;
     const options = await productOperations.getOptionsForOptionTypeId(optionTypeId);
-
-    if (options.length == 0)
-        return res.status(404);
 
     return res.status(200).json(options);
 }
@@ -131,12 +603,12 @@ exports.getProductPage = async function (req, res) {
     if (product == null)
         return res.redirect('/admin_dashboard');
 
-    var optionTypesAndOptions = await productOperations.getOptionTypesAndOptionsForProductByProductId(productId);
+    var optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
     await productOperations.addAllOptionTypesToOptionTypesAndOptionJson(optionTypesAndOptions);
     const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(productId);
     // const selectedOptionTypes = Array.from(new Set(optionTypesAndOptions.map(o => o.optionTypeId)));
 
-    const matrixRows = await productOperations.getPriceMatrixForProduct(productId);
+    const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(productId);
     const selectedOptionTypes = matrixRows[0][0].options.map(o => o.optionType);
 
     const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
@@ -156,6 +628,131 @@ exports.getProductPage = async function (req, res) {
         deliveryTypes: deliveryTypes,
         companyDetails: companyInfo.getCompanyDetails()
     })
+}
+
+exports.continuePage1 = async function (req, res) {
+    const productName = req.body.productName;
+    const productTypeId = req.body.productTypeId;
+    const files = req.files;
+    const description = req.body.description;
+    const subDescription = req.body.subDescription;
+    const subDescriptionTitle = req.body.subDescriptionTitle;
+    const bulletPoints = parseCommaSeperatedText(req.body.bulletPoints);
+    const productId = req.body.productId;
+
+    const productDetails = {
+        name: productName,
+        productTypeFk: productTypeId,
+        description: description,
+        subDescription: subDescription,
+        subDescriptionTitle: subDescriptionTitle,
+    };
+    let s3PathMap = new Map();
+    if(files != null) {
+        s3PathMap = await productOperations.uploadPictures('Products/', productName, files);
+    }
+    // verify productName is not empty
+    if(productName === '')
+        return res.status(400).json({error: "'Product Name' must be set to save."});
+
+    // validate
+    addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, req.body);
+    productOperations.updateProductDetailsWithPicturesAndBulletPoints(s3PathMap, productDetails, bulletPoints);
+    
+    const errors = await productOperations.validateProductInformationDetails(productDetails);
+    if (!isEmpty(errors)) {
+        // if(!(Object.keys(errors).length === 1 && errors.picture1 && files['1Blob'])) {
+        //     return res.status(400).json(errors);
+        // } 
+
+        if(!files || !files['1Blob'] || Object.keys(errors).length !== 1 || !errors.picture1)
+            return res.status(400).json(errors);
+    }
+    if(productId === 'undefined') {
+        // create product
+        productDetails['deleteFl'] = true;
+
+        productDetails['versionNo'] = 1;
+        const product = await productOperations.createProduct(productDetails, s3PathMap, bulletPoints);
+        // req.session.message = 'Saved' ;
+        return res.status(201).json({id: product.id});
+    } else {
+        // update existing product
+        const product = await productOperations.getProductById(productId);
+        if(!product) {
+            // error
+            return res.status(400).json({error: 'Product no found.'});
+        }
+        
+        productDetails['s3PathMap'] = s3PathMap;
+        productDetails['bulletPoints'] = bulletPoints;
+        productDetails['productId'] = productId;
+        await productOperations.updateProduct(productDetails); 
+        
+        const updatedProduct = await productOperations.getProductById(productId);
+        const isValid = await productOperations.isProductValid(updatedProduct);
+        await productOperations.setProductStatusComplete(productId, isValid.isValid);
+        
+        // req.session.message = 'Saved';
+        return res.status(200).json({id: productId});
+    }
+}
+
+exports.savePage1 = async function (req, res) {
+    const productName = req.body.productName;
+    const productTypeId = req.body.productTypeId;
+    const files = req.files;
+    const description = req.body.description;
+    const subDescription = req.body.subDescription;
+    const subDescriptionTitle = req.body.subDescriptionTitle;
+    const bulletPoints = parseCommaSeperatedText(req.body.bulletPoints);
+    const productId = req.body.productId;
+
+    const productDetails = {
+        name: productName,
+        productTypeFk: productTypeId,
+        description: description,
+        subDescription: subDescription,
+        subDescriptionTitle: subDescriptionTitle,
+    };
+    let s3PathMap = new Map()
+    if(files != null) {
+        s3PathMap = await productOperations.uploadPictures('Products/', productName, files);
+    }
+    // verify productName is not empty
+    if(productName === '')
+        return res.status(400).json({error: "'Product Name' must be set to save."});
+
+
+    if(productId === 'undefined') {
+        // create product
+        productDetails['deleteFl'] = true;
+
+        productDetails['versionNo'] = 1;
+        const product = await productOperations.createProduct(productDetails, s3PathMap, bulletPoints);
+        req.session.message = 'Saved' ;
+        return res.status(201).json({id: product.id});
+    } else {
+        const product = await productOperations.getProductById(productId);
+        if(!product) {
+            // error
+            return res.status(400).json({error: 'Product no found.'});
+        }
+        // update existing product
+        addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, req.body);
+        productDetails['s3PathMap'] = s3PathMap;
+        productDetails['bulletPoints'] = bulletPoints;
+        productDetails['productId'] = productId;
+        await productOperations.updateProduct(productDetails); 
+
+        const updatedProduct = await productOperations.getProductById(productId);
+        const isValid = await productOperations.isProductValid(updatedProduct);
+        await productOperations.setProductStatusComplete(productId, isValid.isValid);
+        
+        // await productOperations.updateProduct(productDetails);
+        req.session.message = 'Saved';
+        return res.status(200).json({id: productId});
+    }
 }
 
 exports.getProductTypesPage = async function (req, res) {
@@ -439,7 +1036,7 @@ exports.createProduct = async function (req, res) {
 exports.getOptionTypesAndOptionForProduct = async function (req, res) {
 
     const productId = req.query.productId;
-    const optionTypesAndOptions = await productOperations.getOptionTypesAndOptionsForProductByProductId(productId);
+    const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
     const parsedOptionTypesAndOptions = await productOperations.parseOptionTypesAndOption(optionTypesAndOptions);
 
     res.status(200).json(parsedOptionTypesAndOptions);
@@ -480,7 +1077,7 @@ exports.editProduct = async function (req, res) {
         }
         await productOperations.updateProduct(productDetails);
 
-        const optionTypesAndOptions = await productOperations.getOptionTypesAndOptionsForProductByProductId(productId);
+        const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
         const existingOptionIds = getOptionsIdsFromOptionTypesAndOptionsMap(optionTypesAndOptions);
         const exisitingQuantities = await productOperations.getSelectedQuantitiesForProductById(productId);
         const existingQuantityIds = exisitingQuantities.map(q => q.id.toString());
@@ -1126,6 +1723,162 @@ exports.reactivateAccount = async function (req, res) {
     res.status(200).json({});
 }
 
+exports.getDeactivatePage = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.redirect('/admin_dashboard/products');
+    }
+
+    // check is active
+
+    // if not do nothing
+
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+    const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+    const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    const isValid = await productOperations.isProductValid(product);
+
+    res.render('productDeactivatePage', {
+        user: req.user,
+        companyDetails: companyInfo.getCompanyDetails(),
+        product: product,
+        quantityGroup: quantityGroup,
+        priceMatrix: priceMatrix,
+        finishingMatrices: finishingMatrices,
+        productDeliveries: productDeliveries,
+        isValid: isValid.isValid,
+    });
+}
+
+exports.getActivatePage = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.redirect('/admin_dashboard/products');
+    }
+
+    const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+    const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+    const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    const isValid = await productOperations.isProductValid(product);
+
+    res.render('productActivatePage', {
+        user: req.user,
+        companyDetails: companyInfo.getCompanyDetails(),
+        product: product,
+        quantityGroup: quantityGroup,
+        priceMatrix: priceMatrix,
+        finishingMatrices: finishingMatrices,
+        productDeliveries: productDeliveries,
+        isValid: isValid.isValid,
+    });
+    // check is deactive
+    // check whether everyting is valid
+    // activate
+}
+
+exports.activate = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    if(product.deleteFl === false)
+        return res.status(400).json({error: 'Product is already activated'});
+
+    const isValid = await productOperations.isProductValid(product);
+
+    if(!isValid.isValid) {
+        return res.status(400).json({error: `${isValid.page} is not valid.`, page: isValid.page});
+    }
+
+    await productOperations.activateProduct(product.id);
+
+    res.status(200).json({});
+
+}
+
+exports.deactivate = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    if(product.deleteFl === true)
+        return res.status(400).json({error: 'Product already deactive'});
+
+        
+    const isValid = await productOperations.isProductValid(product);
+    await productOperations.deactivateProduct(productId, isValid.isValid);
+
+    res.status(200).json({});
+}
+
+exports.validate = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    if(product.deleteFl === false) {
+        return res.redirect(`/admin_dashboard/product/${productId}/page5`);
+    }
+
+    const isValid = await productOperations.isProductValid(product);
+    if(!isValid.isValid) {
+        const page = isValid.page;
+
+        return res.redirect(`/admin_dashboard/product/${productId}/${page}`);
+    }
+
+    return res.redirect(`/admin_dashboard/product/${productId}/activate`);
+}
+
+exports.getFinishingMatrices = async function (req, res) {
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const finishingMatrices = await productOperations.getFinishingMatricesDetailsForProductId(product.id);
+    res.status(200).json(finishingMatrices);
+}
+
+exports.getProductDeliveries = async function (req, res) {
+
+    const productId = req.params.id;
+
+    const product = await productOperations.getProductById(productId);
+    if(!product) {
+        // error
+        return res.status(400).json({error: 'Product no found.'});
+    }
+
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    res.status(200).json(productDeliveries);
+
+}
+
+
 async function validateDetails(body, files, from, to) {
     const errors = {};
     const homePageOptions = await productOperations.getHomePageOptions();
@@ -1211,14 +1964,10 @@ function getTimeDifference(date) {
 
 function hasNewMatrixBeenCreated(newOptions, existingOptions, newQuantities, exisitingQuantities) {
 
-    const optionsTheSame = hasTheSameItems(newOptions, existingOptions);
-    const quantitiesTheSame = hasTheSameItems(newQuantities, exisitingQuantities);
+    const optionsTheSame = utilityHelper.hasTheSameItems(newOptions, existingOptions);
+    const quantitiesTheSame = utilityHelper.hasTheSameItems(newQuantities, exisitingQuantities);
 
     return optionsTheSame == false || quantitiesTheSame == false;
-}
-
-function hasTheSameItems(list1, list2) {
-    return list1.length === list2.length && list1.every(item => list2.includes(item));
 }
 
 function getOptionsIdsFromOptionTypesAndOptionsMap(optionTypesAndOptions) {
@@ -1236,9 +1985,17 @@ function addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, request) {
 
     for (var i = 1; i < 6; i++) {
 
-        const item = JSON.parse(request[i + "Remove"]);
-        if (item == true) {
-            s3PathMap.set(i.toString(), null);
+        const itemRemove = JSON.parse(request[i + "Remove"]);
+        const itemPath = request[i + "Path"];
+        const iString = i.toString();
+        if (itemRemove == true) {
+            s3PathMap.set(iString, null);
+        } else  {
+            const uploadedPath = s3PathMap.get(iString);
+            if(uploadedPath === undefined && itemPath !== 'null') {
+                s3PathMap.set(iString, itemPath);
+            } 
+            
         }
     }
 }

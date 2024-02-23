@@ -103,6 +103,10 @@ html(land="en")
                                                                 span
                                                                     small #{option.optionType}: #{option.name}
                                                                     br
+                                                            each finishingOption in basketItem.finishingOptions
+                                                                span
+                                                                    small #{finishingOption.optionType}: #{finishingOption.name}
+                                                                    br
                                                         .col-2.col-md-2.text-center.text-muted
                                                             span #{basketItem.quantity}
                                                         .col-3.text-lg-end.text-start.text-md-end.col-md-3

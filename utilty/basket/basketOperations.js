@@ -22,12 +22,14 @@ async function getActiveBasketItemsForAccount(accountId) {
         totalCost = totalCost + parseFloat(basketItem.price);
 
         const option = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.optionGroupFk);
+        const finishingOption = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.finishingOptionGroupFk);
         const quantities = await productOperations.getQuantitiesForProduct(basketItem.productFk);
         if (basketItem.fileGroupFk != null) {
             const fileGroupItems = await getFileGroupItemByFileGroupId(basketItem.fileGroupFk);
             basketItem['fileGroupItems'] = fileGroupItems;
         }
         basketItem['options'] = option;
+        basketItem['finishingOptions'] = finishingOption;
         basketItem['quantities'] = quantities;
         revisedBasketItems.push(basketItem);
 
@@ -35,11 +37,26 @@ async function getActiveBasketItemsForAccount(accountId) {
     return { basketItems: revisedBasketItems, totalCost: totalCost.toFixed(2) };
 }
 
-async function createBasketItem(accountId, productId, optionGroupId, quantityId, price) {
+async function editBasketItem(basketItemId, optionGroupId, finishingOptionGroupId, quantityId, price) {
+    await models.basketItem.update({
+        optionGroupFk: optionGroupId,
+        finishingOptionGroupFk: finishingOptionGroupId,
+        quantityFk: quantityId,
+        price: price,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id: basketItemId
+        }
+    })
+}
+
+async function createBasketItem(accountId, productId, optionGroupId, finishingOptionGroupId, quantityId, price) {
     return await models.basketItem.create({
         accountFk: accountId,
         productFk: productId,
         optionGroupFk: optionGroupId,
+        finishingOptionGroupFk: finishingOptionGroupId,
         quantityFk: quantityId,
         price: price,
         deleteFl: false,
@@ -332,11 +349,14 @@ async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchase
         var basketItem = result[i];
 
         const option = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.optionGroupFk);
+        const finishingOption = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.finishingOptionGroupFk);
+        
         if (basketItem.fileGroupFk != null) {
             const fileGroupItems = await getFileGroupItemByFileGroupId(basketItem.fileGroupFk);
             basketItem['fileGroupItems'] = fileGroupItems;
         }
         basketItem['options'] = option;
+        basketItem['finishingOptions'] = finishingOption;
         basketItems.push(basketItem);
     }
 
@@ -363,4 +383,5 @@ module.exports = {
     getSubtotalFromBasketItems,
     setPurchaseBasketForBasketItem,
     getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId,
+    editBasketItem
 }

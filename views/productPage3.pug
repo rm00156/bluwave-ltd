@@ -1,0 +1,172 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    include common/productSideBar.pug
+    include common/productNavigationHeader.pug
+    +adminHead()
+    link(href='/assets/libs/dropzone/dist/min/dropzone.min.css' rel='stylesheet')
+    link(href='/assets/css/croppie.css' rel='stylesheet')
+    link(href='/assets/css/pictureUpload.css' rel='stylesheet')
+    #overlay
+        
+        .container
+                .row.justify-content-center
+
+                    .col-md-6.col-lg-6
+                        
+                        .form-styled.bg-white(style="height:240px;margin-top:100px; padding:10px")
+
+                            
+                            
+                            div#section
+
+                                div.mt-10
+                                    p#modal-message(style="text-align:center")
+                                    .row
+                                        .col-lg-6.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id="confirmModal") Yes
+                                        
+                                        .col-lg-6.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id ="cancelModal" ) Cancel
+    // main
+    // main
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                .container
+                    // row
+                    +productNavigationHeader(product)
+                    // row
+                    .row
+                        +productSideBar('page3', statuses)
+                        .col-lg-9.col-9
+                            if(product != null)
+                                input#productId(type="hidden" value=product.id)
+                                input#product(type="hidden" value=product)
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    form#form
+                                        .row
+                                            h4.mb-4.h5 Printing Attributes 
+                                            .mb-3.col-lg-12.mt-5#option-container
+                                                input#optionTypes(type="hidden" value=optionTypes)
+                                                
+                                                if(optionTypesAndOptions)
+                                                    - var optionObjects = Object.keys(optionTypesAndOptions).map((key, index) => ({ index, key, value: optionTypesAndOptions[key] }));
+
+                                                    each optionObject, index in optionObjects
+                                                        .row.mb-3
+                                                            
+                                                            .col-sm-5
+                                                                label.form-label Option Type
+                                                                //- p #{value}
+                                                                select.form-control.optionTypes( name='select[]')
+                                                                    option(value=0)
+                                                                    each optionType in optionTypes
+                                                                        option(value=optionType.id selected=(optionObject.value[0].optionTypeId == optionType.id)) #{optionType.optionType}
+                                                            .col-sm-5
+                                                                label.form-label Options
+                                                                input.selectedOptions.form-control.mb-2(value=optionObject.value[0].selectedOptionNames)
+                                                                //- each x in value.map(o=> o.optionId)
+                                                                    p #{x}
+                                                                select.form-control.options(required multiple name='options[]')
+                                                                    each option in optionObject.value[0].allOptions 
+                                                                        option(value=option.id data-optiontype=optionObject.key data-optiontypeid=option.optionTypeFk selected=(optionObject.value.map(o=> o.optionId).includes(option.id))) #{option.name} 
+                                                            if(index == 0)
+                                                                .col-sm-1
+                                                                    label.form-label.text-white Options
+                                                                    br
+                                                                    button.btn.btn-primary.add-btn-select(type="button") +
+                                                                .col-sm-1 
+                                                            else 
+                                                                .col-sm-1
+                                                                    label.form-label.text-white Options
+                                                                    br
+                                                                    button.remove-btn-select.btn.btn-danger(type='button') -
+                                                                .col-sm-1
+                                                                    label.form-label.text-white Options
+                                                                    br
+                                                                    button.add-btn-select.btn.btn-primary(type='button') +
+
+
+
+                                                else 
+                                                    .row.mb-3
+                                                    
+                                                        .col-sm-5
+                                                            label.form-label Option Type
+                                                            select.form-control.optionTypes( name='select[]')
+                                                                option(value=0)
+                                                                each optionType in optionTypes 
+                                                                    option(value=optionType.id) #{optionType.optionType}
+                                                        .col-sm-5
+                                                            label.form-label Options
+                                                            input.selectedOptions.form-control.mb-2
+                                                            select.form-control.options(required multiple name='options[]')
+                                                                
+                                                        .col-sm-1
+                                                            label.form-label.text-white Options
+                                                            br
+                                                            button.btn.btn-primary.add-btn-select(type="button") +
+                                                        .col-sm-1 
+                                        .row 
+                                            .mb-3.col-lg-12.mt-5
+                                                .col-sm-12
+                                                    label.form-label.mb-2 Price Matrix
+                                                    #price-container
+                                                        if(selectedOptionTypes.length > 0)
+                                                            table#priceMatrixTable.table.table-striped(style="font-size:9pt") 
+                                                                thead.text-center 
+                                                                    each optionType in selectedOptionTypes 
+                                                                        th #{optionType}
+                                                                    
+                                                                    each quantity in selectedQuantities 
+                                                                        th #{quantity.quantity}
+                                                                tbody 
+                                                                    each row in matrixRows 
+                                                                        tr 
+                                                                            each option in row[0].options
+                                                                                td(data-optionid=option.id) #{option.name}
+                                                                            
+                                                                            each item in row 
+                                                                                td
+                                                                                    input.form-control.quantity(style="width:100px" data-quantityid=item.quantityFk data-priceMatrixRowQuantityPriceId = item.priceMatrixRowQuantityPriceId data-optiongroupid=item.optionGroupFk type="text"  value=item.price)
+                                        .row
+                                            .col-sm-6
+                                                .d-grid
+                                                    button.btn.btn-light-primary#save(type='submit')
+                                                        | Save
+                                            .col-sm-6
+                                                .d-grid
+                                                    button.btn.btn-primary#continue(type='submit')
+                                                        | Continue
+                                             
+                       
+
+
+
+        +adminScripts()
+        script(src='/assets/libs/quill/dist/quill.min.js')
+        script(src='/assets/js/vendors/editor.js')
+        script(src='/assets/libs/dropzone/dist/min/dropzone.min.js')
+        script(src='/assets/js/croppie.js')
+        script(src='/js/productPage3.js')
+        script(src="/js/adminDashboard.js")

@@ -103,13 +103,18 @@ html(land="en")
                                                                             | #{orderItem.productName}
                                                                         each option in orderItem.options 
                                                                             p.mb-0 #{option.optionType}: #{option.name}
+                                                                        each finishingOption in orderItem.finishingOptions 
+                                                                            p.mb-0 #{finishingOption.optionType}: #{finishingOption.name}
                                                         td
                                                             span.text-body £#{(parseFloat(orderItem.price)/parseFloat(orderItem.quantity)).toFixed(2)}
+                                                        
+                                                        
+                                                        td #{orderItem.quantity}
                                                         td 
                                                             each fileGroupItem in orderItem.fileGroupItems 
                                                                 a(href=fileGroupItem.path) #{fileGroupItem.fileName}
                                                                 br
-                                                        td #{orderItem.quantity}
+                                                        
                                                         td £#{orderItem.price}
 
 

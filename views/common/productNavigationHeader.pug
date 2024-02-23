@@ -1,0 +1,21 @@
+mixin productNavigationHeader(product)
+    .row.mb-8
+        .col-md-12
+            .d-md-flex.justify-content-between.align-items-center
+                // page header
+                div
+                    h2 Product
+                    // breacrumb
+                    nav(aria-label='breadcrumb')
+                        ol.breadcrumb.mb-0
+                            li.breadcrumb-item
+                                a.text-inherit(href='/admin_dashboard') Dashboard
+                            li.breadcrumb-item
+                                a.text-inherit(href='/admin_dashboard/products') Products
+                            if(product)
+                                li.breadcrumb-item.active(aria-current='page') #{product.name}
+                            else
+                                li.breadcrumb-item.active(aria-current='page') Add New Product
+                // button
+                div
+                    a.btn.btn-light(href='/admin_dashboard/products') Back to Products
