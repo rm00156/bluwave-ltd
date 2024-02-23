@@ -70,11 +70,15 @@ html(land="en")
                                                             a(href="/design_upload/" + basketItem.id) Edit Files
                                                     .col-lg-3.col-md-3.col-xs-6.mb-2
                                                         // title
-                                                        a.text-inherit(href='/shop/' + basketItem.name)
-                                                            h6.mb-0 #{basketItem.name}
+                                                        //- a.text-inherit(href='/shop/' + basketItem.name)
+                                                        h6.mb-0 #{basketItem.name}
                                                         each option in basketItem.options
                                                             span
                                                                 small #{option.optionType}: #{option.name}
+                                                                br
+                                                        each finishingOption in basketItem.finishingOptions
+                                                            span
+                                                                small #{finishingOption.optionType}: #{finishingOption.name}
                                                                 br
                                                         // text
                                                         //- .mt-2.small.lh-1
@@ -88,21 +92,25 @@ html(land="en")
                                                                 span.text-muted.remove(data-basketitemid=basketItem.id) Remove
                                                     
                                                     .col-lg-2.col-md-2.col-xs-6.mb-2
-                                                        select.form-control.quantity(data-basketitemid=basketItem.id)
-                                                            each quantity in basketItem.quantities 
-                                                                option(value=quantity.id selected=(basketItem.quantityFk==quantity.id)) #{quantity.quantity}
+                                                        span.fw-bold #{basketItem.quantity}
+                                                        
                                                     // input group
                                                     .col-lg-2.col-md-2.col-xs-6.mb-2
                                                         span.fw-bold £#{basketItem.price}
-                                                    .col-lg-2.col-md-2.col-xs-6.mb-2
+                                                    .col-lg-1.col-md-1.col-xs-6.mb-1
+                                                        a(href=`/shop/${basketItem.name}?edit=${basketItem.id}`)
+                                                            div.edit-item(style="cursor:pointer" data-basketitemid=basketItem.id)
+                                                                span.me-1.align-text-bottom.text-primary
+                                                                    svg.bi.bi-pencil(xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='currentColor' viewbox='0 0 16 16')
+                                                                        path(d='M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325')
+                                                    .col-lg-1.col-md-1.col-xs-6.mb-1
                                                         div.remove-item(style="cursor:pointer" data-basketitemid=basketItem.id)
-                                                            span.me-1.align-text-bottom
-                                                                svg.feather.feather-trash-2.text-success(xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewbox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round')
-                                                                    polyline(points='3 6 5 6 21 6')
-                                                                    path(d='M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2')
-                                                                    line(x1='10' y1='11' x2='10' y2='17')
-                                                                    line(x1='14' y1='11' x2='14' y2='17')
-                                                            span Remove
+                                                            span.me-1.align-text-bottom.text-danger
+                                                                svg.bi.bi-trash(xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='currentColor' viewbox='0 0 16 16')
+                                                                    path(d='M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z')
+                                                                    path(d='M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z')
+
+                                                            //- span Remove
                                     
                                     // btn
                                     .d-flex.justify-content-between.mt-4
@@ -118,16 +126,6 @@ html(land="en")
                                             // list group
                                             ul.list-group.list-group-flush
                                                 // list group item
-                                                //- li.list-group-item.d-flex.justify-content-between.align-items-start
-                                                //-     .me-auto
-                                                //-         div Item Subtotal
-                                                //-     span $70.00
-                                                //- // list group item
-                                                //- li.list-group-item.d-flex.justify-content-between.align-items-start
-                                                //-     .me-auto
-                                                //-         div Service Fee
-                                                //-     span $3.00
-                                                //- // list group item
                                                 li.list-group-item.d-flex.justify-content-between.align-items-start
                                                     .me-auto
                                                         .fw-bold Subtotal

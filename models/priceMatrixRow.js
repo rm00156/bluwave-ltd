@@ -26,6 +26,11 @@ module.exports = function(sequelize, Sequelize) {
             }
         },
 
+        orderNo: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
+
         deleteFl:{
             type: Sequelize.BOOLEAN,
             allowNull: false,

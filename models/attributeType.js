@@ -1,29 +1,17 @@
+const { DataTypes } = require('sequelize');
 module.exports = function(sequelize, Sequelize) {
  
-    var OptionTypeGroup = sequelize.define('optionTypeGroup', {
+    var AttributeType = sequelize.define('attributeType', {
  
         id: {
             autoIncrement: true,
             primaryKey: true,
             type: Sequelize.INTEGER
         },
-
-        productFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'products',
-                key: 'id'
-            }
-        },
-
-        attributeTypeFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'attributeTypes',
-                key: 'id'
-            }
+ 
+        attributeType: {
+            type: DataTypes.ENUM('Printing', 'Finishing'),
+            allowNull: false
         },
 
         deleteFl:{
@@ -42,5 +30,5 @@ module.exports = function(sequelize, Sequelize) {
         timestamps:false
     });
  
-    return OptionTypeGroup;
+    return AttributeType;
 }

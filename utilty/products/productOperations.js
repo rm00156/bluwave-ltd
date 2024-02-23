@@ -2,6 +2,9 @@ const models = require('../../models');
 const { Upload } = require("@aws-sdk/lib-storage");
 const { S3Client } = require("@aws-sdk/client-s3");
 const { Op } = require('sequelize');
+const { isEmpty } = require('lodash');
+const utilityHelper = require('../general/utilityHelper');
+const deliveryOperations = require('../delivery/deliveryOperations');
 
 async function getAllActiveProductTypes() {
     return await models.productType.findAll({
@@ -51,7 +54,9 @@ async function getAllActiveProducts() {
 }
 
 async function getAllProducts() {
-    return await models.product.findAll();
+    return models.sequelize.query('select p.*, pt.productType from products p ' +
+    ' inner join productTypes pt on p.productTypeFk = pt.id ', 
+    {type: models.sequelize.QueryTypes.SELECT});
 }
 
 async function getProductByProductName(productName) {
@@ -64,9 +69,17 @@ async function getProductByProductName(productName) {
 }
 
 async function getProductById(id) {
-    return await models.product.findOne({
+    return models.product.findOne({
         where: {
             id: id
+        }
+    })
+}
+
+async function getOptionGroupForProductId(productId) {
+    return models.optionGroup.findOne({
+        where: {
+            productFk: productId
         }
     })
 }
@@ -119,7 +132,7 @@ async function getAllQuantities() {
     })
 }
 
-async function getQuantityPriceTable(options, productId) {
+async function getQuantityPriceTable(options, finishingOptions, productId,) {
 
     var query = 'select q.quantity, q.id as quantityId, pmrqpr.id as priceMatrixRowQuantityRowId, pmrqpr.price, pmrqpr.price/q.quantity as pricePer from priceMatrixRowQuantityPrices pmrqpr ' +
         ' inner join priceMatrixRows pmr on pmrqpr.priceMatrixRowFk = pmr.id ' +
@@ -150,11 +163,50 @@ async function getQuantityPriceTable(options, productId) {
     query = query.substring(0, query.length - 1);
     query = query + ')) = 0 ) order by q.quantity asc';
 
-    return await models.sequelize.query(query, { replacements: replacements, type: models.sequelize.QueryTypes.SELECT });
+    const quantityPriceTable = await models.sequelize.query(query, { replacements: replacements, type: models.sequelize.QueryTypes.SELECT });
+    // return quantityPriceTable;
 
+    if(finishingOptions.length > 0) {
+        const finishingPriceTable = await models.sequelize.query('select q.quantity, q.id as quantityId, fq.id as finishingMatrixRowQuantityPriceId, fq.price, fq.price/q.quantity as pricePer  from finishingMatrices fm ' +
+        ' inner join finishingMatrixRows fmr on fmr.finishingMatrixFk = fm.id ' +
+        ' inner join finishingMatrixRowQuantityPrices fq on fq.finishingMatrixRowFk = fmr.id ' +
+        ' inner join quantities q on fq.quantityFk = q.id ' +
+        ' where fmr.optionFk in (:options) ' + 
+        ' and fm.deleteFl = false ' + 
+        ' and fm.productFk = :productId', {replacements:{productId: productId, options: finishingOptions.map(f => f.value)}, type: models.sequelize.QueryTypes.SELECT});
+    
+        const quantities = new Set(finishingPriceTable.map(f => f.quantityId));
+        const finishingQuantityPriceMap = new Map();
+    
+        quantities.forEach(quantityId => {
+    
+            const finishingQuantityRows = finishingPriceTable.filter(f => f.quantityId === quantityId);
+    
+            let price = 0;
+            let pricePer = 0;
+    
+            finishingQuantityRows.forEach(fqr => {
+                price += parseFloat(fqr.price);
+                pricePer += parseFloat(fqr.pricePer);
+            });
+    
+            finishingQuantityPriceMap.set(quantityId, {price: price, pricePer: pricePer});
+        });
+    
+        quantityPriceTable.forEach(qr => {
+    
+            const quantityId = qr.quantityId;
+            const {pricePer, price} = finishingQuantityPriceMap.get(quantityId);
+            qr.price = (parseFloat(qr.price) + price).toFixed(2);
+            qr.pricePer = (parseFloat(qr.pricePer) + pricePer).toFixed(2);
+        });
+    }
+    
+
+    return quantityPriceTable;
 }
 
-async function getOptionTypesAndOptionsForProductByProductId(productId) {
+async function getPricingMatrixOptionTypesAndOptionsForProduct(productId) {
 
     const results = await models.sequelize.query('SELECT distinct ot.id AS optionTypeId, ot.optionType, o.id AS optionId, o.name ' +
         ' FROM products p ' +
@@ -169,6 +221,27 @@ async function getOptionTypesAndOptionsForProductByProductId(productId) {
     if (results.length == 0)
         return null;
 
+    return mapToObject(results);
+}
+
+async function getFinishingMatrixOptionTypesAndOptionsForProduct(productId) {
+
+    const results = await models.sequelize.query('SELECT distinct ot.id AS optionTypeId, ot.optionType, o.id AS optionId, o.name ' +
+        ' FROM products p ' +
+        ' INNER JOIN finishingMatrices fm ON fm.productFk = p.id ' +
+        ' INNER JOIN finishingMatrixRows fmr ON fmr.finishingMatrixFk = fm.id ' +
+        ' INNER JOIN options o ON o.id = fmr.optionFk ' +
+        ' INNER JOIN optionTypes ot ON o.optionTypeFk = ot.id ' +
+        ' WHERE p.id = :productId ' +
+        ' and fm.deleteFl = false ', { replacements: { productId: productId }, type: models.sequelize.QueryTypes.SELECT });
+
+    if (results.length == 0)
+        return null;
+
+    return mapToFinishingObject(productId, results);
+}
+
+function mapToObject(results) {
     var map = new Map();
 
     results.forEach(result => {
@@ -187,12 +260,64 @@ async function getOptionTypesAndOptionsForProductByProductId(productId) {
             optionId: optionId,
             name: name,
             optionTypeId: optionTypeId
-        }
+        };
 
         options.push(option);
-
+    
         map.set(optionType, options);
     });
+
+   
+    const mapAsObject = Object.fromEntries(map);
+
+    return mapAsObject;
+}
+
+async function mapToFinishingObject(productId, results) {
+    var map = new Map();
+
+    results.forEach(result => {
+
+        const optionTypeId = result.optionTypeId;
+        const optionType = result.optionType;
+        const optionId = result.optionId;
+        const name = result.name;
+
+        if (!map.has(optionType)) {
+            map.set(optionType, {options: []});
+        }
+
+        var options = map.get(optionType);
+        var option = {
+            optionId: optionId,
+            name: name,
+            optionTypeId: optionTypeId
+        };
+        const newOptions = options.options;
+        newOptions.push(option);
+
+        map.set(optionType, {options: newOptions, rows: []});
+    });
+    for (const [optionType, value] of map.entries()) {
+
+        
+        const rowQuantityPrices = await getFinishingMatrixRowQuantityPricesForProductIdAndOptionType(productId, optionType);
+        let options = value.options;
+
+        for(let i = 0; i < options.length; i++) {
+            const option = options[i];
+            const rowItems = rowQuantityPrices.filter(rq => rq.optionId === option.optionId);
+            const sortedRowItems = rowItems.sort((a, b) => a.quantity - b.quantity);
+            
+            const existingRows = value['rows'];
+            existingRows.push(sortedRowItems);
+            value['rows'] = existingRows;
+        }
+        
+        
+        map.set(optionType, value);
+    }
+
 
     const mapAsObject = Object.fromEntries(map);
 
@@ -261,29 +386,67 @@ function getExtension(mimeType) {
 }
 async function createProduct(productDetails, s3PathMap, bulletPoints) {
 
-    // var imageCount = 1;
-    s3PathMap.forEach((value, key) => {
-        productDetails['image' + key + 'Path'] = value;
-        // imageCount++;
-    });
+    updateProductDetailsWithPicturesAndBulletPoints(s3PathMap, productDetails, bulletPoints);
 
-    var descriptionCount = 1;
-    bulletPoints.forEach(bulletPoint => {
-        productDetails['descriptionPoint' + descriptionCount] = bulletPoint;
-        descriptionCount++;
-    })
+    productDetails['status'] = 'Incomplete';
 
     return await models.product.create(productDetails);
 }
 
-async function createPriceMatrix(productId, options, quantities) {
+function updateProductDetailsWithPicturesAndBulletPoints(s3PathMap, productDetails, bulletPoints) {
+    s3PathMap.forEach((value, key) => {
+        productDetails['image' + key + 'Path'] = value;
+    });
+
+    var descriptionCount = 1;
+    bulletPoints.forEach(bulletPoint => {
+        const trimmed = bulletPoint.replace(/\s+$/, "");
+        if (trimmed !== '') {
+            productDetails['descriptionPoint' + descriptionCount] = bulletPoint;
+            descriptionCount++;
+        }
+
+    });
+}
+
+async function validateProductInformationDetails(productDetails) {
+
+    const errors = {};
+    const {name, productTypeFk, image1Path, description, subDescriptionTitle, subDescription, descriptionPoint1} = productDetails;
+
+    if(name === null || name === '')
+        errors['name'] = "'Product Name' must be set to continue.";
+
+    const productType = await getProductTypeById(productTypeFk);
+    if(productType === null)
+        errors['productType'] = "'Product Type' must be set to continue.";
+
+    if(image1Path === undefined || image1Path === null || image1Path === '')
+        errors['picture1'] = "Make sure the main picture has been set to continue.";
+
+    if(description === undefined || description === null || description === '')
+        errors['description'] = "'Main Product Description'' must be set to continue.";
+
+    if(subDescriptionTitle === undefined || subDescriptionTitle === null || subDescriptionTitle === '')
+        errors['subDescriptionTitle'] = "'Sub Product Description Title' must be set to continue.";
+
+    if(subDescription === undefined || subDescription === null || subDescription === '')
+        errors['subDescription'] = "'Sub Product Description' must be set to continue.";
+
+    if(descriptionPoint1 === undefined || descriptionPoint1 === null || descriptionPoint1 === '')
+        errors['descriptionBulletPoint'] = "'Description Bullet Point' must be set to continue.";
+
+    return errors;
+}
+
+async function createPriceMatrix(productId, options, isComplete) {
 
     // from options list, u have the id
     // from the list of ids get the distinct optionType ids
     // create optiontypegroup
     // then optiontypegroupitems
-
-    const optionTypeGroup = await createOptionTypeGroup();
+    const attributeType = await getPrintingAttributeType();
+    const optionTypeGroup = await createOptionTypeGroup(productId, attributeType.id);
     var optionsObject = await getOptionsByIds(options);
     var optionTypeIds = new Set();
 
@@ -295,14 +458,12 @@ async function createPriceMatrix(productId, options, quantities) {
         await createOptionTypeGroupItem(optionTypeGroup.id, optionTypeId);
     })
 
-    const quantityGroup = await createQuantityGroup();
-    quantities.forEach(async quantityId => {
-        await createQuantityGroupItem(quantityGroup.id, quantityId);
-    })
+    const quantityGroup = await getQuantityGroupForProductId(productId);
 
     return models.priceMatrix.create({
         productFk: productId,
         optionTypeGroupFk: optionTypeGroup.id,
+        status: isComplete ? 'Complete' : 'Incomplete',
         quantityGroupFk: quantityGroup.id,
         deleteFl: false,
         verisonNo: 1
@@ -310,10 +471,10 @@ async function createPriceMatrix(productId, options, quantities) {
 }
 
 async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
-
+    let orderNo = 1;
     rows.forEach(async row => {
         const optionGroup = await createOptionGroup();
-        const priceMatrixRow = await createPriceMatrixRow(priceMatrixId, optionGroup.id);
+        const priceMatrixRow = await createPriceMatrixRow(priceMatrixId, optionGroup.id, orderNo);
         const optionIds = row.optionIdGroup;
         optionIds.forEach(async optionId => {
             await createOptionGroupItem(optionGroup.id, optionId);
@@ -323,8 +484,10 @@ async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
 
         quantities.forEach(async quantity => {
 
-            await createPriceMatrixRowQuantityPrices(priceMatrixRow.id, quantity.id, quantity.price);
+            await createPriceMatrixRowQuantityPrices(priceMatrixRow.id, quantity.id, quantity.price === '' ? null : quantity.price);
         });
+
+        orderNo++;
     })
 }
 
@@ -354,8 +517,9 @@ async function createQuantityGroupItem(quantityGroupId, quantityId) {
     });
 }
 
-async function createQuantityGroup() {
+async function createQuantityGroup(productFk) {
     return models.quantityGroup.create({
+        productFk,
         deleteFl: false,
         versionNo: 1
     })
@@ -381,8 +545,10 @@ async function getOptionsByIds(options) {
     })
 }
 
-async function createOptionTypeGroup() {
+async function createOptionTypeGroup(productId, attributeTypeId) {
     return await models.optionTypeGroup.create({
+        productFk: productId,
+        attributeTypeFk: attributeTypeId,
         deleteFl: false,
         versionNo: 1
     });
@@ -404,10 +570,11 @@ async function createOptionGroupItem(optionGroupId, optionId) {
     });
 }
 
-async function createPriceMatrixRow(priceMatrixId, optionGroupId) {
+async function createPriceMatrixRow(priceMatrixId, optionGroupId, orderNo) {
     return await models.priceMatrixRow.create({
         priceMatrixFk: priceMatrixId,
         optionGroupFk: optionGroupId,
+        orderNo,
         deleteFl: false,
         versionNo: 1
     });
@@ -470,30 +637,56 @@ async function addAllOptionTypesToOptionTypesAndOptionJson(optionTypesAndOptions
     }
 }
 
+async function addAllOptionTypesToOptionTypesAndOptionToFinishingJson(optionTypesAndOptions) {
+
+    for (var key in optionTypesAndOptions) {
+        const optionTypeAndOption = optionTypesAndOptions[key];
+
+        const optionTypeId = optionTypeAndOption.options[0].optionTypeId;
+        const selectedOptionNames = optionTypeAndOption.options.map(o1 => o1.name).join(", ");
+        const allOptions = await getOptionsForOptionTypeId(optionTypeId);
+
+        optionTypeAndOption.options.forEach(o => {
+            o['selectedOptionNames'] = selectedOptionNames;
+            o['allOptions'] = allOptions;
+        });
+    }
+}
+
 async function getSelectedQuantitiesForProductById(productId) {
 
-    var result = await models.sequelize.query('select distinct q.id, q.quantity from quantityGroupItems qi ' +
-        ' inner join priceMatrices pm on pm.quantityGroupFk = qi.quantityGroupFk ' +
-        ' inner join priceMatrixRows pmr on pmr.priceMatrixFk = pm.id ' +
-        ' inner join priceMatrixRowQuantityPrices pq on pq.priceMatrixRowFk = pmr.id ' +
-        ' inner join quantities q on pq.quantityFk = q.id ' +
-        ' where pm.productFk = :productId ' +
-        ' and pm.deleteFl = false ' +
-        ' order by q.quantity asc', { replacements: { productId: productId }, type: models.sequelize.QueryTypes.SELECT })
+    var result = await models.sequelize.query('select distinct q.id, q.quantity from quantityGroupItems qi ' + 
+    ' inner join quantities q on qi.quantityFk = q.id ' + 
+    ' inner join quantityGroups qg on qi.quantityGroupFk = qg.id ' +
+    ' where qg.productFk = :productId ' +
+    ' order by q.quantity asc ', { replacements: { productId: productId }, type: models.sequelize.QueryTypes.SELECT })
 
     return result;
 }
 
-async function getPriceMatrixForProduct(productId) {
+async function getPriceMatrixForProductId(productId) {
+    return models.priceMatrix.findOne({
+        where: {
+            productFk: productId,
+            deleteFl: false
+        }
+    })
+}
+
+async function getPriceMatrixDetailsForProductId(productId) {
 
     const result = await models.sequelize.query('select distinct q.quantity, pmr.*,pq.*, pq.id as priceMatrixRowQuantityPriceId from priceMatrixRows pmr ' +
         ' inner join priceMatrices pm on pmr.priceMatrixFk = pm.id ' +
         ' inner join priceMatrixRowQuantityPrices pq on pq.priceMatrixRowFk = pmr.id ' +
         ' inner join quantities q on pq.quantityFk = q.id ' +
-        ' inner join optionGroupItems ogi on ogi.optionGroupFk = pmr.optionGroupFk ' +
+        ' inner join optionGroupItems ogi on ogi.optionGroupFk = pmr.optionGroupFk ' + 
         ' where pm.productFk = :productId ' +
-        ' and pm.deleteFl = false', { replacements: { productId: productId }, type: models.sequelize.QueryTypes.SELECT });
+        ' and pm.deleteFl = false order by pmr.orderNo asc', { replacements: { productId: productId }, type: models.sequelize.QueryTypes.SELECT });
 
+    return await getRowDetails(result);
+}
+
+async function getRowDetails(result) {
     const optionGroupIds = Array.from(new Set(result.map(o => o.optionGroupFk)));
     var rows = [];
     for (var i = 0; i < optionGroupIds.length; i++) {
@@ -509,6 +702,7 @@ async function getPriceMatrixForProduct(productId) {
 
     return rows;
 }
+
 
 async function getOptionGroupItemsForOptionGroup(optionGroupId) {
 
@@ -530,12 +724,11 @@ async function getOptionGroupItemsByOptionGroupId(id) {
 async function updateProduct(productDetails) {
 
     const data = {
-        name: productDetails.productName,
-        productTypeFk: productDetails.productTypeId,
+        name: productDetails.name,
+        productTypeFk: productDetails.productTypeFk,
         description: productDetails.description,
         subDescriptionTitle: productDetails.subDescriptionTitle,
         subDescription: productDetails.subDescription,
-        deleteFl: productDetails.deleteFl,
         versionNo: models.sequelize.literal('versionNo + 1')
     };
 
@@ -550,11 +743,19 @@ async function updateProduct(productDetails) {
 
         if (i < numberOfPoints) {
             const bulletPoint = bulletPoints[i];
-            data['descriptionPoint' + (i + 1)] = bulletPoint;
+            const trimmed = bulletPoint.replace(/\s+$/, "");
+            if(trimmed !== '') {
+                data['descriptionPoint' + (i + 1)] = bulletPoint;
+            } else {
+                data['descriptionPoint' + (i + 1)] = null;
+            }
+            
         } else {
             data['descriptionPoint' + (i + 1)] = null;
         }
     }
+
+    // data['status'] = await isV ? 'Complete' : 'Incomplete';
 
     await models.product.update(data, {
         where: {
@@ -585,19 +786,6 @@ async function updatePriceMatrixRowPrices(rows) {
             await updatePriceMatrixRowQuantityPriceById(priceMatrixRowQuantityPriceId, item.price);
 
         })
-    })
-}
-
-async function deletePriceMatrixForProduct(productId) {
-
-    await models.priceMatrix.update({
-        deleteFl: true,
-        versionNo: models.sequelize.literal('versionNo + 1')
-    }, {
-        where: {
-            productFk: productId,
-            deleteFl: false
-        }
     })
 }
 
@@ -638,12 +826,12 @@ async function getActiveProductsForProductTypeName(productTypeName) {
 }
 
 async function getQuantitiesForProduct(productId) {
-    return await models.sequelize.query('select q.* from products p ' +
-        ' inner join priceMatrices pm on pm.productFk = p.id ' +
-        ' inner join quantityGroupItems qgi on qgi.quantityGroupFk = pm.quantityGroupFk ' +
-        ' inner join quantities q on qgi.quantityFk = q.id ' +
-        ' where p.id = :productId ' +
-        ' and pm.deleteFl = false order by q.quantity asc', { replacements: { productId: productId }, type: models.sequelize.QueryTypes.SELECT });
+    return await models.sequelize.query('select q.* from products p ' + 
+    ' inner join quantityGroups qg on qg.productFk = p.id ' +
+    ' inner join quantityGroupItems qgi on qgi.quantityGroupFk = qg.id ' +
+    ' inner join quantities q on qgi.quantityFk = q.id ' + 
+    ' where p.id = :productId ' +
+    ' order by q.quantity asc' , { replacements: { productId: productId }, type: models.sequelize.QueryTypes.SELECT });
 }
 
 async function getOptionGroupById(id) {
@@ -944,7 +1132,615 @@ async function updateTemplate(id, body) {
     })
 }
 
+async function isProductInformationDetailsComplete(details) {
+
+    const {name, productTypeFk, image1Path, description, subDescriptionTitle, subDescription, descriptionPoint1} = details;
+
+    if(name === null || name === '')
+        return false;
+
+    const productType = await getProductTypeById(productTypeFk);
+    if(productType === null)
+        return false;
+
+    if(image1Path === undefined || image1Path === null || image1Path === '')
+        return false;
+
+    if(description === undefined || description === null || description === '')
+        return false;
+
+    if(subDescriptionTitle === undefined || subDescriptionTitle === null || subDescriptionTitle === '')
+        return false;
+
+    if(subDescription === undefined || subDescription === null || subDescription === '')
+        return false;
+
+    if(descriptionPoint1 === undefined || descriptionPoint1 === null || descriptionPoint1 === '')
+        return false;
+
+    return true;
+}
+
+async function getQuantityGroupForProductId(productId) {
+    return models.quantityGroup.findOne({
+        where: {
+            productFk: productId
+        }
+    });
+}
+
+async function getPriceMatrixDetailsForProductIdId(productId) {
+    return models.priceMatrix.findOne({
+        where: {
+            productFk: productId,
+        }
+    })
+};
+
+
+async function verifyQuantities(productId, quantities) {
+    
+    const quantityGroup = await getQuantityGroupForProductId(productId);
+    if(!quantityGroup) {
+        return {valid: true, warning: false, message: false, create: true};
+    }
+
+    const exisitingQuantities = await getSelectedQuantitiesForProductById(productId);
+    const existingQuantityIds = exisitingQuantities.map(q => q.id.toString());
+    const quantitiesTheSame = utilityHelper.hasTheSameItems(quantities, existingQuantityIds);
+
+    if(quantitiesTheSame) {
+        return {valid: false, warning: false, message: 'No changes made.'};
+    }
+
+    const priceMatrix = await getPriceMatrixForProductId(productId);
+
+    return {valid: true, create: false, warning: priceMatrix ? true : false, message: priceMatrix ? "Are you sure you wish to make this change? \nMaking this change will alter the existing 'Price' and 'Finishing' matrices and existing prices will be lost." : null};
+    // check whether price matrix exists for product
+    // TODO
+    // check whether finishing matrix exists also
+
+}
+
+async function getFinishingMatrixRowQuantityPricesForProductIdAndOptionType(productId, optionType) {
+    return models.sequelize.query('select distinct q.quantity, o.name as optionName, o.id as optionId, fmr.*, fq.*, fq.id as finishingMatrixRowQuantityPriceId from finishingMatrices fm ' + 
+        ' inner join finishingMatrixRows fmr on fmr.finishingMatrixFk = fm.id ' + 
+        ' inner join finishingMatrixRowQuantityPrices fq on fq.finishingMatrixRowFk = fmr.id ' + 
+        ' inner join optionTypes ot on fm.optionTypeFk = ot.id ' +
+        ' inner join quantities q on fq.quantityFk = q.id ' + 
+        ' inner join options o on fmr.optionFK = o.id ' +
+        ' where fm.productFk = :productId and ot.optionType = :optionType ' +
+        ' and fm.deleteFl = false ' +
+        ' and fmr.deleteFl = false ' + 
+        ' and fq.deleteFl = false ' +
+        ' order by fmr.orderNo asc', {replacements: {productId: productId, optionType: optionType},
+    type: models.sequelize.QueryTypes.SELECT});
+}
+
+async function setQuantitiesForQuantityGroup(quantityGroup, quantities) {
+    quantities.forEach(async quantityId => {
+        await createQuantityGroupItem(quantityGroup.id, quantityId);
+    })
+}
+
+async function removeAllQuantitesFromQuantityGroup(quantityGroup) { 
+    await models.sequelize.query('delete from quantityGroupItems where quantityGroupFk = :id', 
+    {replacements: {id: quantityGroup.id}, type: models.sequelize.QueryTypes.DELETE});
+}
+
+async function getQuantitiesForQuantityGroup(quantityGroupId) {
+    return models.sequelize.query('select q.* from quantities q ' +
+        ' inner join quantityGroupItems qgi on qgi.quantityFk = q.id ' + 
+        ' where qgi.quantityGroupFk = :id ', {replacements: {id: quantityGroupId}, type: models.sequelize.QueryTypes.SELECT});
+}
+
+async function getPriceMatrixRowsForQuantityGroup(quantityGroupId) {
+
+    return models.sequelize.query('select pmr.* from priceMatrices pm ' +
+        ' inner join quantityGroups qg on pm.quantityGroupFk = qg.id ' + 
+        ' inner join priceMatrixRows pmr on pmr.priceMatrixFk = pm.id ' +
+        ' where pm.deleteFl = false ' +
+        ' and pmr.deleteFl = false ' + 
+        ' and qg.id = :id ', {replacements: {id: quantityGroupId}, type: models.sequelize.QueryTypes.SELECT});
+}
+
+async function getFinishingMatrixRowsForQuantityGroup(quantityGroupId) {
+
+    return models.sequelize.query('select fmr.* from finishingMatrices fm ' +
+        ' inner join quantityGroups qg on fm.quantityGroupFk = qg.id ' + 
+        ' inner join finishingMatrixRows fmr on fmr.finishingMatrixFk = fm.id ' +
+        ' where fm.deleteFl = false ' +
+        ' and fmr.deleteFl = false ' + 
+        ' and qg.id = :id ', {replacements: {id: quantityGroupId}, type: models.sequelize.QueryTypes.SELECT});
+}
+
+async function updatePriceMatrixRowQuantityPricesQuantityChange(quantityGroupId, removedQuantities, addQuantities) {
+    
+    if(removedQuantities.length > 0) {
+        await models.sequelize.query(' delete pq1 from priceMatrixRowQuantityPrices as pq1 ' + 
+        ' inner join priceMatrixRowQuantityPrices as pq2 on pq1.id = pq2.id ' +
+        ' inner join priceMatrixRows pmr on pq2.priceMatrixRowFk = pmr.id ' + 
+        ' inner join priceMatrices pm on pmr.priceMatrixFk = pm.id ' +
+        ' where pm.quantityGroupFk = :id ' +
+        ' and pm.deleteFl = false ' +
+        ' and pmr.deleteFl = false ' + 
+        ' and pq2.deleteFl = false ' + 
+        ' and pq2.quantityFk in (:removedQuantities)', {replacements: {id: quantityGroupId, removedQuantities:removedQuantities}, type: models.sequelize.QueryTypes.DELETE});
+
+    }
+    
+    //get pricematrix rows not deleted
+    const priceMatrixRows = await getPriceMatrixRowsForQuantityGroup(quantityGroupId);
+
+    for(let i = 0; i < priceMatrixRows.length; i++) {
+
+        const priceMatrixRow = priceMatrixRows[i];
+        for(let j = 0; j < addQuantities.length; j++) {
+            const addQuantity = addQuantities[j];
+
+            await createPriceMatrixRowQuantityPrices(priceMatrixRow.id, addQuantity, null);
+        }
+    }
+}
+
+async function updateFinishingMatrixRowQuantityPricesQuantityChange(quantityGroupId, removedQuantities, addQuantities) {
+    if(removedQuantities.length > 0) {
+        await models.sequelize.query(' delete fq1 from finishingMatrixRowQuantityPrices as fq1 ' + 
+        ' inner join finishingMatrixRowQuantityPrices as fq2 on fq1.id = fq2.id ' +
+        ' inner join finishingMatrixRows fmr on fq2.finishingMatrixRowFk = fmr.id ' + 
+        ' inner join finishingMatrices fm on fmr.finishingMatrixFk = fm.id ' +
+        ' where fm.quantityGroupFk = :id ' +
+        ' and fm.deleteFl = false ' +
+        ' and fmr.deleteFl = false ' + 
+        ' and fq2.deleteFl = false ' + 
+        ' and fq2.quantityFk in (:removedQuantities)', {replacements: {id: quantityGroupId, removedQuantities:removedQuantities}, type: models.sequelize.QueryTypes.DELETE});
+    }
+    const finishingMatrixRows = await getFinishingMatrixRowsForQuantityGroup(quantityGroupId);
+
+    for(let i = 0; i < finishingMatrixRows.length; i++) {
+
+        const finishingMatrixRow = finishingMatrixRows[i];
+        for(let j = 0; j < addQuantities.length; j++) {
+            const addQuantity = addQuantities[j];
+
+            await createFinishingMatrixRowQuantityPrice(finishingMatrixRow.id, addQuantity, null);
+        }
+    }
+}
+
+async function updateQuantitiesForQuantityGroup(quantityGroup, quantities) {
+
+    const existingQuantities = await getQuantitiesForQuantityGroup(quantityGroup.id);
+    const existingQuantityIds = existingQuantities.map(q => q.id.toString());
+    const remove = [];
+    const add = [];
+
+    existingQuantityIds.forEach(existingQuantityId => {
+        if(!quantities.includes(existingQuantityId))
+            remove.push(existingQuantityId);
+    });
+
+    quantities.forEach(quantity => {
+
+        if(!existingQuantityIds.includes(quantity))
+            add.push(quantity);
+    });
+
+    await removeAllQuantitesFromQuantityGroup(quantityGroup);
+
+    await setQuantitiesForQuantityGroup(quantityGroup, quantities);
+
+    
+    await updatePriceMatrixRowQuantityPricesQuantityChange(quantityGroup.id, remove, add);
+    await updateFinishingMatrixRowQuantityPricesQuantityChange(quantityGroup.id, remove, add);
+    // update pricematrixrowquantityprices
+    // update finisingmatrices
+
+
+}
+
+async function createQuantityGroupAndSetQuantities(productId, quantities) {
+    const quantityGroup = await createQuantityGroup(productId);
+    await setQuantitiesForQuantityGroup(quantityGroup, quantities);
+}
+
+async function createPrintingAttributes(productId, options, rows) {
+
+    const isComplete = await isMatrixDetailsComplete(rows);
+    const priceMatrix = await createPriceMatrix(productId, options, isComplete);
+    await createPriceMatrixRowsAndQuantityPrices(priceMatrix.id, rows);
+}
+
+
+async function getAttributeTypeByType(attributeType) {
+    return models.attributeType.findOne({
+        where: {
+            attributeType
+        }
+    })
+};
+
+async function getPrintingAttributeType() {
+    return getAttributeTypeByType('Printing');
+}
+
+async function getFinishingAttributeType() {
+    return getAttributeTypeByType('Finishing');
+}
+
+async function deletePriceMatrixForProduct(productId) {
+
+    await deletePriceMatrixRowQuantityPricesForPriceMatrixRow(productId);
+    await deleteOptionGroupItemsForProduct(productId);
+    await deletePriceMatrixRowsForProduct(productId);
+    await deleteOptionGroupsForPriceMatrix(productId);
+    await deleteOptionTypeGroupAndItemsForProductId(productId, 'Printing');
+
+    await models.priceMatrix.update({
+        deleteFl: true,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            productFk: productId,
+            deleteFl: false
+        }
+    })
+}
+
+async function deletePriceMatrixRowQuantityPricesForPriceMatrixRow(productId) {
+    await models.sequelize.query(
+        'update priceMatrixRowQuantityPrices as pmrqr1 ' +
+        ' inner join priceMatrixRowQuantityPrices as pmrqr2 on pmrqr1.id = pmrqr2.id ' +
+        ' inner join priceMatrixRows pmr on pmrqr2.priceMatrixRowFk = pmr.id ' + 
+        ' inner join priceMatrices pm on pmr.priceMatrixFk = pm.id ' + 
+        ' inner join products p on pm.productFk = p.id ' +
+        ' set pmrqr1.deleteFl = true, pmrqr1.versionNo = pmrqr1.versionNo + 1 ' + 
+        ' where pm.deleteFl = false and p.id = :productId', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.UPDATE})
+
+}
+
+
+async function deleteOptionGroupItemsForProduct(productId) {
+    await models.sequelize.query('update optionGroupItems as ogi1 ' +
+    ' inner join optionGroupItems as ogi2 on ogi1.id = ogi2.id ' +
+    ' inner join priceMatrixRows pmr on pmr.optionGroupFk = ogi2.optionGroupFk ' + 
+    ' inner join priceMatrices pm on pmr.priceMatrixFk = pm.id ' + 
+    ' inner join products p on pm.productFk = p.id ' + 
+    ' set ogi1.deleteFl = true, ogi1.versionNo = ogi1.versionNo + 1 ' + 
+    ' where pm.deleteFl = false and p.id = :productId', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.UPDATE})
+}
+
+async function deletePriceMatrixRowsForProduct(productId) {
+    await models.sequelize.query('update priceMatrixRows as pmr1 ' +
+    ' inner join priceMatrixRows as pmr2 on pmr1.id = pmr2.id ' + 
+    ' inner join priceMatrices pm on pmr2.priceMatrixFk = pm.id ' +
+    ' inner join products p on pm.productFk = p.id ' + 
+    ' set pmr1.deleteFl = true, pmr1.versionNo = pmr1.versionNo + 1 ' + 
+    ' where pm.deleteFl = false and p.id = :productId', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.UPDATE})
+}
+
+
+async function deleteOptionGroupsForPriceMatrix(productId) {
+    await models.sequelize.query('update optionGroups as og1 ' + 
+    ' inner join optionGroups as og2 on og1.id = og2.id ' + 
+    ' inner join priceMatrixRows as pmr on pmr.optionGroupFk = og2.id ' + 
+    ' inner join priceMatrices pm on pmr.priceMatrixFk = pm.id ' +
+    ' inner join products p on pm.productFk = p.id ' + 
+    ' set og1.deleteFl = true, og1.versionNo = og1.versionNo + 1 ' + 
+    ' where pm.deleteFl = false and p.id = :productId', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.UPDATE})
+}
+
+async function deleteOptionTypeGroupAndItemsForProductId(productId, attributeType) {
+     await models.sequelize.query(
+        'update optionTypeGroupItems as otgi1 ' + 
+        ' inner join optionTypeGroupItems as otgi2 on otgi1.id = otgi2.id ' +
+        ' inner join optionTypeGroups otg on otgi2.optionTypeGroupFk = otg.id ' + 
+        ' inner join attributeTypes a on otg.attributeTypeFk = a.id ' + 
+        ' inner join products p on otg.productFk = p.id ' +
+        ' set otgi1.deleteFl = true, otgi1.versionNo = otgi1.versionNo + 1 ' + 
+        ' where otg.deleteFl = false and p.id = :productId ' + 
+        ' and a.attributeType = :attributeType', {replacements: {productId: productId, attributeType: attributeType}, type: models.sequelize.QueryTypes.UPDATE});
+
+    await models.optionTypeGroup.update({
+        deleteFl: true,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            productFk: productId,
+            deleteFl: false
+        }
+    })
+    
+}
+
+async function getFinishingOptionTypesForProduct(productId) {
+
+    return models.sequelize.query('select distinct ot.* from finishingMatrices fm ' +
+    ' inner join optionTypeGroupItems otgi on otgi.optionTypeGroupFk = fm.optionTypeGroupFk ' + 
+    ' inner join optionTypes ot on otgi.optionTypeFk = ot.id ' + 
+    ' inner join products p on fm.productFk = p.id ' +
+    ' where fm.deleteFl = false and p.id = :productId ', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.SELECT});
+}
+
+async function getOptionTypesNotUsedByFinishingMatrixForProduct(productId) {
+    // get optionTypes For finishinmatrix
+
+    return models.sequelize.query('select distinct * from optionTypes where id not in (select ot.id from finishingMatrices fm ' +
+    ' inner join optionTypes ot on ot.id = fm.optionTypeFk ' + 
+    ' inner join products p on fm.productFk = p.id ' +
+    ' where fm.deleteFl = false and p.id = :productId) ', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.SELECT});
+}
+
+async function getOptionTypesNotUsedByPricingMatrixForProduct(productId) {
+    // get optionTypes For finishinmatrix
+
+    return models.sequelize.query('select distinct * from optionTypes where id not in (select ot.id from priceMatrices pm ' +
+    ' inner join optionTypeGroupItems otgi on otgi.optionTypeGroupFk = pm.optionTypeGroupFk ' + 
+    ' inner join optionTypes ot on otgi.optionTypeFk = ot.id ' + 
+    ' inner join products p on pm.productFk = p.id ' +
+    ' where pm.deleteFl = false and p.id = :productId) ', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.SELECT});
+}
+
+async function getFinishingMatricesForProductId(productId) {
+    return models.finishingMatrix.findAll({
+        where: {
+            productFk: productId,
+            deleteFl: false
+        },
+        order: [['orderNo', 'ASC']]
+    })
+}
+
+async function getFinishingMatrixRowsForMatrix(matrixId) {
+    const result = await models.sequelize.query('select distinct o.id as optionId, q.quantity, fmr.*, fq.*, fq.id as finishingMatrixRowQuantityPriceId from finishingMatrixRows fmr ' +
+        ' inner join finishingMatrices fm on fmr.finishingMatrixFk = fm.id ' +
+        ' inner join finishingMatrixRowQuantityPrices fq on fq.finishingMatrixRowFk = fmr.id ' +
+        ' inner join quantities q on fq.quantityFk = q.id ' +
+        ' inner join options o on o.id = fmr.optionFk ' + 
+        ' where fm.id = :matrixId ' +
+        ' and fm.deleteFl = false order by fmr.orderNo asc', { replacements: { matrixId: matrixId }, type: models.sequelize.QueryTypes.SELECT });
+
+    return result;
+}
+
+async function getFinishingMatricesDetailsForProductId(productId) {
+
+    const finishingMatrices = await getFinishingMatricesForProductId(productId);
+    const result = [];
+    for(let i = 0; i < finishingMatrices.length; i++) {
+
+        const finishingMatrix = finishingMatrices[i];
+
+        const finishingMatrixRows = await getFinishingMatrixRowsForMatrix(finishingMatrix.id);
+
+        const matrixDetails = {
+            id: finishingMatrix.id,
+            rows: finishingMatrixRows
+        }
+
+        result.push(matrixDetails);
+
+    }
+    return result;
+        
+}
+
+async function createFinishingMatrix(productId, optionTypeId, orderNo, isComplete) {
+
+    const quantityGroup = await getQuantityGroupForProductId(productId);
+    return models.finishingMatrix.create({
+        productFk: productId,
+        orderNo,
+        status: isComplete ? 'Complete' : 'Incomplete',
+        optionTypeFk: optionTypeId,
+        quantityGroupFk: quantityGroup.id,
+        deleteFl: false,
+        versionNo: 1
+    })
+}
+
+async function getOptionTypeFromOptionId(optionId) {
+    const optionTypes = await models.sequelize.query('select ot.* from options o ' + 
+        ' inner join optionTypes ot on o.optionTypeFk = ot.id ' +
+        ' where o.id = :id ', {replacements: {id: optionId}, type: models.sequelize.QueryTypes.SELECT});
+
+    if(optionTypes.length === 0)
+        return null;
+    
+    return optionTypes[0];
+}
+
+async function isMatrixDetailsComplete(matrix) {
+
+    for(let i = 0; i < matrix.length; i++) {
+        const row = matrix[i];
+        const quantityGroup = row.quantityGroup;
+        const pricesNotSet = quantityGroup.filter(q => q.price === '');
+
+        if(pricesNotSet.length > 0) {
+            return false;
+        }
+    };
+
+    return true;
+}
+
+async function createFinishingMatrixRow(finishingMatrixId, optionId, orderNo) {
+    return models.finishingMatrixRow.create({
+        finishingMatrixFk: finishingMatrixId,
+        optionFk: optionId,
+        orderNo,
+        deleteFl: false,
+        versionNo: 1
+    })
+}
+
+async function createFinishingMatrixRowQuantityPrice(finishingMatrixRowId, quantityId, price) {
+    return models.finishingMatrixRowQuantityPrice.create({
+        finishingMatrixRowFk: finishingMatrixRowId,
+        quantityFk: quantityId,
+        price: price === '' ? null : price,
+        deleteFl: false,
+        versionNo: 1
+    })
+}
+
+async function createFinishingMatrices(productId, matrices) {
+
+    for(let i = 0; i < matrices.length; i++) {
+
+        const matrix = matrices[i];
+        const isComplete = await isMatrixDetailsComplete(matrix);
+        const optionType = await getOptionTypeFromOptionId(matrix[0].optionId[0]);
+        const finishingMatrix = await createFinishingMatrix(productId, optionType.id, i + 1, isComplete);
+        for(let j = 0; j < matrix.length; j++) {
+            const row = matrix[j];
+            const quantityGroup = row.quantityGroup;
+            const optionId = row.optionId[0];
+            const finishingMatrixRow = await createFinishingMatrixRow(finishingMatrix.id, optionId, j + 1);
+
+        
+            for(let k = 0; k < quantityGroup.length; k++) {
+
+                const quantityItem = quantityGroup[k];
+
+                await createFinishingMatrixRowQuantityPrice(finishingMatrixRow.id, quantityItem.id, quantityItem.price);
+            }
+        }
+    }
+}
+
+async function deleteFinishingMatricesRowQuantitiesForProductId(productId) {
+
+    await models.sequelize.query('update finishingMatrixRowQuantityPrices as fq1 ' + 
+    ' inner join finishingMatrixRowQuantityPrices as fq2 on fq1.id = fq2.id ' +
+    ' inner join finishingMatrixRows fmr on fq2.finishingMatrixRowFk = fmr.id ' +
+    ' inner join finishingMatrices fm on fmr.finishingMatrixFk = fm.id ' +
+    ' inner join products p on fm.productFk = p.id ' + 
+    ' set fq1.deleteFl = true, fq1.versionNo = fq1.versionNo + 1 ' + 
+    ' where fm.deleteFl = false ' + 
+    ' and fq2.deleteFl =  false ' + 
+    ' and fmr.deleteFl = false ' +
+    ' and p.id = :productId ', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.UPDATE});
+}
+
+async function deleteFinishingMatricesRowsForProductId(productId) {
+
+    await models.sequelize.query('update finishingMatrixRows as fmr1 ' +
+    ' inner join finishingMatrixRows as fmr2 on fmr1.id = fmr2.id ' +
+    ' inner join finishingMatrices fm on fmr2.finishingMatrixFk = fm.id ' +
+    ' inner join products p on fm.productFk = p.id ' + 
+    ' set fmr1.deleteFl = true, fmr1.versionNo = fmr1.versionNo + 1 ' + 
+    ' where fm.deleteFl = false ' + 
+    ' and fmr2.deleteFl = false ' +
+    ' and p.id = :productId ', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.UPDATE});
+}
+
+async function deleteFinishingMatricesForProductId(productId) {
+    await models.sequelize.query('update finishingMatrices as fm1 ' + 
+    ' inner join finishingMatrices as fm2 on fm1.id = fm2.id ' +
+    ' set fm1.deleteFl = true, fm1.versionNo = fm1.versionNo + 1 ' + 
+    ' where fm2.productFk = :productId ' + 
+    ' and fm2.deleteFl = false ', {replacements: {productId: productId}, type: models.sequelize.QueryTypes.UPDATE});
+}
+
+async function deleteFinishingPriceMatricesForProduct(productId) {
+
+    const transaction = await models.sequelize.transaction();
+    try {
+        await deleteFinishingMatricesRowQuantitiesForProductId(productId);
+        await deleteFinishingMatricesRowsForProductId(productId);
+        await deleteFinishingMatricesForProductId(productId);
+        await transaction.commit();
+    } catch(err) {
+        console.log(err);
+        await transaction.rollback();
+    }   
+}
+
+async function isAllFinishingMatricesComplete(matrices) {
+
+    for(let i = 0; i < matrices.length; i++) {
+        const matrix = matrices[i];
+
+        const isFinishingMatrixComplete = await isMatrixDetailsComplete(matrix);
+
+        if(!isFinishingMatrixComplete)
+            return false;
+    }
+
+    return true;
+}
+
+async function isProductValid(product) {
+
+    const errors = await validateProductInformationDetails(product);
+    if(!isEmpty(errors))
+        return {isValid: false, page: 'page1'};
+
+    const quantityGroup = await getQuantityGroupForProductId(product.id);
+    if(!quantityGroup) 
+        return {isValid: false, page: 'page2'};
+
+    const priceMatrix = await getPriceMatrixForProductId(product.id);
+    if(!priceMatrix)
+        return {isValid: false, page: 'page3'};
+
+    if(priceMatrix.status === 'Incomplete')
+        return {isValid: false, page: 'page3'};
+
+    const finishingMatrices = await getFinishingMatricesForProductId(product.id);
+
+    const incompleteMatrices = finishingMatrices.filter(f => f.status === 'Incomplete');
+    if(incompleteMatrices.length > 0) 
+        return {isValid: false, page: 'page4'};
+
+    const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+    if(productDeliveries.length === 0)
+        return {isValid: false, page: 'page5'};
+
+
+    // discounts    
+    return {isValid: true};
+}
+
+async function deactivateProduct(productId, isComplete) {
+    await models.product.update({
+        deleteFl: true,
+        status: isComplete ? 'Complete' : 'Incomplete',
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id: productId
+        }
+    })
+}
+
+async function activateProduct(productId) {
+    await models.product.update({
+        deleteFl: false,
+        versionNo: models.sequelize.literal('versionNo + 1'),
+        status: 'Complete',
+    }, {
+        where: {
+            id: productId
+        }
+    })
+}
+
+async function setProductStatusComplete(productId, isComplete) {
+    await models.product.update({
+        versionNo: models.sequelize.literal('versionNo + 1'),
+        status: isComplete ? 'Complete' : 'Incomplete',
+    }, {
+        where: {
+            id: productId
+        }
+    })
+}
+
 module.exports = {
+    createPrintingAttributes,
     parseOptionTypesAndOption,
     getAllProductWithLowestPriceDetails,
     createPriceMatrixRowsAndQuantityPrices,
@@ -952,7 +1748,7 @@ module.exports = {
     createProduct,
     uploadPictures,
     getOptionsForOptionTypeId,
-    getOptionTypesAndOptionsForProductByProductId,
+    getPricingMatrixOptionTypesAndOptionsForProduct,
     getQuantityPriceTable,
     getAllQuantities,
     getAllOptionTypes,
@@ -968,7 +1764,7 @@ module.exports = {
     getAllActiveProductTypes,
     addAllOptionTypesToOptionTypesAndOptionJson,
     getSelectedQuantitiesForProductById,
-    getPriceMatrixForProduct,
+    getPriceMatrixDetailsForProductId,
     updateProduct,
     updatePriceMatrixRowPrices,
     deletePriceMatrixForProduct,
@@ -1009,5 +1805,33 @@ module.exports = {
     getAvailableSizeOptionsForNewTemplate,
     createTemplate,
     getTemplate,
-    updateTemplate
+    updateTemplate,
+    isProductInformationDetailsComplete,
+    validateProductInformationDetails,
+    updateProductDetailsWithPicturesAndBulletPoints,
+    getQuantityGroupForProductId,
+    getPriceMatrixDetailsForProductIdId,
+    verifyQuantities,
+    setQuantitiesForQuantityGroup,
+    updateQuantitiesForQuantityGroup,
+    createQuantityGroupAndSetQuantities,
+    getPriceMatrixDetailsForProductIdId,
+    getOptionGroupForProductId,
+    getPriceMatrixForProductId,
+    getOptionTypesNotUsedByFinishingMatrixForProduct,
+    getFinishingOptionTypesForProduct,
+    getOptionTypesNotUsedByPricingMatrixForProduct,
+    getFinishingMatricesForProductId,
+    getFinishingMatrixOptionTypesAndOptionsForProduct,
+    getFinishingMatricesDetailsForProductId,
+    createFinishingMatrices,
+    addAllOptionTypesToOptionTypesAndOptionToFinishingJson,
+    deleteFinishingPriceMatricesForProduct,
+    isMatrixDetailsComplete,
+    isAllFinishingMatricesComplete,
+    isProductValid,
+    deactivateProduct,
+    activateProduct,
+    setProductStatusComplete
+    
 };

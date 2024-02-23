@@ -654,6 +654,8 @@ function picture1Error() {
     const picture1 = fileJsonObject[1];
     if (picture1.remove == true) {
         $('#picture1Error').text('Make sure the main picture has been set');
+        const pictureLabel = document.getElementById('picture1Label');
+        pictureLabel.classList.add('picture-error');
         return true
     }
 

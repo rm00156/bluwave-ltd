@@ -158,6 +158,7 @@ html(land="en")
                                                         button.btn.btn-success.add-btn +
 
                                             .mb-3.col-lg-12.mt-5#option-container
+                                                h4.mb-4.h5 Printing Attributes
                                                 input#optionTypes(type="hidden" value=optionTypes)
                                                 
                                                 .row.mb-3
@@ -190,8 +191,14 @@ html(land="en")
                                                 .col-sm-12
                                                     label.form-label.mb-2 Price Matrix
                                                     #price-container
-
+                                            h4.mb-4.h5 Finishing Attributes
+                                            
+                                            .finishing_attributes_section.mb-5
+                                                button.btn.btn-primary.add-finishing-btn#add-finishing-btn(type='button') Add Finishing Attribute
+                                                p.small.text-danger#finishingError.mt-3
+                                                #finishing_option_types    
                                             #delivery-container
+                                                h4.mb-4.h5 Delivery
                                                 .row.mb-3
                                                     .col-sm-5
                                                         label.form-label Delivery Option

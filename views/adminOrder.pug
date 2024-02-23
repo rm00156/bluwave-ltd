@@ -129,13 +129,16 @@ html(land="en")
                                                                                 | #{basketItem.productName}
                                                                             each option in basketItem.options 
                                                                                 p.mb-0 #{option.optionType}: #{option.name}
+                                                                            each finishingOption in basketItem.finishingOptions 
+                                                                                p.mb-0 #{finishingOption.optionType}: #{finishingOption.name}
                                                             td
                                                                 span.text-body £#{(parseFloat(basketItem.price)/parseFloat(basketItem.quantity)).toFixed(2)}
+                                                            td #{basketItem.quantity}
                                                             td 
                                                                 each fileGroupItem in basketItem.fileGroupItems 
                                                                     a(href=fileGroupItem.path) #{fileGroupItem.fileName}
                                                                     br
-                                                            td #{basketItem.quantity}
+                                                            
                                                             td £#{basketItem.price}
 
 

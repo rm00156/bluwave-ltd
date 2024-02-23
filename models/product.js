@@ -16,7 +16,7 @@ module.exports = function(sequelize, Sequelize) {
 
         productTypeFk: {
             type: Sequelize.INTEGER,
-            allowNull: false,
+            allowNull: true,
             references: {
                 model: 'productTypes',
                 key: 'id'
@@ -25,7 +25,7 @@ module.exports = function(sequelize, Sequelize) {
 
         image1Path: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: true
         },
 
         image2Path: {
@@ -50,22 +50,22 @@ module.exports = function(sequelize, Sequelize) {
 
         description: {
             type: Sequelize.TEXT,
-            allowNull: false
+            allowNull: true
         },
 
         subDescriptionTitle: {
             type: Sequelize.STRING,
-            allowNull: false,
+            allowNull: true,
         },
 
         subDescription: {
             type: Sequelize.TEXT,
-            allowNull: false
+            allowNull: true
         },
 
         descriptionPoint1: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: true
         },
 
         descriptionPoint2: {
@@ -91,6 +91,11 @@ module.exports = function(sequelize, Sequelize) {
         descriptionPoint6: {
             type: Sequelize.STRING,
             allowNull: true
+        },
+
+        status: {
+            type: DataTypes.ENUM('Incomplete', 'Complete'),
+            allowNull: false
         },
 
         deleteFl:{

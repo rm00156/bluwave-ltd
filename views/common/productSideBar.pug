@@ -1,0 +1,82 @@
+mixin productSideBar(type, statuses)
+    .col-12
+        //- .d-flex.justify-content-between.align-items-center.d-md-none.py-4
+            // heading
+            h3.fs-5.mb-0 Account Setting
+            // button
+            button.btn.btn-outline-gray-400.text-muted.d-md-none.btn-icon.btn-sm.ms-3(type='button' data-bs-toggle='offcanvas' data-bs-target='#offcanvasAccount' aria-controls='offcanvasAccount')
+                i.bi.bi-text-indent-left.fs-3
+    // col
+    .col-lg-3.col-md-4.col-12.border-end
+        .pt-10.pe-lg-10
+            // nav
+            ul.nav.flex-column.nav-pills.nav-pills-dark
+                // nav item
+
+                li.nav-item
+                    a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product ? product.id : 0}/page1` class=(type=='page1' ? 'active' : ''))
+                        //- i.feather-icon.icon-shopping-bag.me-2
+                        //- <i class="bi bi-check-square-fill me-2"></i>
+                        | Product Information
+                        //- if(statuses.productInformation)
+                            <i class="bi bi-check-square-fill ms-2" style="color: green"></i>
+                        //- else 
+                            <i class="bi bi-x-square-fill ms-2" style="color: red"></i>
+                        //- span
+                            <i class="bi bi-check-square-fill"></i>
+                if(product)
+                    li.nav-item
+                        a.nav-link(aria-current='page' disabled href=`/admin_dashboard/product/${product.id}/page2` class=(type=='page2' ? 'active' : ''))
+                            //- i.feather-icon.icon-shopping-bag.me-2
+                            | Quantities
+                    if(quantityGroup)
+                        li.nav-item
+                            a.nav-link(aria-current='page' disabled href=`/admin_dashboard/product/${product.id}/page3` class=(type=='page3' ? 'active' : ''))
+                                //- i.feather-icon.icon-shopping-bag.me-2
+                                | Printing Attributes
+                    
+                    if(priceMatrix)
+                        li.nav-item
+                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/page4` class=(type=='page4' ? 'active' : ''))
+                                //- i.feather-icon.icon-shopping-bag.me-2
+                                | Finishing Attributes
+                    
+                    if(priceMatrix)
+                        li.nav-item
+                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/page5` class=(type=='page5' ? 'active' : ''))
+                                //- i.feather-icon.icon-shopping-bag.me-2
+                                | Delivery Options
+
+                    //- if(productDeliveries.length > 0)
+                        li.nav-item
+                            a.nav-link(aria-current='page' /*href=`/admin_dashboard/product/${product.id}/page6`*/  class=(type=='page6' ? 'active' : ''))
+                                //- i.feather-icon.icon-shopping-bag.me-2
+                                | Discounts
+                    
+                    if(product.deleteFl == false)
+                        li.nav-item
+                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/deactivate` class=(type=='deactivate' ? 'active' : ''))
+                                //- i.feather-icon.icon-shopping-bag.me-2
+                                | Deactivate 
+                    
+                    if(product.deleteFl == true && isValid)
+                        li.nav-item
+                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/activate` class=(type=='activate' ? 'active' : ''))
+                                //- i.feather-icon.icon-shopping-bag.me-2
+                                | Activate 
+
+                // nav item
+
+                // nav item
+                
+                // nav item
+                if(product && product.status == 'Completed')
+                    li.nav-item
+                        hr
+                    li.nav-item
+                        a.nav-link(aria-current='page' href='/account/' + user.id + '/settings' class=(type=='page6' ? 'active' : ''))
+                            i.feather-icon.icon-shopping-bag.me-2
+                            if(product.deleteFl)
+                                | Activate 
+                            else 
+                                | Deactivate

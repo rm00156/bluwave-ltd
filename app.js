@@ -29,7 +29,8 @@ function setSocket(ioSocket) {
 models.sequelize.sync().then(function() {
 
   models.notification.afterCreate((instance, options) => {
-    socket.emit('notification', {notification: instance});
+    if(socket)
+      socket.emit('notification', {notification: instance});
   })
 }).catch(function(err) {
 

@@ -36,6 +36,15 @@ module.exports = function(sequelize, Sequelize) {
             }
         },
 
+        finishingOptionGroupFk: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                model: 'optionGroups',
+                key: 'id'
+            }
+        },
+
         quantityFk: {
             type: Sequelize.INTEGER,
             allowNull: false,

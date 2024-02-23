@@ -1,0 +1,88 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    include common/productSideBar.pug
+    include common/productNavigationHeader.pug
+    +adminHead()
+    link(href='/assets/libs/dropzone/dist/min/dropzone.min.css' rel='stylesheet')
+    link(href='/assets/css/croppie.css' rel='stylesheet')
+    link(href='/assets/css/pictureUpload.css' rel='stylesheet')
+    #overlay
+        
+        .container
+                .row.justify-content-center
+
+                    .col-md-6.col-lg-6
+                        
+                        .form-styled.bg-white(style="height:240px;margin-top:100px; padding:10px")
+
+                            
+                            
+                            div#section
+
+                                div.mt-10
+                                    p#modal-message(style="text-align:center")
+                                    .row
+                                        .col-lg-6.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id="confirmModal") Yes
+                                        
+                                        .col-lg-6.text-center
+                                            button.btn.btn-outline-primary.btn-block.mt-3(id ="cancelModal" ) Cancel
+    // main
+    // main
+    div
+        if(message)
+            #toast.toast.show.toast_alert.align-items-center.text-white.bg-primary.border-0(role='alert' aria-live='assertive' aria-atomic='true')
+                .d-flex
+                    .toast-body(style="width:100%")
+                        h6.text-white(style="text-align:center") #{message}
+                    button.btn-close.btn-close-white.me-2.m-auto(type='button' data-bs-dismiss='toast' aria-label='Close')
+            input#message(type="hidden" value=message)
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                .container
+                    // row
+                    +productNavigationHeader(product)
+                    
+                    // row
+                    .row
+                        +productSideBar('activate')
+                        .col-lg-9.col-9
+                            if(product != null)
+                                input#productId(type="hidden" value=product.id)
+                                input#product(type="hidden" value=product)
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    form#form
+                                        .row
+                                            h4.mb-4.h5 Activate #{product.name}
+                                            
+                                        .row.mt-5
+                                            //- .col-sm-6
+                                            //-     .d-grid
+                                            //-         button.btn.btn-light-primary#save(type='submit')
+                                            //-             | Save
+                                            .col-sm-6.offset-sm-3
+                                                .d-grid
+                                                    button.btn.btn-primary#activate(type='submit')
+                                                        | Activate
+
+
+        +adminScripts()
+        script(src='/assets/libs/quill/dist/quill.min.js')
+        script(src='/assets/js/vendors/editor.js')
+        script(src='/assets/libs/dropzone/dist/min/dropzone.min.js')
+        //- script(src='/assets/js/croppie.js')
+        script(src='/js/productPageActivate.js')
+        script(src="/js/adminDashboard.js")

@@ -1115,11 +1115,219 @@ function updateAllDeliverySelects(e) {
     })
 }
 
-function cancelCrop()
-{
+function cancelCrop() {
     basic.destroy();
     $('#uploadedImageForCrop').empty();
     $('#overlay').attr('style','display:none');
+}
+
+
+function handleFinishingAttributesError() {
+    const optionContainerDiv = document.getElementById('finishing_option_types');
+    const options = optionContainerDiv.getElementsByClassName('options');
+    if(options.length === 0) {
+        return $('#finishingError').text("Please make sure all option types in 'Printing Attributes' are set.");
+    }
+
+
+        
+}
+
+function addFinishingOptionType(event) {
+    // const addFinishingButton = document.getElementById('add-finishing-btn');
+    // addFinishingButton.style = 'display:none';
+
+    
+
+    // check if the last printing options type are fully populated
+    // and last finishing option type fully populated
+
+
+    // get option-container
+    // get all class options
+    // essentially get the last one
+
+    $('#finishingError').text("");
+    if(!isValidToAddNewFinishingAttributes()) {
+        // display error message
+
+        return handleFinishingAttributesError(event);
+    }
+    
+    // add finishing section
+
+    const finishingOptionTypesDiv = document.getElementById('finishing_option_types');
+
+    var selectsArray = $('select[name="select[]"]').serializeArray().map(function (item) {
+        return item.value;
+    });
+
+    var optionTypes = JSON.parse($('#optionTypes').val());
+    optionTypes = optionTypes.filter(o => !selectsArray.includes((o.id).toString()));
+
+    if (optionTypes.length == 0)
+        return;
+
+    // Create a new input row
+    const newInputRow = document.createElement('div');
+    newInputRow.classList.add('row');
+    newInputRow.classList.add('mb-3');
+
+    const column1 = document.createElement('div');
+    column1.classList.add('col-sm-5');
+
+    const column2 = document.createElement('div');
+    column2.classList.add('col-sm-5');
+
+    const column3 = document.createElement('div');
+    column3.classList.add('col-sm-1');
+
+    const column4 = document.createElement('div');
+    column4.classList.add('col-sm-1');
+
+    const label1 = document.createElement('label');
+    label1.classList.add('form-label');
+    label1.append('Option Type')
+
+    // Create a new input field
+    const newSelect = document.createElement('select');
+    newSelect.classList.add('form-control');
+    newSelect.classList.add('optionTypes');
+    newSelect.name = 'select[]';
+    newSelect.required = true;
+
+    const option = document.createElement('option');
+    option.value = 0;
+    newSelect.append(option);
+
+    for (var i = 0; i < optionTypes.length; i++) {
+        const optionType = optionTypes[i];
+        const option = document.createElement('option');
+        option.value = optionType.id;
+        option.append(optionType.optionType);
+        newSelect.append(option);
+    }
+
+    const label2 = document.createElement('label');
+    label2.classList.add('form-label');
+    label2.append('Options')
+    const inputOptions = document.createElement('input');
+    inputOptions.classList.add('selectedOptions');
+    inputOptions.classList.add('form-control');
+    inputOptions.classList.add('mb-2');
+    inputOptions.disabled = true;
+
+    const newOptions = document.createElement('select');
+    newOptions.classList.add('form-control');
+    newOptions.classList.add('options');
+    newOptions.name = 'options[]';
+    newOptions.required = true;
+    newOptions.multiple = true;
+
+    const label3 = document.createElement('label');
+    label3.classList.add('form-label');
+    label3.classList.add('text-white');
+    label3.append('Options')
+
+    const label4 = document.createElement('label');
+    label4.classList.add('form-label');
+    label4.classList.add('text-white');
+    label4.append('Options')
+
+    // Create a plus button for the new input row
+    const removeButton = document.createElement('button');
+    removeButton.textContent = 'Remove';
+    removeButton.classList.add('remove-btn-select');
+    removeButton.classList.add('btn');
+    removeButton.classList.add('btn-danger');
+    removeButton.type="button";
+
+    // Create a plus button for the new input row
+    const plusButton = document.createElement('button');
+    plusButton.textContent = '+';
+    plusButton.classList.add('add-btn-select');
+    plusButton.classList.add('btn');
+    plusButton.classList.add('btn-primary');
+    plusButton.type="button";
+
+    // // Append the new input and plus button to the new input row
+    column1.append(label1);
+    column1.appendChild(newSelect);
+    newInputRow.appendChild(column1);
+
+    column2.append(label2);
+    column2.append(inputOptions);
+    column2.append(newOptions);
+    newInputRow.appendChild(column2);
+
+    column3.append(label3);
+    column3.appendChild(document.createElement('br'));
+    column3.appendChild(removeButton);
+    newInputRow.appendChild(column3);
+
+    column4.append(label4);
+    column4.appendChild(document.createElement('br'));
+    column4.appendChild(plusButton);
+    newInputRow.appendChild(column4);
+
+    // // Append the new input row to the container
+    finishingOptionTypesDiv.append(newInputRow);
+
+
+    // // Attach the remove button click event
+    // removeButton.addEventListener('click', handleRemoveSelectClick);
+    // addButton.parentNode.innerHTML = '';
+    // // Attach the add button click event to the new input row
+    // plusButton.addEventListener('click', handleAddSelectClick);
+    // rowCount++;
+
+    $('.optionTypes').on('change', getOptions);
+    $('.options').on('click', selectedOptions);
+
+} 
+
+function isValidToAddNewFinishingAttributes() {
+
+    return isPrintingAttribuetesValidToAddNewFinishingAttributes() && isFinishingAttribuetesValidToAddNewFinishingAttributes();
+}
+
+function isPrintingAttribuetesValidToAddNewFinishingAttributes() {
+    const optionContainerDiv = document.getElementById('option-container');
+    const options = optionContainerDiv.getElementsByClassName('options');
+    if(options.length == 0)
+        return false;
+
+    console.log('reece')
+    return isValidOptionsSelected(options, true);
+    
+}
+
+function isFinishingAttribuetesValidToAddNewFinishingAttributes() {
+    const optionContainerDiv = document.getElementById('finishing_option_types');
+    const options = optionContainerDiv.getElementsByClassName('options');
+
+    if(options.length == 0)
+        return true;
+    
+    return isValidOptionsSelected(options, false);
+}
+
+function isValidOptionsSelected(options, isPrintingAttribute) {
+    
+    const lastOptionsList = options[options.length - 1];
+    const lastOptions = lastOptionsList.options;
+    console.log(lastOptions)
+    if(lastOptions.length == 0) {
+        return !isPrintingAttribute;
+    }
+    const selected = [];
+    lastOptions.forEach(option => {
+        if(option.selected) {
+            selected.push(option);
+        }
+    });
+    console.log(selected)
+    return selected.length > 0;
 }
 
 // Attach the add button click event to the initial input row
@@ -1149,4 +1357,6 @@ $(function () {
     $('#form').on('submit', createProduct);
 
     $('.delivery-select').on('change', updateAllDeliverySelects);
+
+    $('.add-finishing-btn').on('click', addFinishingOptionType);
 })

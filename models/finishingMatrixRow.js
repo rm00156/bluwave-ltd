@@ -1,7 +1,6 @@
-const { DataTypes } = require('sequelize');
 module.exports = function(sequelize, Sequelize) {
  
-    var PriceMatrixRowQuantityPrice = sequelize.define('priceMatrixRowQuantityPrice', {
+    var FinishingMatrixRow = sequelize.define('finishingMatrixRow', {
  
         id: {
             autoIncrement: true,
@@ -9,27 +8,27 @@ module.exports = function(sequelize, Sequelize) {
             type: Sequelize.INTEGER
         },
 
-        priceMatrixRowFk: {
+        finishingMatrixFk: {
             type: Sequelize.INTEGER,
             allowNull: false,
             references: {
-                model: 'priceMatrixRows',
+                model: 'finishingMatrices',
                 key: 'id'
             }
         },
 
-        quantityFk: {
+        optionFk: {
             type: Sequelize.INTEGER,
             allowNull: false,
             references: {
-                model: 'quantities',
+                model: 'options',
                 key: 'id'
             }
         },
 
-        price: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: true,
+        orderNo: {
+            type: Sequelize.INTEGER,
+            allowNull: false
         },
 
         deleteFl:{
@@ -48,5 +47,5 @@ module.exports = function(sequelize, Sequelize) {
         timestamps:false
     });
  
-    return PriceMatrixRowQuantityPrice;
+    return FinishingMatrixRow;
 }

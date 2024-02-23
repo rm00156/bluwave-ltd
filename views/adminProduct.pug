@@ -6,6 +6,7 @@ html(land="en")
     +adminHead()
     link(href='/assets/libs/dropzone/dist/min/dropzone.min.css' rel='stylesheet')
     link(href='/assets/css/croppie.css' rel='stylesheet')
+    
     #overlay
         .section.section-full
             .container
@@ -238,6 +239,7 @@ html(land="en")
                                                         button.btn.btn-success.add-btn +
 
                                             .mb-3.col-lg-12.mt-5#option-container
+                                                h4.mb-4.h5 Printing Attributes
                                                 input#optionTypes(type="hidden" value=optionTypes)
                                                 
                                                 - var optionObjects = Object.keys(optionTypesAndOptions).map((key, index) => ({ index, key, value: optionTypesAndOptions[key] }));
@@ -276,6 +278,7 @@ html(land="en")
                                                         each quantity in quantities
                                                             option(value=quantity.id selected=(selectedQuantities.map(q => q.id).includes(quantity.id))) #{quantity.quantity}
                                             input#matrixRows(type="hidden" value=matrixRows)
+                                            
                                             .mb-3.col-lg-12.mt-5
                                                 .col-sm-12
                                                     label.form-label.mb-2 Price Matrix
@@ -296,7 +299,7 @@ html(land="en")
                                                                         each item in row 
                                                                             td
                                                                                 input.form-control.quantity(data-quantityid=item.quantityFk data-priceMatrixRowQuantityPriceId = item.priceMatrixRowQuantityPriceId data-optiongroupid=item.optionGroupFk type="text" required value=item.price)
-
+                                            h4.mb-4.h5 Finishing Attributes
                                             #delivery-container
                                                 input#totalProductDelivery(type="hidden" value=productDeliveries.length)
                                                 input#productDeliveries(type="hidden" value=productDeliveries)

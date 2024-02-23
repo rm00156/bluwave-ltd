@@ -31,3 +31,7 @@ exports.validPassword = function(account, password)
 {
     return bcrypt.compareSync(password, account.password);
 }
+
+exports.hasTheSameItems = function(list1, list2) {
+    return list1.length === list2.length && list1.every(item => list2.includes(item));
+}

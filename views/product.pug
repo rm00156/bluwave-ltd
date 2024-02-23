@@ -171,10 +171,15 @@ html(land="en")
                                 .mb-4
                                     input#productId(type="hidden" value=product.id)
                                     input#productType(type="hidden" value=productType.productType)
+                                    input#priceMatrixOptions(type="hidden" value=priceMatrixOptions)
+                                    input#finishingMatrixOptions(type="hidden" value=finishingMatrixOptions)
+                                    input#currentQuantityId(type="hidden" value=currentQuantityId)
                                     large.fw-bold.text-dark Customise your #{product.name}
                                     br
                                     br
                                     #optionsSection
+
+                                    #finishingOptionSection
                                 .mb-4
                                     large.fw-bold.text-dark Select your Quantity 
                                     .col-12
@@ -186,8 +191,10 @@ html(land="en")
                                     // table
                                     #summaryTableSection
                                     table.table#summary
-
-                                    button.btn.btn-primary#addToBasket(style="width:100%") Add to Basket       
+                                    if(isEdit)
+                                        button.btn.btn-primary#editBasket(style="width:100%" data-basket-item=edit) Edit Basket Item
+                                    else
+                                        button.btn.btn-primary#addToBasket(style="width:100%") Add to Basket       
 
             if(templates.length > 0)
                 section(style='background-color: aliceblue;')

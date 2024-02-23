@@ -10,6 +10,7 @@ const {isCustomer, isNotGuest} = require('../middleware/customer');
 const {isAdmin, isSecuredAdmin, enterPassword, isLoginRequire2faCode, adminRequire2faSetup, setup2fa, twoFa, twoFa2} = require('../middleware/admin');
 const {isLoggedIn} = require('../middleware/loggedIn');
 const {getUser, isCheckoutAsGuest, isGuest} = require('../middleware/cookie');
+const {isValidEditSession, isValidEdit} = require('../middleware/shop');
 const {isArtworkRequired} = require('../middleware/checkout');
 const {validatePhoneNumber, isCorrectAccount} = require('../validators/checkout'); 
 
@@ -22,8 +23,9 @@ router.get('/faqs', getUser, homeController.getFaqsPage);
 router.get('/faq/:id', getUser, homeController.getFaqPage);
 
 router.get('/shop', getUser, shopController.getShopTypePage)
-router.get('/shop/:productName', getUser, shopController.getProductPage);
-router.get('/get_option_types_and_options_for_product', getUser, shopController.getOptionTypesAndOptionsForProductByProductId)
+router.get('/shop/:productName', getUser, isValidEditSession, shopController.getProductPage);
+router.get('/product/:id/get_price_matrix_option_types_and_options', getUser, shopController.getPricingMatrixOptionTypesAndOptionsForProduct);
+router.get('/product/:id/get_finishing_matrix_option_types_and_options', getUser, shopController.getFinishingMatrixOptionTypesAndOptionsForProduct);
 router.get('/get_quantity_price_table_details', getUser, shopController.getQuantityPriceTableDetails);
 
 router.get('/admin_dashboard', isAdmin, adminRequire2faSetup, adminDashboardController.getAdminDashboardPage);
@@ -37,8 +39,34 @@ router.post('/admin_login', isLoginRequire2faCode, loginController.adminLogin);
 router.get('/admin/login/step_two', twoFa, twoFa2, loginController.adminLoginStepTwo);
 router.post('/admin/login/step_two', twoFa, loginController.adminLogin);
 router.get('/admin_dashboard/products', isAdmin, adminRequire2faSetup, adminDashboardController.getProductsPage);
-router.get('/admin_dashboard/product/add_product', isAdmin, adminRequire2faSetup, adminDashboardController.getAddProductPage);
+router.get('/admin_dashboard/product/:id/page1', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage1);
 router.get('/admin_dashboard/product/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage);
+router.post('/admin_dashboard/product/page1/save', isAdmin, adminRequire2faSetup, adminDashboardController.savePage1);
+router.post('/admin_dashboard/product/page1/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage1);
+router.get('/admin_dashboard/product/:id/page2', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage2);
+router.get('/admin_dashboard/product/:id/page3', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage3);
+router.get('/admin_dashboard/product/:id/page4', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage4);
+router.get('/admin_dashboard/product/:id/page5', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage5);
+router.get('/admin_dashboard/product/:id/activate', isAdmin, adminRequire2faSetup, adminDashboardController.getActivatePage);
+router.get('/admin_dashboard/product/:id/deactivate', isAdmin, adminRequire2faSetup, adminDashboardController.getDeactivatePage);
+
+router.post('/admin_dashboard/product/:id/page3/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage3);
+router.post('/admin_dashboard/product/:id/page4/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage4);
+
+
+router.get('/product/:id/verify_quantities', isAdmin, adminRequire2faSetup, adminDashboardController.verifyQuantities);
+router.post('/product/:id/save_quantities', isAdmin, adminRequire2faSetup, adminDashboardController.saveQuantities);
+router.get('/product/:id/get_quantities', isAdmin, adminRequire2faSetup, adminDashboardController.getQuantities);
+router.get('/product/:id/get_price_matrix_rows', isAdmin, adminRequire2faSetup, adminDashboardController.getPriceMatrixRows);
+router.post('/product/:id/save_printing_attributes', isAdmin, adminRequire2faSetup, adminDashboardController.savePrintingAttributes);
+router.post('/product/:id/save_finishing_attributes', isAdmin, adminRequire2faSetup, adminDashboardController.saveFinishingAttributes);
+router.post('/product/:id/save_delivery_options', isAdmin, adminRequire2faSetup, adminDashboardController.saveDeliveryOptions);
+router.get('/product/:id/get_finishing_matrices', isAdmin, adminRequire2faSetup, adminDashboardController.getFinishingMatrices);
+router.get('/product/:id/get_product_deliveries', isAdmin, adminRequire2faSetup, adminDashboardController.getProductDeliveries);
+router.get('/product/:id/validate', isAdmin, adminRequire2faSetup, adminDashboardController.validate);
+router.post('/product/:id/activate', isAdmin, adminRequire2faSetup, adminDashboardController.activate);
+router.post('/product/:id/deactivate', isAdmin, adminRequire2faSetup, adminDashboardController.deactivate);
+
 router.get('/admin_dashboard/product_types', isAdmin, adminRequire2faSetup, adminDashboardController.getProductTypesPage);
 router.get('/admin_dashboard/product_type/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getProductTypePage);
 router.get('/getOptionsForOptionType', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionsForOptionType);
@@ -73,6 +101,7 @@ router.get('/forgot_password', getUser, isCustomer, homeController.getForgotPass
 router.post('/forgotten_password', getUser, homeController.requestForgottenPasswordEmail);
 
 router.post('/add_to_basket', getUser, isCustomer, shopController.addToBasket);
+router.post('/edit_basket_item', getUser, isCustomer, isValidEdit, shopController.editBasketItem);
 router.get('/basket', getUser, isCustomer, shopController.getBasketPage);
 router.delete('/remove_basket_item', getUser, isCustomer, shopController.deleteBasketItem);
 router.put('/update_basket_quantity', getUser, isCustomer, shopController.updateBasketQuantity);
