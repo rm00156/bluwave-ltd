@@ -103,9 +103,9 @@ html(land="en")
 
                                                             if(index == 0)
                                                                 .col-sm-1
-                                                                    label.form-label.text-white Options
-                                                                    br
-                                                                    button.btn.btn-primary.add-btn-select(type="button" data-matrix-orderNo=1) +
+                                                                    //- label.form-label.text-white Options
+                                                                    //- br
+                                                                    //- button.btn.btn-primary.add-btn-select(type="button" data-matrix-orderNo=1) +
                                                                 .col-sm-1 
                                                             else 
                                                                 .col-sm-1
@@ -113,9 +113,10 @@ html(land="en")
                                                                     br
                                                                     button.remove-btn-select.btn.btn-danger(type='button') -
                                                                 .col-sm-1
-                                                                    label.form-label.text-white Options
-                                                                    br
-                                                                    button.add-btn-select.btn.btn-primary(type='button' data-matrix-orderNo=index+1) +
+                                                                    if(index === optionObjects.length -1)
+                                                                        label.form-label.text-white Options
+                                                                        br
+                                                                        button.add-btn-select.btn.btn-primary(type='button' data-matrix-orderNo=index+1) +
                                                             .row 
                                                                 .mb-3.col-lg-12.mt-5
                                                                     .col-sm-12

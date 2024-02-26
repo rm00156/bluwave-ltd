@@ -4,7 +4,7 @@
   "description": "Bluwave ecommerce website",
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest "
+    "test": "jest --detectOpenHandles"
   },
   "engines": {
     "node": "^20.1.0",
@@ -71,7 +71,7 @@
   "devDependencies": {
     "dotenv": "^8.0.0",
     "faker": "^6.6.6",
-    "jest": "^29.6.4",
+    "jest": "^29.7.0",
     "sequelize-mock": "^0.10.2",
     "supertest": "^6.3.3"
   }

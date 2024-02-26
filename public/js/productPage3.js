@@ -643,12 +643,13 @@ $(function () {
     setupMatrix();
     $('.options').on('click', selectedOptions);
     $('.optionTypes').on('change', getOptions);
-    const addSelectButton = document.querySelector('.add-btn-select');
-    addSelectButton.addEventListener('click', handleAddSelectClick);
-
-    const removeSelectButton = document.querySelector('.remove-btn-select');
-    if(removeSelectButton)
-        removeSelectButton.addEventListener('click', handleRemoveSelectClick);
+    
     getQuantities();
     populateMatrixMap();
+    $('.add-btn-select').on('click', handleAddSelectClick);
+    // addSelectButton.addEventListener('click', handleAddSelectClick);
+
+    $('.remove-btn-select').on('click', handleRemoveSelectClick);
+    // if(removeSelectButton)
+    //     removeSelectButton.addEventListener('click', handleRemoveSelectClick);
 })

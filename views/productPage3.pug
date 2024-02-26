@@ -92,19 +92,22 @@ html(land="en")
                                                                         option(value=option.id data-optiontype=optionObject.key data-optiontypeid=option.optionTypeFk selected=(optionObject.value.map(o=> o.optionId).includes(option.id))) #{option.name} 
                                                             if(index == 0)
                                                                 .col-sm-1
-                                                                    label.form-label.text-white Options
-                                                                    br
-                                                                    button.btn.btn-primary.add-btn-select(type="button") +
+                                                                    //- label.form-label.text-white Options
+                                                                    //- br
+                                                                    //- button.btn.btn-primary.add-btn-select(type="button") +
                                                                 .col-sm-1 
                                                             else 
                                                                 .col-sm-1
                                                                     label.form-label.text-white Options
                                                                     br
                                                                     button.remove-btn-select.btn.btn-danger(type='button') -
+                                                                
+                                                                
                                                                 .col-sm-1
-                                                                    label.form-label.text-white Options
-                                                                    br
-                                                                    button.add-btn-select.btn.btn-primary(type='button') +
+                                                                    if(index === optionObjects.length -1)
+                                                                        label.form-label.text-white Options
+                                                                        br
+                                                                        button.add-btn-select.btn.btn-primary(type='button') +
 
 
 
