@@ -42,11 +42,11 @@ html(land="en")
                                         // input
                                         if(error) 
                                             p.text-danger #{error}
-                                        input#email.form-control(type='email' placeholder='Email' name="email" required value='rmillermcpherson4@gmail.com')
+                                        input#email.form-control(type='email' placeholder='Email' name="email" required value=username ? username : '')
                                     .col-12
                                         // input
                                         .password-field.position-relative
-                                            input#password.form-control(type='password' name="password" placeholder='Enter Password' required value='welcome')
+                                            input#password.form-control(type='password' name="password" placeholder='Enter Password' required value=password ? password : '')
                                             span
                                                 i#passwordToggler.bi.bi-eye-slash
                                     

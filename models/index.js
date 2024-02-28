@@ -4,7 +4,8 @@ var Sequelize = require("sequelize");
 var env = process.env.NODE_ENV || "development";
 var sequelize = new Sequelize(env == "test" ? process.env.TEST_DATABASE_NAME : process.env.DATABASE_NAME, process.env.DATABASE_USERNAME, process.env.DATABASE_PASSWORD, {
     host: process.env.DATABASE_HOST,
-    dialect: process.env.DATABASE_DIALECT
+    dialect: process.env.DATABASE_DIALECT,
+    logging: env !== 'test' && env !== 'development',
 });
 var db = {};
  
@@ -26,6 +27,5 @@ Object.keys(db).forEach(function(modelName) {
  
  
 db.sequelize = sequelize;
-db.Sequelize = Sequelize;
  
 module.exports = db;

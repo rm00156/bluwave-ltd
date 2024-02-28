@@ -5,6 +5,7 @@ const { Op } = require('sequelize');
 const { isEmpty } = require('lodash');
 const utilityHelper = require('../general/utilityHelper');
 const deliveryOperations = require('../delivery/deliveryOperations');
+var Sequelize = require("sequelize");
 
 async function getAllActiveProductTypes() {
     return await models.productType.findAll({
@@ -119,7 +120,7 @@ async function getAllOptionTypes() {
 
 async function getAllOptionTypesWithOptions() {
     return await models.sequelize.query('select distinct ot.* from optionTypes ot ' +
-        ' inner join options o on o.optionTypeFk = ot.id ',
+        ' inner join options o on o.optionTypeFk = ot.id where o.deleteFl = false',
         { type: models.sequelize.QueryTypes.SELECT });
 }
 
@@ -862,10 +863,19 @@ async function getOptionTypeById(id) {
     })
 }
 
+async function getOptionById(id) {
+    return models.option.findOne({
+        where: {
+            id: id
+        }
+    })
+}
+
 async function getOptionByName(name) {
     return await models.option.findOne({
         where: {
-            name: name
+            name: name,
+            deleteFl: false
         }
     })
 }
@@ -874,7 +884,8 @@ async function getOptionByNameAndType(name, optionTypeId) {
     return await models.option.findOne({
         where: {
             name: name,
-            optionTypeFk: optionTypeId
+            optionTypeFk: optionTypeId,
+            deleteFl: false
         }
     })
 }
@@ -1399,7 +1410,6 @@ async function deletePriceMatrixRowQuantityPricesForPriceMatrixRow(productId) {
 
 }
 
-
 async function deleteOptionGroupItemsForProduct(productId) {
     await models.sequelize.query('update optionGroupItems as ogi1 ' +
     ' inner join optionGroupItems as ogi2 on ogi1.id = ogi2.id ' +
@@ -1744,7 +1754,117 @@ async function setProductStatusComplete(productId, isComplete) {
     })
 }
 
+
+function getDistinctProductDetails(list) {
+    let seen = new Map();
+    let distinctObjects = [];
+    
+    list.forEach(obj => {
+        let key = obj.productId + '|' + obj.name;
+        if (!seen.has(key)) {
+            seen.set(key, true);
+            distinctObjects.push({productId: obj.productId, name: obj.name});
+        }
+    });
+    
+    return distinctObjects;
+}
+
+
+async function getProductsWhereFinishingAttributeUsesOptionId(id) {
+
+    const result = await models.sequelize.query('select fmr.*, p.name, p.id as productId from finishingMatrices fm ' +
+        ' inner join finishingMatrixRows fmr on fmr.finishingMatrixFk = fm.id ' +
+        ' inner join products p on fm.productFk = p.id ' +
+        ' where fm.deleteFl = false ' + 
+        ' and fmr.optionFk = :optionId', {replacements: {optionId: id}, type: models.sequelize.QueryTypes.SELECT});
+
+    const products = getDistinctProductDetails(result);
+
+    const finishingMatrixRowIds = result.map(r => r.id);
+
+    return {products, finishingMatrixRowIds};
+}
+
+async function getProductsWherePrintingAttributeUsesOptionId(id) {
+    
+    const result = await models.sequelize.query('select pmr.*,  ogi.id as optionGroupItemId ,p.name, p.id as productId from priceMatrices pm ' +
+        ' inner join priceMatrixRows pmr on pmr.priceMatrixFk = pm.id ' +
+        ' inner join optionGroupItems ogi on pmr.optionGroupFk = ogi.optionGroupFk ' +
+        ' inner join products p on pm.productFk = p.id ' +
+        ' where pm.deleteFl = false ' +
+        ' and ogi.optionFk = :optionId ', {replacements: {optionId: id}, type: models.sequelize.QueryTypes.SELECT});
+
+    
+    const products = getDistinctProductDetails(result);
+
+    const optionGroupItemIds = result.map(r => r.optionGroupItemId);
+
+    return {products, optionGroupItemIds};
+}
+
+async function getProductsWhichCurrentlyUseOptionId(id) {
+
+    const productsWithFinishingOption = await getProductsWhereFinishingAttributeUsesOptionId(id);
+    const productsWithPrintingOption = await getProductsWherePrintingAttributeUsesOptionId(id);
+
+    // const products = [...productsWithFinishingOption.products, ...productsWithPrintingOption.products];
+    
+    
+    return {productsWithFinishingOption: productsWithFinishingOption.products,
+        productsWithPrintingOption: productsWithPrintingOption.products, optionGroupItemIds: productsWithPrintingOption.optionGroupItemIds, finishingMatrixRowIds: productsWithFinishingOption.finishingMatrixRowIds};
+}
+
+async function updateOptionForOptionGroupItems(optionGroupItemIds, optionId) {
+    await models.optionGroupItem.update({
+        optionFk: optionId,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id: { [Sequelize.Op.in]: optionGroupItemIds }
+        }
+    })
+}
+
+async function updateOptionForFinishingMatrixRows(finishingMatrixRowIds, optionId) {
+    await models.finishingMatrixRow.update({
+        optionFk: optionId,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id: { [Sequelize.Op.in]: finishingMatrixRowIds }
+        }
+    })
+}
+
+async function updateOptionForTemplates(templateIds, optionId) {
+    await models.template.update({
+        optionFk: optionId,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id: { [Sequelize.Op.in]: templateIds }
+        }
+    })
+}
+
+async function deleteOption(id) {
+    await models.option.update({
+        deleteFl: true,
+        versionNo: models.sequelize.literal('versionNo + 1')
+    }, {
+        where: {
+            id
+        }
+    })
+}
+
 module.exports = {
+    deleteOption,
+    updateOptionForTemplates,
+    updateOptionForFinishingMatrixRows,
+    updateOptionForOptionGroupItems,
+    getProductsWhichCurrentlyUseOptionId,
     createPrintingAttributes,
     parseOptionTypesAndOption,
     getAllProductWithLowestPriceDetails,
@@ -1837,6 +1957,7 @@ module.exports = {
     isProductValid,
     deactivateProduct,
     activateProduct,
-    setProductStatusComplete
+    setProductStatusComplete,
+    getOptionById
     
 };

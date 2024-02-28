@@ -4,15 +4,20 @@ const basketOperations = require('../utilty/basket/basketOperations');
 const accountOperations = require('../utilty/account/accountOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const productOperations = require('../utilty/products/productOperations');
+const isDevelopment = process.env.NODE_ENV === undefined;
 
 async function getAdminLoginPage(req, res) {
     req.session.attempt = 0;
     var error = req.query.error;
     const allProductTypes = await productOperations.getAllActiveProductTypes();
+    const username = isDevelopment ? process.env.LOGIN_USERNAME : null;
+    const password = isDevelopment ? process.env.LOGIN_PASSWORD : null;
 
     res.render('adminLogin', {
         user: req.user,
         error: error,
+        username: username,
+        password: password,
         allProductTypes: allProductTypes,
         companyDetails: companyInfo.getCompanyDetails()
     });

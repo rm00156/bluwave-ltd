@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 
-exports.generateNumberCode = function() {
+function generateNumberCode() {
     var result = '';
     const characters = '23456789';
     const charactersLength = characters.length;
@@ -10,12 +10,11 @@ exports.generateNumberCode = function() {
     return result;
 }
 
-exports.generateHash = function(password){
+function generateHash(password){
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null );
 }
 
-
-exports.dateXAmountFromNow = function(amountInMs) {
+function dateXAmountFromNow(amountInMs) {
     const currentTime = Date.now();
 
     // Create a new Date object using the current timestamp
@@ -27,11 +26,26 @@ exports.dateXAmountFromNow = function(amountInMs) {
     return futureDate;
 }
 
-exports.validPassword = function(account, password)
+function validPassword(account, password)
 {
     return bcrypt.compareSync(password, account.password);
 }
 
-exports.hasTheSameItems = function(list1, list2) {
+function hasTheSameItems(list1, list2) {
     return list1.length === list2.length && list1.every(item => list2.includes(item));
+}
+
+function pauseForTimeInSecond(seconds) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, seconds * 1000);
+    });
+}
+
+module.exports = {
+    dateXAmountFromNow,
+    generateHash,
+    generateNumberCode,
+    hasTheSameItems,
+    pauseForTimeInSecond,
+    validPassword
 }

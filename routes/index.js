@@ -76,6 +76,8 @@ router.post('/admin_dashboard/product_type/edit_product_type', isAdmin, adminReq
 router.get('/get_option_types_and_option_for_product', adminDashboardController.getOptionTypesAndOptionForProduct);
 router.post('/admin_dashboard/option/add', isAdmin, adminRequire2faSetup, adminDashboardController.addOption)
 router.post('/admin_dashboard/option_type/add', isAdmin, adminRequire2faSetup, adminDashboardController.addOptionType)
+router.get('/admin_dashboard/option/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionPage);
+router.post('/option/:id/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateOptionName);
 
 router.get('/admin_dashboard/templates', isAdmin, adminRequire2faSetup, adminDashboardController.getTemplatesPage);
 router.get('/admin_dashboard/add_template', isAdmin, adminRequire2faSetup, adminDashboardController.getAddTemplatePage);
