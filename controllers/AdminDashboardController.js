@@ -1412,6 +1412,23 @@ exports.addOptionType = async function (req, res) {
     return res.status(201).json({});
 }
 
+exports.getOptionPage = async function(req, res) {
+
+    const id = req.params.id;
+
+    const option = await productOperations.getOptionById(id);
+
+    if(!option)
+        return res.status(400).json({error: 'Option not found'});
+
+    const optionType = await productOperations.getOptionTypeById(option.optionTypeFk);
+
+    res.render('adminOption', {
+        user: req.user, option: option, optionType: optionType,
+        companyDetails: companyInfo.getCompanyDetails()
+    })
+}
+
 exports.getAddProductTypePage = async function (req, res) {
     res.render('addProductType', {
         user: req.user,
@@ -2050,4 +2067,53 @@ async function getNotificationDetails(accountId) {
     })
 
     return { numberOfNotifications: numberOfNotifications, notifications: notifications };
+}
+
+exports.updateOptionName = async function(req, res) {
+    const id = req.params.id;
+    const name = req.body.name;
+    const withWarnings = req.body.withWarnings === 'true';
+
+    const option = await productOperations.getOptionById(id);
+    if(!option)
+        return res.status(400).json({error: 'Option not found'});
+
+    // do any products use this option
+    if(option.name === name)
+        return res.status(400).json({error: 'No Change made.'});
+
+    // check whether name already exists for the same optiontype
+    const existingOption = await productOperations.getOptionByNameAndType(name, option.optionTypeFk);
+
+    if (existingOption)
+        return res.status(400).json({ error: 'Option with this name already exists for this Option Type.' });
+
+    const {productsWithPrintingOption, productsWithFinishingOption, optionGroupItemIds, finishingMatrixRowIds} = await productOperations.getProductsWhichCurrentlyUseOptionId(id);
+    
+    if(productsWithPrintingOption.length > 0 || productsWithFinishingOption.length > 0) {
+        if(withWarnings) 
+            return res.status(500).json({productsWithFinishingOption, productsWithPrintingOption});
+    }
+
+    const newOption = await productOperations.createOption(name, option.optionTypeFk);
+
+    if(optionGroupItemIds.length > 0) {
+        await productOperations.updateOptionForOptionGroupItems(optionGroupItemIds, newOption.id);
+    }
+
+    if(finishingMatrixRowIds.length > 0) {
+        await productOperations.updateOptionForFinishingMatrixRows(finishingMatrixRowIds, newOption.id);
+    }
+
+    const templates = await productOperations.getTemplatesForSizeOptions([id]);
+
+    if(templates.length > 0) {
+        const templateIds = templates.map(t => t.id);
+        await productOperations.updateOptionForTemplates(templateIds, newOption.id);
+    }
+
+    await productOperations.deleteOption(id);
+
+    res.status(200).json({id: newOption.id});
+
 }

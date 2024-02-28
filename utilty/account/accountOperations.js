@@ -169,7 +169,7 @@ async function getNewAccountNumber() {
     if (account == null)
         return code;
 
-    return await getNewAccountNumber();
+    return getNewAccountNumber();
 }
 
 async function complete2FaSetupForAccountId(accountId, secret) {
@@ -478,7 +478,17 @@ async function deleteAllNotificationsForAccount(accountId) {
     }
 }
 
+async function createAccountType(id, accountType) {
+    return models.accountType.create({
+        id,
+        accountType,
+        deleteFl: false,
+        versionNo: 1
+    })
+}
+
 module.exports = {
+    createAccountType,
     updateAccount,
     complete2FaSetupForAccountId,
     findAccountById,
