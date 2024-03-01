@@ -391,7 +391,17 @@ async function createProduct(productDetails, s3PathMap, bulletPoints) {
 
     productDetails['status'] = 'Incomplete';
 
-    return await models.product.create(productDetails);
+    return models.product.create(productDetails);
+}
+
+async function createDefaultProduct(name, productTypeFk, status) {
+    return models.product.create({
+        name,
+        productTypeFk,
+        status,
+        deleteFl: false,
+        versionNo: 1
+    })
 }
 
 function updateProductDetailsWithPicturesAndBulletPoints(s3PathMap, productDetails, bulletPoints) {
@@ -866,7 +876,8 @@ async function getOptionTypeById(id) {
 async function getOptionById(id) {
     return models.option.findOne({
         where: {
-            id: id
+            id: id,
+            deleteFl: false
         }
     })
 }
@@ -1353,6 +1364,7 @@ async function updateQuantitiesForQuantityGroup(quantityGroup, quantities) {
 async function createQuantityGroupAndSetQuantities(productId, quantities) {
     const quantityGroup = await createQuantityGroup(productId);
     await setQuantitiesForQuantityGroup(quantityGroup, quantities);
+    return quantityGroup;
 }
 
 async function createPrintingAttributes(productId, options, rows) {
@@ -1859,7 +1871,31 @@ async function deleteOption(id) {
     })
 }
 
+async function getQuantityByName(quantity) {
+    return models.quantity.findOne({
+        where: {
+            quantity
+        }
+    })
+}
+
+async function createQuantity(quantity) {
+
+    let quantityObject = await getQuantityByName(quantity);
+
+    if(!quantityObject)
+        quantityObject = await models.quantity.create({
+            quantity,
+            deleteFl: false,
+            versionNo: 1
+        });
+    
+    return quantityObject;
+}
+
 module.exports = {
+    getQuantityByName,
+    createQuantity,
     deleteOption,
     updateOptionForTemplates,
     updateOptionForFinishingMatrixRows,
@@ -1958,6 +1994,8 @@ module.exports = {
     deactivateProduct,
     activateProduct,
     setProductStatusComplete,
-    getOptionById
-    
+    getOptionById,
+    createDefaultProduct,
+    getFinishingMatrixRowsForQuantityGroup,
+    getPriceMatrixRowsForQuantityGroup
 };

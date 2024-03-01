@@ -26,8 +26,7 @@ function dateXAmountFromNow(amountInMs) {
     return futureDate;
 }
 
-function validPassword(account, password)
-{
+function validPassword(account, password) {
     return bcrypt.compareSync(password, account.password);
 }
 

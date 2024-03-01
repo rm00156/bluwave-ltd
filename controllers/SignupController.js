@@ -3,7 +3,9 @@ const{ validateCustomerUser } = require('../validators/signup');
 const { isEmpty } = require('lodash');
 const accountOperations = require('../utilty/account/accountOperations');
 const productOperations = require('../utilty/products/productOperations');
-const queueOperations = require('../utilty/queue/queueOperations');
+const notProduction = process.env.NODE_ENV != 'production';
+
+const queueOperations = !notProduction ? require('../utilty/queue/queueOperations') : null;
 const passport = require('passport');
 
 exports.getSignUpPage = async function(req,res)

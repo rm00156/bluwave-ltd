@@ -35,7 +35,7 @@ html(land="en")
                                                 p.create-account-error.small.text-danger #{errors.email}
                                         .col-12
                                             .password-field.position-relative
-                                                input#password.form-control(type='password' name="password" placeholder='Enter Password' required value=(formData != undefined ? formData.password : 'welcome'))
+                                                input#password.form-control(type='password' name="password" placeholder='Enter Password' required value=(formData != undefined ? formData.password : defaultPassword))
                                                 span
                                                     i#passwordToggler.bi.bi-eye-slash
                                             if(errors && errors.password)

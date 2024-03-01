@@ -2,7 +2,9 @@ const companyInfo = require('../utilty/company/companyInfo');
 const productOperations = require('../utilty/products/productOperations');
 const accountOperations = require('../utilty/account/accountOperations');
 const basketOperations = require('../utilty/basket/basketOperations');
-const queueOperations = require('../utilty/queue/queueOperations');
+const notProduction = process.env.NODE_ENV != 'production';
+
+const queueOperations = !notProduction ? require('../utilty/queue/queueOperations') : null;
 const faqOperations = require('../utilty/faq/faqOperations');
 
 exports.getHomePage = async function(req, res) {
