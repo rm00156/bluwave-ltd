@@ -40,7 +40,7 @@ async function createGuestAccount(res) {
         account = await models.account.create({
             email: 'temp@temp.com',
             phoneNumber: '00000000000',
-            password: utiltyHelper.generateHash('welcome'),
+            password: utiltyHelper.generateHash(process.env.LOGIN_PASSWORD),
             name: `temp`,
             accountTypeFk: 2,
             createdAt: Date.now(),
@@ -487,7 +487,16 @@ async function createAccountType(id, accountType) {
     })
 }
 
+async function getAdminAccountType() {
+    return models.accountType.findOne({
+        where: {
+            id: 1
+        }
+    })
+}
+
 module.exports = {
+    getAdminAccountType,
     createAccountType,
     updateAccount,
     complete2FaSetupForAccountId,

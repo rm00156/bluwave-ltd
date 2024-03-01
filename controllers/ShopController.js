@@ -3,7 +3,9 @@ const productOperations = require('../utilty/products/productOperations');
 const basketOperations = require('../utilty/basket/basketOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const deliveryOperations = require('../utilty/delivery/deliveryOperations');
-const queueOperations = require('../utilty/queue/queueOperations');
+const notProduction = process.env.NODE_ENV != 'production';
+
+const queueOperations = !notProduction ? require('../utilty/queue/queueOperations') : null;
 const accountOperations = require('../utilty/account/accountOperations');
 const models = require('../models');
 const stripe = require('stripe')(process.env.STRIPE_KEY);

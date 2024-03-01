@@ -30,7 +30,7 @@ exports.getUser = async function (req, res, next) {
             const email = await accountOperations.createGuestAccount(res);
 
             req.body['email'] = email;
-            req.body['password'] = 'welcome';
+            req.body['password'] = process.env.LOGIN_PASSWORD;
 
             passport.authenticate('local', (err, user, info) => {
                 if (err)
@@ -87,7 +87,7 @@ async function loginUsingCookie(req, next, res) {
     const cookieDetails = req.cookies['bluwave_ecommerce_user_data'];
     const account = await accountOperations.findAccountById(cookieDetails.id);
     req.body['email'] = account.email;
-    req.body['password'] = 'welcome';
+    req.body['password'] = process.env.LOGIN_PASSWORD;
 
     passport.authenticate('local2', (err, user, info) => {
         if (err)

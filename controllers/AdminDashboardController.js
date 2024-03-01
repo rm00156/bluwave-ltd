@@ -35,6 +35,7 @@ exports.getAdminDashboardPage = async function (req, res) {
 exports.getCreateAdminPage = async function (req, res) {
 
     res.render('createAdmin', {
+        defaultPassword: process.env.LOGIN_PASSWORD,
         user: req.user,
         companyDetails: companyInfo.getCompanyDetails()
     });
@@ -2019,6 +2020,7 @@ function addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, request) {
 
 async function rerenderCreateAdmin(errors, req, res) {
     res.render('createAdmin', {
+        defaultPassword: process.env.LOGIN_PASSWORD,
         errors: errors,
         formData: req.body,
         user: req.user,

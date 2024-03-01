@@ -1,5 +1,6 @@
-const bcrypt = require('bcrypt');
 const accountOperations = require('../utilty/account/accountOperations');
+const utilityHelper = require('../utilty/general/utilityHelper');
+const notProduction = process.env.NODE_ENV != 'production';
 
 exports.isAdmin = async function(req,res,next)
 {
@@ -51,7 +52,7 @@ exports.isSecuredAdmin = async function(req,res,next)
 exports.enterPassword = async function(req,res,next)
 {
     var password = req.query.password;
-    if(!validPassword(req.user,password))
+    if(!utilityHelper.validPassword(req.user,password))
     {
         res.redirect('/setup_2fa');
     }
@@ -65,7 +66,7 @@ exports.enterPassword = async function(req,res,next)
 exports.adminRequire2faSetup = async function(req,res,next)
 {
     const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(req.user.id);
-    if(twoFactorAuth == null || !twoFactorAuth.authenticatedFl)
+    if(!notProduction && (twoFactorAuth == null || !twoFactorAuth.authenticatedFl))
         return res.redirect('/setup_2fa');
     
     next();
@@ -84,7 +85,7 @@ exports.isLoginRequire2faCode = async function(req,res, next)
         return res.redirect('/admin/login?error=UserNotFound');
     }
 
-    if(!validPassword(account,password))
+    if(!utilityHelper.validPassword(account,password))
     {
         return res.redirect('/admin/login?error=UserNotFound');
     }
@@ -135,11 +136,6 @@ function twoFa(req,res,next)
     }
     else
         res.redirect('/admin/login');
-}
-
-function validPassword(user, password)
-{
-    return bcrypt.compareSync(password, user.password);
 }
 
 exports.setup2fa = async function(req,res,next)
