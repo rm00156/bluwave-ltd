@@ -1,39 +1,39 @@
-const { DataTypes } = require('sequelize');
-module.exports = function(sequelize, Sequelize) {
- 
-    var ProductType = sequelize.define('productType', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
- 
-        productType: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+function ProductTypes(sequelize, Sequelize) {
+  const ProductType = sequelize.define('productType', {
 
-        bannerPath: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    productType: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return ProductType;
+    bannerPath: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return ProductType;
 }
+
+module.exports = ProductTypes;

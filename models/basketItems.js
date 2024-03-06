@@ -1,95 +1,97 @@
 const { DataTypes } = require('sequelize');
-module.exports = function(sequelize, Sequelize) {
- 
-    var BasketItem = sequelize.define('basketItem', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
 
-        accountFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'accounts',
-                key: 'id'
-            }
-        },
+function BasketItems(sequelize, Sequelize) {
+  const BasketItem = sequelize.define('basketItem', {
 
-        productFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'products',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        optionGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'optionGroups',
-                key: 'id'
-            }
-        },
+    accountFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'accounts',
+        key: 'id',
+      },
+    },
 
-        finishingOptionGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-            references: {
-                model: 'optionGroups',
-                key: 'id'
-            }
-        },
+    productFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'products',
+        key: 'id',
+      },
+    },
 
-        quantityFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'quantities',
-                key: 'id'
-            }
-        },
+    optionGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'optionGroups',
+        key: 'id',
+      },
+    },
 
-        fileGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-            references: {
-                model: 'fileGroups',
-                key: 'id'
-            }
-        },
+    finishingOptionGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'optionGroups',
+        key: 'id',
+      },
+    },
 
-        price: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    quantityFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'quantities',
+        key: 'id',
+      },
+    },
 
-        purchaseBasketFk: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-            references: {
-                model: 'purchaseBaskets',
-                key: 'id'
-            }
-        },
+    fileGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'fileGroups',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-        },
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return BasketItem;
+    purchaseBasketFk: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'purchaseBaskets',
+        key: 'id',
+      },
+    },
+
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return BasketItem;
 }
+
+module.exports = BasketItems;

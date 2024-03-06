@@ -1,66 +1,68 @@
 const { DataTypes } = require('sequelize');
-module.exports = function(sequelize, Sequelize) {
- 
-    var FinishingMatrix = sequelize.define('finishingMatrix', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
 
-        productFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'products',
-                key: 'id'
-            }
-        },
+function FinishingMatrices(sequelize, Sequelize) {
+  const FinishingMatrix = sequelize.define('finishingMatrix', {
 
-        orderNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        status: {
-            type: DataTypes.ENUM('Incomplete', 'Complete'),
-            allowNull: false
-        },
+    productFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'products',
+        key: 'id',
+      },
+    },
 
-        optionTypeFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'optionTypes',
-                key: 'id'
-            }
-        },
+    orderNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
 
-        quantityGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'quantityGroups',
-                key: 'id'
-            }
-        },
+    status: {
+      type: DataTypes.ENUM('Incomplete', 'Complete'),
+      allowNull: false,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    optionTypeFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'optionTypes',
+        key: 'id',
+      },
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return FinishingMatrix;
+    quantityGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'quantityGroups',
+        key: 'id',
+      },
+    },
+
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return FinishingMatrix;
 }
+
+module.exports = FinishingMatrices;

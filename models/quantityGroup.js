@@ -1,37 +1,38 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var QuantityGroup = sequelize.define('quantityGroup', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function QuantityGroups(sequelize, Sequelize) {
+  const QuantityGroup = sequelize.define('quantityGroup', {
 
-        productFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'products',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    productFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'products',
+        key: 'id',
+      },
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return QuantityGroup;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return QuantityGroup;
 }
+
+module.exports = QuantityGroups;

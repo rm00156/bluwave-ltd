@@ -1,48 +1,47 @@
-module.exports = function (sequelize, Sequelize) {
+function HomePageMainBannerSections(sequelize, Sequelize) {
+  const HomePageMainBannerSection = sequelize.define('homePageMainBannerSection', {
 
-    var HomePageMainBannerSection = sequelize.define('homePageMainBannerSection', {
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+    title: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        title: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
+    description: {
+      type: Sequelize.TEXT,
+      allowNull: false,
+    },
 
-        description: {
-            type: Sequelize.TEXT,
-            allowNull: false,
-        },
+    imagePath: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        imagePath: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
+    buttonText: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        buttonText: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
 
-        deleteFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false
-        },
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
 
-        versionNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        }
+  }, {
+    timestamps: false,
+  });
 
-    }, {
-        timestamps: false
-    }
-    );
-
-    return HomePageMainBannerSection;
-
+  return HomePageMainBannerSection;
 }
+
+module.exports = HomePageMainBannerSections;

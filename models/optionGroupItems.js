@@ -1,46 +1,47 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var OptionGroupItems = sequelize.define('optionGroupItem', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function OptionGroupItems(sequelize, Sequelize) {
+  const OptionGroupItem = sequelize.define('optionGroupItem', {
 
-        optionGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'optionGroups',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        optionFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'options',
-                key: 'id'
-            }
-        },
+    optionGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'optionGroups',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    optionFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'options',
+        key: 'id',
+      },
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return OptionGroupItems;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return OptionGroupItem;
 }
+
+module.exports = OptionGroupItems;

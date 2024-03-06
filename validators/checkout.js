@@ -1,32 +1,41 @@
 const validator = require('validator');
-const basketOperations = require('../utilty/basket/basketOperations');
+const logger = require('pino')();
 const orderOperations = require('../utilty/order/orderOperations');
 
-exports.validatePhoneNumber = function(req, res) {
-    
-    const phoneNumber = req.query.phoneNumber;
-    const errors = [];
-    if (phoneNumber != undefined && !validator.isLength(phoneNumber, { min: 11, max: 11 })) {
-        errors.push("Please enter a valid Phone Number");
-        console.log("Please use enter a valid Phone Number");
-    }
+function validatePhoneNumber(req, res) {
+  const { phoneNumber } = req.query;
+  const errors = [];
+  if (
+    phoneNumber !== undefined
+    && !validator.isLength(phoneNumber, { min: 11, max: 11 })
+  ) {
+    errors.push('Please enter a valid Phone Number');
+    logger.info('Please use enter a valid Phone Number');
+  }
 
-    if (phoneNumber != undefined && !validator.isNumeric(phoneNumber)) {
-        errors.push("Please use enter a valid Phone Number");
-        console.log("Please use enter a valid Phone Number");
-    }
+  if (phoneNumber !== undefined && !validator.isNumeric(phoneNumber)) {
+    errors.push('Please use enter a valid Phone Number');
+    logger.info('Please use enter a valid Phone Number');
+  }
 
-    res.status(200).json({errors});
+  res.status(200).json({ errors });
 }
 
-exports.isCorrectAccount = async function(req, res, next) {
+async function isCorrectAccount(req, res, next) {
+  const purchaseBasketId = req.params.id;
+  const purchaseBasket = await orderOperations.getPurchaseBasketWithIdAndAccountId(
+    purchaseBasketId,
+    req.user.id,
+  );
 
-    const purchaseBasketId = req.params.id;
-    const purchaseBasket = await orderOperations.getPurchaseBasketWithIdAndAccountId(purchaseBasketId, req.user.id);
+  if (purchaseBasket == null) {
+    return res.redirect('/');
+  }
 
-    if(purchaseBasket == null) {
-        return res.redirect('/');
-    } 
-
-    next();
+  return next();
 }
+
+module.exports = {
+  isCorrectAccount,
+  validatePhoneNumber,
+};

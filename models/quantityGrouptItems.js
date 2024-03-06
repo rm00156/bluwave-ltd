@@ -1,46 +1,47 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var QuantityGroupItems = sequelize.define('quantityGroupItem', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function QuantityGroupItems(sequelize, Sequelize) {
+  const QuantityGroupItem = sequelize.define('quantityGroupItem', {
 
-        quantityGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'quantityGroups',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        quantityFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'quantities',
-                key: 'id'
-            }
-        },
+    quantityGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'quantityGroups',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    quantityFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'quantities',
+        key: 'id',
+      },
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return QuantityGroupItems;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return QuantityGroupItem;
 }
+
+module.exports = QuantityGroupItems;

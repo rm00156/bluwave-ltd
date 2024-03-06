@@ -1,34 +1,31 @@
-const { DataTypes } = require('sequelize');
+function FaqTypes(sequelize, Sequelize) {
+  const FaqType = sequelize.define('faqType', {
 
-module.exports = function (sequelize, Sequelize) {
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-    var FaqType = sequelize.define('faqType', {
+    faqType: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
 
-        faqType: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+  }, {
+    timestamps: false,
+  });
 
-        deleteFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false
-        },
-
-        versionNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        }
-    }, {
-        timestamps: false
-    }
-    );
-
-    return FaqType;
-
+  return FaqType;
 }
+
+module.exports = FaqTypes;

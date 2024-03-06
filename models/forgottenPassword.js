@@ -1,58 +1,55 @@
-const { DataTypes } = require('sequelize');
+function ForgottenPasswords(sequelize, Sequelize) {
+  const ForgottenPassword = sequelize.define('forgottenPassword', {
 
-module.exports = function (sequelize, Sequelize) {
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-    var ForgottenPassword = sequelize.define('forgottenPassword', {
+    accountFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'accounts',
+        key: 'id',
+      },
+    },
 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+    createdDttm: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
 
-        accountFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'accounts',
-                key: 'id'
-            }
-        },
+    expirationDttm: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
 
-        createdDttm: {
-            type: Sequelize.DATE,
-            allowNull: false
-        },
+    usedFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
 
-        expirationDttm: {
-            type: Sequelize.DATE,
-            allowNull: false,
-        },
+    token: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        usedFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false
-        },
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
 
-        token: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+  }, {
+    timestamps: false,
+  });
 
-        deleteFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false
-        },
-
-        versionNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        }
-    }, {
-        timestamps: false
-    }
-    );
-
-    return ForgottenPassword;
-
+  return ForgottenPassword;
 }
+
+module.exports = ForgottenPasswords;

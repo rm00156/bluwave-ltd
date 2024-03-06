@@ -1,52 +1,51 @@
-module.exports = function (sequelize, Sequelize) {
+function Notifications(sequelize, Sequelize) {
+  const Notification = sequelize.define('notification', {
 
-    var Notification = sequelize.define('notification', {
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+    accountFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      referenes: {
+        model: 'accounts',
+        key: 'id',
+      },
+    },
 
-        accountFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            referenes: {
-                model: 'accounts',
-                key: 'id'
-            }
-        },
+    createdDttm: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
 
-        createdDttm: {
-            type: Sequelize.DATE,
-            allowNull: false
-        },
+    text: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        text: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    link: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        link: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
 
-        deleteFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false
-        },
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
 
-        versionNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        }
+  }, {
+    timestamps: false,
+  });
 
-    }, {
-        timestamps: false
-    }
-    );
-
-    return Notification;
-
+  return Notification;
 }
+
+module.exports = Notifications;
