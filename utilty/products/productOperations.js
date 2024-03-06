@@ -152,7 +152,9 @@ async function getRowDetails(result) {
     new Set(result.map((o) => o.optionGroupFk)),
   );
   const rows = [];
-  await Promise.all(optionGroupIds.map((optionGroupId) => handleGetRowDetail(optionGroupId, rows, result)));
+  await Promise.all(
+    optionGroupIds.map((optionGroupId) => handleGetRowDetail(optionGroupId, rows, result)),
+  );
 
   return rows;
 }
@@ -846,9 +848,9 @@ async function createPriceMatrix(productId, options, isComplete) {
     optionTypeIds.add(o.optionTypeFk);
   });
 
-  optionTypeIds.forEach(async (optionTypeId) => {
-    await createOptionTypeGroupItem(optionTypeGroup.id, optionTypeId);
-  });
+  await Promise.all(
+    Array.from(optionTypeIds).map((optionTypeId) => createOptionTypeGroupItem(optionTypeGroup.id, optionTypeId)),
+  );
 
   const quantityGroup = await getQuantityGroupForProductId(productId);
 
@@ -864,30 +866,36 @@ async function createPriceMatrix(productId, options, isComplete) {
 
 async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
   let orderNo = 1;
-  rows.forEach(async (row) => {
+  for (let i = 0; i < rows.length; i += 1) {
+    const row = rows[i];
+    // eslint-disable-next-line no-await-in-loop
     const optionGroup = await createOptionGroup();
+    // eslint-disable-next-line no-await-in-loop
     const priceMatrixRow = await createPriceMatrixRow(
       priceMatrixId,
       optionGroup.id,
       orderNo,
     );
     const optionIds = row.optionIdGroup;
-    optionIds.forEach(async (optionId) => {
+    for (let j = 0; j < optionIds.length; j += 1) {
+      const optionId = optionIds[j];
+      // eslint-disable-next-line no-await-in-loop
       await createOptionGroupItem(optionGroup.id, optionId);
-    });
-
+    }
     const quantities = row.quantityGroup;
 
-    quantities.forEach(async (quantity) => {
+    for (let k = 0; k < quantities.length; k += 1) {
+      const quantity = quantities[k];
+      // eslint-disable-next-line no-await-in-loop
       await createPriceMatrixRowQuantityPrices(
         priceMatrixRow.id,
         quantity.id,
         quantity.price === '' ? null : quantity.price,
       );
-    });
+    }
 
     orderNo += 1;
-  });
+  }
 }
 
 async function getAllProductWithLowestPriceDetails() {
@@ -1612,7 +1620,9 @@ async function verifyQuantities(productId, quantities) {
 }
 
 async function setQuantitiesForQuantityGroup(quantityGroup, quantities) {
-  await Promise.all(quantities.map((quantityId) => createQuantityGroupItem(quantityGroup.id, quantityId)));
+  await Promise.all(
+    quantities.map((quantityId) => createQuantityGroupItem(quantityGroup.id, quantityId)),
+  );
 }
 
 async function removeAllQuantitesFromQuantityGroup(quantityGroup) {
@@ -1702,11 +1712,9 @@ async function updatePriceMatrixRowQuantityPricesQuantityChange(
     for (let j = 0; j < addQuantities.length; j += 1) {
       const addQuantity = addQuantities[j];
 
-      promises.push(createPriceMatrixRowQuantityPrices(
-        priceMatrixRow.id,
-        addQuantity,
-        null,
-      ));
+      promises.push(
+        createPriceMatrixRowQuantityPrices(priceMatrixRow.id, addQuantity, null),
+      );
     }
   }
   await Promise.all(promises);
@@ -1744,11 +1752,13 @@ async function updateFinishingMatrixRowQuantityPricesQuantityChange(
     for (let j = 0; j < addQuantities.length; j += 1) {
       const addQuantity = addQuantities[j];
 
-      promises.push(createFinishingMatrixRowQuantityPrice(
-        finishingMatrixRow.id,
-        addQuantity,
-        null,
-      ));
+      promises.push(
+        createFinishingMatrixRowQuantityPrice(
+          finishingMatrixRow.id,
+          addQuantity,
+          null,
+        ),
+      );
     }
   }
   await Promise.all(promises);
@@ -1853,7 +1863,9 @@ async function getFinishingMatricesDetailsForProductId(productId) {
   const finishingMatrices = await getFinishingMatricesForProductId(productId);
   const result = [];
 
-  await Promise.all(finishingMatrices.map((finishingMatrix) => getFinishingMatrixDetail(finishingMatrix, result)));
+  await Promise.all(
+    finishingMatrices.map((finishingMatrix) => getFinishingMatrixDetail(finishingMatrix, result)),
+  );
 
   return result;
 }
