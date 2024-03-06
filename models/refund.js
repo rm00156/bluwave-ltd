@@ -1,56 +1,55 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var Refund = sequelize.define('refund', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
- 
-        refundTypeFk: {
-            type: Sequelize.INTEGER,
-            allowNull:false,
-            references: {
-                model: 'refundTypes',
-                key: 'id'
-            }
-        },
+function Refunds(sequelize, Sequelize) {
+  const Refund = sequelize.define('refund', {
 
-        createdDttm:{
-            type:Sequelize.DATE,
-            allowNull:false
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        amount:{
-            type:Sequelize.STRING,
-            allowNull:false
-        },
-        
-        purchaseBasketFk:{
-            type:Sequelize.INTEGER,
-            allowNull:false,
-            references: {
-                model: 'purchaseBaskets',
-                key: 'id'
-            }
-        },
+    refundTypeFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'refundTypes',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type:Sequelize.BOOLEAN,
-            allowNull:false
-        },
+    createdDttm: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type:Sequelize.INTEGER,
-            allowNull:false
-        }
- 
-    },{
-        timestamps:false
-    }
-);
- 
-    return Refund;
- 
+    amount: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+
+    purchaseBasketFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'purchaseBaskets',
+        key: 'id',
+      },
+    },
+
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return Refund;
 }
+
+module.exports = Refunds;

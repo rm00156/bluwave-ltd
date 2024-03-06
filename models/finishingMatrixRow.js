@@ -1,51 +1,52 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var FinishingMatrixRow = sequelize.define('finishingMatrixRow', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function FinishingMatrixRows(sequelize, Sequelize) {
+  const FinishingMatrixRow = sequelize.define('finishingMatrixRow', {
 
-        finishingMatrixFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'finishingMatrices',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        optionFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'options',
-                key: 'id'
-            }
-        },
+    finishingMatrixFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'finishingMatrices',
+        key: 'id',
+      },
+    },
 
-        orderNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
+    optionFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'options',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    orderNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return FinishingMatrixRow;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return FinishingMatrixRow;
 }
+
+module.exports = FinishingMatrixRows;

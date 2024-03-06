@@ -1,52 +1,54 @@
 const { DataTypes } = require('sequelize');
-module.exports = function(sequelize, Sequelize) {
- 
-    var ProductDelivery = sequelize.define('productDelivery', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
 
-        productFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'products',
-                key: 'id'
-            }
-        },
+function ProductDeliveries(sequelize, Sequelize) {
+  const ProductDelivery = sequelize.define('productDelivery', {
 
-        deliveryTypeFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'deliveryTypes',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        price: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    productFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'products',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    deliveryTypeFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'deliveryTypes',
+        key: 'id',
+      },
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return ProductDelivery;
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return ProductDelivery;
 }
+
+module.exports = ProductDeliveries;

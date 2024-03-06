@@ -1,52 +1,54 @@
 const { DataTypes } = require('sequelize');
-module.exports = function(sequelize, Sequelize) {
- 
-    var FinishingMatrixRowQuantityPrice = sequelize.define('finishingMatrixRowQuantityPrice', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
 
-        finishingMatrixRowFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'finishingMatrixRows',
-                key: 'id'
-            }
-        },
+function FinishingMatrixRowQuantityPrices(sequelize, Sequelize) {
+  const FinishingMatrixRowQuantityPrice = sequelize.define('finishingMatrixRowQuantityPrice', {
 
-        quantityFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'quantities',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        price: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: true,
-        },
+    finishingMatrixRowFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'finishingMatrixRows',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    quantityFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'quantities',
+        key: 'id',
+      },
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return FinishingMatrixRowQuantityPrice;
+    price: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+    },
+
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return FinishingMatrixRowQuantityPrice;
 }
+
+module.exports = FinishingMatrixRowQuantityPrices;

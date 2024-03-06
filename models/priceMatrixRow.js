@@ -1,51 +1,52 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var PriceMatrixRow = sequelize.define('priceMatrixRow', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function PriceMatrixRows(sequelize, Sequelize) {
+  const PriceMatrixRow = sequelize.define('priceMatrixRow', {
 
-        priceMatrixFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'priceMatrices',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        optionGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'optionGroups',
-                key: 'id'
-            }
-        },
+    priceMatrixFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'priceMatrices',
+        key: 'id',
+      },
+    },
 
-        orderNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
+    optionGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'optionGroups',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    orderNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return PriceMatrixRow;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return PriceMatrixRow;
 }
+
+module.exports = PriceMatrixRows;

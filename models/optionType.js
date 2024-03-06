@@ -1,33 +1,34 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var OptionType = sequelize.define('optionType', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function OptionTypes(sequelize, Sequelize) {
+  const OptionType = sequelize.define('optionType', {
 
-        optionType: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    optionType: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return OptionType;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return OptionType;
 }
+
+module.exports = OptionTypes;

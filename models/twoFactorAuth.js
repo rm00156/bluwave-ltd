@@ -1,52 +1,53 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var TwoFactorAuth = sequelize.define('twoFactorAuth', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
- 
-        accountFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'accounts',
-                key: 'id'
-            }
-        },
+function TwoFactorAuths(sequelize, Sequelize) {
+  const TwoFactorAuth = sequelize.define('twoFactorAuth', {
 
-        secret: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        qrCode: {
-            type: Sequelize.TEXT,
-            allowNull: false
-        },
+    accountFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'accounts',
+        key: 'id',
+      },
+    },
 
-        authenticatedFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-        },
+    secret: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    qrCode: {
+      type: Sequelize.TEXT,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return TwoFactorAuth;
+    authenticatedFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
+
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return TwoFactorAuth;
 }
+
+module.exports = TwoFactorAuths;

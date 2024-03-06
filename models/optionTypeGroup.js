@@ -1,46 +1,47 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var OptionTypeGroup = sequelize.define('optionTypeGroup', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function OptionTypeGroups(sequelize, Sequelize) {
+  const OptionTypeGroup = sequelize.define('optionTypeGroup', {
 
-        productFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'products',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        attributeTypeFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'attributeTypes',
-                key: 'id'
-            }
-        },
+    productFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'products',
+        key: 'id',
+      },
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    attributeTypeFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'attributeTypes',
+        key: 'id',
+      },
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return OptionTypeGroup;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return OptionTypeGroup;
 }
+
+module.exports = OptionTypeGroups;

@@ -1,44 +1,41 @@
-const { DataTypes } = require('sequelize');
+function DeliveryTypes(sequelize, Sequelize) {
+  const DeliveryType = sequelize.define('deliveryType', {
 
-module.exports = function (sequelize, Sequelize) {
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-    var DeliveryType = sequelize.define('deliveryType', {
+    name: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+    workingDays: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
 
-        name: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
+    collectFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
 
-        workingDays: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+    },
 
-        collectFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-        },
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+  }, {
+    timestamps: false,
+  });
 
-        deleteFl: {
-            type: Sequelize.BOOLEAN,
-            allowNull: false
-        },
-
-        versionNo: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        }
-    }, {
-        timestamps: false
-    }
-    );
-
-    return DeliveryType;
-
+  return DeliveryType;
 }
+
+module.exports = DeliveryTypes;

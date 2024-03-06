@@ -1,79 +1,80 @@
 const { DataTypes } = require('sequelize');
 
-module.exports = function(sequelize, Sequelize) {
- 
-    var Template = sequelize.define('template', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function Templates(sequelize, Sequelize) {
+  const Template = sequelize.define('template', {
 
-        sizeOptionFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'options',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        bleedAreaWidth: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    sizeOptionFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'options',
+        key: 'id',
+      },
+    },
 
-        bleedAreaHeight: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    bleedAreaWidth: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-        trimWidth: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    bleedAreaHeight: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-        trimHeight: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    trimWidth: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-        safeAreaWidth: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    trimHeight: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-        safeAreaHeight: {
-            type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
-        },
+    safeAreaWidth: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-        pdfPath: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
+    safeAreaHeight: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
 
-        jpegPath: {
-            type: Sequelize.STRING,
-            allowNull: false,
-        },
+    pdfPath: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    jpegPath: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return Template;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return Template;
 }
+
+module.exports = Templates;

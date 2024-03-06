@@ -1,47 +1,48 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var FileGroupItem = sequelize.define('fileGroupItem', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function FileGroupItems(sequelize, Sequelize) {
+  const FileGroupItem = sequelize.define('fileGroupItem', {
 
-        fileGroupFk: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'fileGroups',
-                key: 'id'
-            }
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        path: {
-            type: Sequelize.STRING,
-            allowNull: false, 
-        },
+    fileGroupFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'fileGroups',
+        key: 'id',
+      },
+    },
 
-        fileName: {
-            type: Sequelize.STRING,
-            alllowNull: false
-        },
+    path: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    fileName: {
+      type: Sequelize.STRING,
+      alllowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return FileGroupItem;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return FileGroupItem;
 }
+
+module.exports = FileGroupItems;

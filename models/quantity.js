@@ -1,33 +1,34 @@
-module.exports = function(sequelize, Sequelize) {
- 
-    var Quantity = sequelize.define('quantity', {
- 
-        id: {
-            autoIncrement: true,
-            primaryKey: true,
-            type: Sequelize.INTEGER
-        },
+function Quantities(sequelize, Sequelize) {
+  const Quantity = sequelize.define('quantity', {
 
-        quantity: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
+    id: {
+      autoIncrement: true,
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+    },
 
-        deleteFl:{
-            type: Sequelize.BOOLEAN,
-            allowNull: false,
-            defaultValue: false
-        },
+    quantity: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
 
-        versionNo:{
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            defaultValue: 1
-        }
-        
-    },{
-        timestamps:false
-    });
- 
-    return Quantity;
+    deleteFl: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+
+    versionNo: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+
+  }, {
+    timestamps: false,
+  });
+
+  return Quantity;
 }
+
+module.exports = Quantities;
