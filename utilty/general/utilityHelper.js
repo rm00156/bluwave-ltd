@@ -1,4 +1,9 @@
+const logger = require('pino')();
 const bcrypt = require('bcrypt');
+// const { Upload } = require('@aws-sdk/lib-storage');
+const {
+  S3Client, /* GetObjectCommand, */ ListObjectsV2Command, DeleteObjectsCommand,
+} = require('@aws-sdk/client-s3');
 
 function generateNumberCode() {
   let result = '';
@@ -41,6 +46,7 @@ function pauseForTimeInSecond(seconds) {
 }
 
 function parseCommaSeperatedText(text) {
+  if (!text) return [];
   const textSplit = text.split(',');
 
   if (textSplit.length === 0) return [textSplit];
@@ -114,14 +120,61 @@ function getExtension(mimeType) {
   }
 }
 
+function isEmptyString(str) {
+  // Trim the string to remove whitespace characters from the beginning and end
+  const trimmedStr = str.trim();
+
+  // Check if the trimmed string is empty
+  return trimmedStr === '';
+}
+function createNewS3Client() {
+  return new S3Client({
+    region: process.env.region,
+    credentials: {
+      secretAccessKey: process.env.secretAccessKey,
+      accessKeyId: process.env.accessKeyId,
+    },
+    endpoint: process.env.s3_endpoint,
+  });
+}
+
+async function deleteS3Folder(folderPrefix) {
+  try {
+    const s3 = createNewS3Client();
+    const params = {
+      Bucket: process.env.S3_BUCKET,
+      Prefix: folderPrefix,
+    };
+    // List all objects in the specified prefix
+    const objects = await s3.send(new ListObjectsV2Command(params));
+    // Check if there are any objects to delete
+    if (objects.Contents.length === 0) {
+      logger.error('Folder is already empty.');
+      return;
+    }
+
+    // Prepare the list of objects to be deleted
+    const deleteParams = {
+      Bucket: process.env.S3_BUCKET,
+      Delete: { Objects: objects.Contents.map((obj) => ({ Key: obj.Key })) },
+    };
+    // Delete the objects
+    await s3.send(new DeleteObjectsCommand(deleteParams));
+  } catch (error) {
+    logger.error('Error:', error.message);
+  }
+}
+
 module.exports = {
   checkNoDuplicateNonZeroNumbers,
   dateXAmountFromNow,
+  deleteS3Folder,
   generateHash,
   generateNumberCode,
   getExtension,
   getTimeDifference,
   hasTheSameItems,
+  isEmptyString,
   parseCommaSeperatedText,
   pauseForTimeInSecond,
   validPassword,

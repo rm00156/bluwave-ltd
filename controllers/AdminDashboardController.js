@@ -97,7 +97,7 @@ function hasNewMatrixBeenCreated(
 
 function addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, request) {
   for (let i = 1; i < 6; i += 1) {
-    const itemRemove = JSON.parse(request[`${i}Remove`]);
+    const itemRemove = request[`${i}Remove`] ? JSON.parse(request[`${i}Remove`]) : false;
     const itemPath = request[`${i}Path`];
     const iString = i.toString();
     if (itemRemove === true) {
@@ -879,6 +879,13 @@ async function continuePage1(req, res) {
   return res.status(200).json({ id: productId });
 }
 
+async function createProductFromProductDetails(productDetails, bulletPoints, files) {
+  const updatedProductDetails = { ...productDetails, deleteFl: true, versionNo: 1 };
+  const s3PathMap = files !== null && files !== undefined ? (await productOperations.uploadPictures('Products/', updatedProductDetails.name, files)) : new Map();
+  const product = await productOperations.createProduct(updatedProductDetails, s3PathMap, bulletPoints);
+  return product;
+}
+
 async function savePage1(req, res) {
   const { productName } = req.body;
   const { productTypeId } = req.body;
@@ -890,7 +897,6 @@ async function savePage1(req, res) {
     req.body.bulletPoints,
   );
   const { productId } = req.body;
-
   const productDetails = {
     name: productName,
     productTypeFk: productTypeId,
@@ -898,41 +904,31 @@ async function savePage1(req, res) {
     subDescription,
     subDescriptionTitle,
   };
-  let s3PathMap = new Map();
-  if (files !== null) {
-    s3PathMap = await productOperations.uploadPictures(
-      'Products/',
-      productName,
-      files,
-    );
-  }
+
   // verify productName is not empty
-  if (productName === '') {
+  if (!productName || utilityHelper.isEmptyString(productName)) {
     return res
       .status(400)
       .json({ error: "'Product Name' must be set to save." });
   }
 
-  if (productId === 'undefined') {
+  if (productId === 'undefined' || productId === undefined) {
     // create product
-    productDetails.deleteFl = true;
-
-    productDetails.versionNo = 1;
-    const product = await productOperations.createProduct(
-      productDetails,
-      s3PathMap,
-      bulletPoints,
-    );
+    const product = await createProductFromProductDetails(productDetails, bulletPoints, files);
     req.session.message = 'Saved';
     return res.status(201).json({ id: product.id });
   }
+
   const product = await productOperations.getProductById(productId);
   if (!product) {
     // error
     return res.status(400).json({ error: 'Product no found.' });
   }
+
+  const s3PathMap = files !== null && files !== undefined ? (await productOperations.uploadPictures('Products/', productName, files)) : new Map();
   // update existing product
   addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, req.body);
+
   productDetails.s3PathMap = s3PathMap;
   productDetails.bulletPoints = bulletPoints;
   productDetails.productId = productId;
@@ -1360,7 +1356,7 @@ async function editProductType(req, res) {
     productTypeName,
   );
 
-  if (existingProductType && existingProductType.id !== productTypeId) {
+  if (existingProductType && existingProductType.id !== Number(productTypeId)) {
     return res
       .status(400)
       .json({ error: 'Product Type with this name already exists.' });
