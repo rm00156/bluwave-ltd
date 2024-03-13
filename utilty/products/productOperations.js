@@ -8,6 +8,10 @@ const utilityHelper = require('../general/utilityHelper');
 const deliveryOperations = require('../delivery/deliveryOperations');
 const models = require('../../models');
 
+const env = process.env.NODE_ENV || 'development';
+const TEST = 'test';
+const DEVELOPMENT = 'development';
+
 async function getAttributeTypeByType(attributeType) {
   return models.attributeType.findOne({
     where: {
@@ -733,7 +737,10 @@ async function uploadPictures(folder, productName, files) {
   });
   const date = Date.now();
   const s3PathMap = new Map();
-
+  let testDevelopment = '';
+  if (env === TEST || env === DEVELOPMENT) {
+    testDevelopment = `${env}/`;
+  }
   await Promise.all(
     Object.keys(files).map(async (key) => {
       const value = files[key];
@@ -743,13 +750,13 @@ async function uploadPictures(folder, productName, files) {
       const fileName = `picture${index}`;
       const s3Path = `${
         process.env.S3_BUCKET_PATH
-      }/${folder}${productName}/${date}_${encodeURIComponent(
+      }/${testDevelopment}${folder}${productName}/${date}_${encodeURIComponent(
         fileName,
       )}.${extension}`;
       const params = {
         Bucket: process.env.S3_BUCKET,
         Body: blob,
-        Key: `${folder + productName}/${date}_${fileName}.${extension}`,
+        Key: `${testDevelopment + folder + productName}/${date}_${fileName}.${extension}`,
         ACL: 'public-read',
       };
 

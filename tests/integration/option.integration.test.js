@@ -1,44 +1,26 @@
-const request = require('supertest');
 const Sequelize = require('sequelize');
-const { app } = require('../../app');
-const accountOperations = require('../../utilty/account/accountOperations');
 const productOperations = require('../../utilty/products/productOperations');
+const accountTestHelper = require('../helper/accountTestHelper');
 const models = require('../../models');
 
-let adminAccountType;
 let adminAccount;
 let productType;
 let quantity;
 const optionTypeName = 'Size';
 const productTypeName = 'Bookmarks';
 let optionType;
-const email = 'email@email.com';
-const name = 'name';
-const phoneNumber = 'phoneNumber';
-const password = 'password';
 
 let agent;
 beforeAll(async () => {
-  adminAccountType = await accountOperations.getAdminAccountType();
-
   optionType = await productOperations.getOptionTypeByName(optionTypeName);
 
   productType = await productOperations.getProductTypeByType(productTypeName);
 
   quantity = await productOperations.getQuantityByName(25);
 
-  adminAccount = await accountOperations.createAccount(
-    adminAccountType.id,
-    email,
-    name,
-    phoneNumber,
-    password,
-  );
-  const response = await request(app)
-    .post('/admin_login')
-    .send({ email, password });
-  agent = request.agent(app);
-  agent.set('Cookie', response.headers['set-cookie']);
+  const adminSetup = await accountTestHelper.setUpAdminAccountAndAgent();
+  adminAccount = adminSetup.adminAccount;
+  agent = adminSetup.agent;
 });
 
 describe('post /option/:id/update', () => {
@@ -297,9 +279,5 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await models.account.destroy({
-    where: {
-      id: adminAccount.id,
-    },
-  });
+  await accountTestHelper.deleteAccountById(adminAccount.id);
 });
