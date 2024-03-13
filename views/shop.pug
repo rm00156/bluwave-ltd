@@ -38,7 +38,14 @@ html(land="en")
                         .card-body(style="padding:8rem !important")
                             // title
                             .container
-                                h4.mb-0 #{productType.productType}
+                                // row
+                                .row
+                                    .col-xl-4.col-lg-6.col-md-7
+                                        .card.border-0.shadow
+                                            .card-body.p-6
+                                                .mb-4
+
+                                                    h4.mb-0 #{productType.productType}
                 else 
                     .card.mb-4.bg-light.border-0(style='background: url(' + + ')no-repeat; background-position: center; background-size: cover;')
                         // card body
