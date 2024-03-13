@@ -14,9 +14,9 @@ async function parseHomePageOptions(from, to, homePageOptions) {
   const options = [];
   for (let i = from; i <= to; i += 1) {
     const productTypeId = homePageOptions[`productTypeFk${i}`];
-    if (productTypeId !== null) {
+    if (productTypeId !== null && productTypeId !== undefined) {
       options.push({
-        productType: productOperations.getProductTypeById(productTypeId),
+        productType: await productOperations.getProductTypeById(productTypeId),
         imagePath: homePageOptions[`imagePath${i}`],
         description: homePageOptions[`description${i}`],
       });
@@ -328,6 +328,7 @@ module.exports = {
   getPrivacyPage,
   searchProductOrProductTypes,
   getTermsPage,
+  parseHomePageOptions,
   passwordEmailSentPage,
   passwordResetPage,
   requestForgottenPasswordEmail,
