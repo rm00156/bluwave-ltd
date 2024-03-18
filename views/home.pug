@@ -140,15 +140,15 @@ html(land="en")
                                         .card-header(style="padding:0")
                                             // badge
                                             .text-center.position-relative
-                                                a(href='/shop?type=' + encodeURIComponent(option.productType.productType))
+                                                a(href='/shop?type=' + encodeURIComponent(option.productType))
                                                     // img
                                                     img.img-fluid(src=option.imagePath alt='Bluwave image')
                                         .card-body
                                             // heading
                                             h2.fs-6
-                                                a.text-inherit.text-decoration-none(href='/shop?type=' + encodeURIComponent(option.productType.productType)) #{option.productType.productType}
+                                                a.text-inherit.text-decoration-none(href='/shop?type=' + encodeURIComponent(option.productType)) #{option.productType}
                                             .text-small.mb-1
-                                                a.text-decoration-none.light-grey(href='#!')
+                                                a.text-decoration-none.light-grey(href='/shop?type=' + encodeURIComponent(option.productType))
                                                     small
                                                         | #{option.description}
 
