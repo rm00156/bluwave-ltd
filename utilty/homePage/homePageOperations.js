@@ -46,7 +46,7 @@ async function getHomePageOptionDetails() {
   const result = [];
   homePageOptions.forEach((h) => {
     const newHomePageOption = { ...h.dataValues };
-    if (productTypeMap.get(h.id) !== null) newHomePageOption.productType = productTypeMap.get(h.id);
+    if (productTypeMap.get(h.productTypeFk) !== null) newHomePageOption.productType = productTypeMap.get(h.productTypeFk);
 
     result.push(newHomePageOption);
   });
@@ -60,7 +60,8 @@ async function getAllAvailableActiveProductTypes(productTypeId) {
   const homePageOptions = await getHomePageOptions();
   const homePageOptionProductTypeIds = homePageOptions.map((h) => h.productTypeFk);
 
-  return [productType, ...await productOperations.getAllProductTypesNotInList(homePageOptionProductTypeIds)];
+  const availableProductTypes = await productOperations.getAllProductTypesNotInList(homePageOptionProductTypeIds);
+  return [productType, ...availableProductTypes];
 }
 
 async function getHomePageOptionByProductTypeId(productTypeFk) {
