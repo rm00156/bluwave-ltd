@@ -1,38 +1,21 @@
-// var fileMap = initialiseFileMap();
-var basic;
-var fileJsonObject;
-function initialiseFileMap() {
-    var map = new Map();
-    map.set(1, null);
-    map.set(2, null);
-    map.set(3, null);
-    map.set(4, null);
-    return map;
-}
 
-function initialiseFileJsonObject() {
-    var jsonObject = {};
-    var homePageOptions = JSON.parse($('#homePageOptions').val());
-    for (var i = 1; i < 6; i++) {
-        jsonObject[i] = { path: homePageOptions['imagePath' + i ], blob: null, remove: false };
-    }
-    
-    return jsonObject;
-}
+var basic;
+let initialImagePath;
+let imageBlob;
+let remove = false;
 
 function removePicture(event) {
     const button = event.currentTarget;
     const label = button.parentNode;
     const container = label.parentNode;
     const input = container.getElementsByClassName('picture')[0];
-    console.log(input)
     input.value = null;
-    var position = Number((input.id).replace('picture', ''));
-    fileJsonObject[position] = { path: fileJsonObject[position].path, blob: null, remove: true };
+    imageBlob = null;
     var event = new Event('change');
 
     // Dispatch the event on the file input element
     input.dispatchEvent(event);
+    remove = true;
 }
 
 function resetLabel(input) {
@@ -111,8 +94,7 @@ function confirmCrop(event) {
         format: 'jpeg'
     }).then(function (blob) {
 
-        var position = Number(pictureAttribute.replace('picture', ''));
-        fileJsonObject[position] = { path: fileJsonObject[position].path, blob, remove: false };
+        imageBlob = blob;
         // $('#uploadedImageForCrop').empty();
         // $('#cropSection').attr('style','display:none');
         $('#overlay').attr('style', 'display:none');
@@ -133,6 +115,7 @@ function confirmCrop(event) {
         button.append('X');
         container.append(button);
         basic.destroy();
+        remove = false;
         $('#reset').on('click', function () {
 
 
@@ -143,92 +126,46 @@ function confirmCrop(event) {
     })
 }
 
-function setHomePageOption(e) {
-    $('#error1').text('');
-    $('#error2').text('');
-    $('#error3').text('');
-    $('#error4').text('');
-    $('#error').text('');
 
+function setHomePageOption(e) {
+
+    $('#error').text('')
+    const homePageOptionId = $('#homePageOptionId').val();
     const form = document.getElementById('form');
     if(form.checkValidity()) {
         e.preventDefault();
 
-        const productTypeId1 = $('#position1').val();
-        // const picture1 = fileMap.get(1);
-        const description1 = $('#description1').val();
+        if(remove)
+            return $('#error').text('Image must be set.');
 
-        const productTypeId2 = $('#position2').val();
-        // const picture2 = fileMap.get(2);
-        const description2 = $('#description2').val();
-
-        const productTypeId3 = $('#position3').val();
-        // const picture3 = fileMap.get(3);
-        const description3 = $('#description3').val();
-
-        const productTypeId4 = $('#position4').val();
-        // const picture4 = fileMap.get(4);
-        const description4 = $('#description4').val();
+        const productTypeId = $('#productTypeId').val();
+        const description = $('#description').val();
 
         var data = new FormData();
         var request = new XMLHttpRequest();
         request.responseType = 'json';
 
-        data.append('productTypeId1', productTypeId1);
-        // data.append('1Blob',  picture1);
-        data.append('description1', description1);
+        data.append('productTypeId', productTypeId);
+        data.append('description', description);
 
-        data.append('productTypeId2', productTypeId2);
-        // data.append('2Blob',  picture2);
-        data.append('description2', description2);
+        if(imageBlob !== null)
+            data.append('image', imageBlob);
 
-        data.append('productTypeId3', productTypeId3);
-        // data.append('3Blob',  picture3);
-        data.append('description3', description3);
-
-        data.append('productTypeId4', productTypeId4);
-        // data.append('4Blob',  picture4);
-        data.append('description4', description4);
-
-
-        for (key in fileJsonObject) {
-            const item = fileJsonObject[key];
-            data.append(key + 'Blob', item.blob);
-        }
         request.addEventListener('load', function(response, xhr, status){
             
             if(request.status == 200) {
                 location.reload();
             } else {
-                const errors = response.currentTarget.response;
-                var err = '';
-                if(errors.error1) {
-                    $('#error1').text(response.currentTarget.response.error1);
-                    err = 'error1';
-                }
-                if(errors.error2) {
-                    $('#error2').text(response.currentTarget.response.error2);
-                    err = 'error2';
-                }
-                if(errors.error3) {
-                    $('#error3').text(response.currentTarget.response.error3);
-                    err = 'error3';
-                }
-                if(errors.error4) {
-                    $('#error4').text(response.currentTarget.response.error4);
-                    err = 'error4';
-                }
-                if(errors.error) {
-                    $('#error').text(response.currentTarget.response.error);
-                    err = 'error';
-                }
-                const element = document.getElementById(err);
+
+                $('#error').text(response.currentTarget.response.error);
+               
+                const element = document.getElementById('error');
                 element.scrollIntoView({ behavior: "smooth" });
             }
             
         });
 
-        request.open('put','/admin_dashboard/home_page_option/update');
+        request.open('put',`/home_page_option/${homePageOptionId}/update`);
         request.send(data);
 
     } 
@@ -243,7 +180,7 @@ function cancelCrop()
 
 $(function(){
 
-    fileJsonObject = initialiseFileJsonObject();
+    initialImagePath = $('#imagePath').val();
     $('.picture').on('change', setupCropWindow);
     $('#confirmCrop').on('click', confirmCrop);
     $('#cancelCrop').on('click', cancelCrop);
