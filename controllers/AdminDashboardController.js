@@ -10,45 +10,13 @@ const productOperations = require('../utilty/products/productOperations');
 const deliveryOperations = require('../utilty/delivery/deliveryOperations');
 const basketOperations = require('../utilty/basket/basketOperations');
 const emailOperations = require('../utilty/email/emailOperations');
+const homePageOperations = require('../utilty/homePage/homePageOperations');
 const orderOperations = require('../utilty/order/orderOperations');
 const refundOperations = require('../utilty/refund/refundOperations');
 const faqOperations = require('../utilty/faq/faqOperations');
 const utilityHelper = require('../utilty/general/utilityHelper');
 
 const models = require('../models');
-
-async function validateDetails(body, files, from, to) {
-  const errors = {};
-  const homePageOptions = await productOperations.getHomePageOptions();
-  for (let i = from; i <= to; i += 1) {
-    const productTypeId = body[`productTypeId${i}`];
-    const description = body[`description${i}`.trimStart()];
-    const picture = files === null ? null : files[`${i}Blob`];
-
-    if (productTypeId === 0) {
-      if (description !== '' || picture !== undefined) {
-        errors[`error${i}`] = 'All values must be set.';
-      }
-    }
-
-    if (description === '') {
-      if (productTypeId !== 0 || picture !== undefined) {
-        errors[`error${i}`] = 'All values must be set.';
-      }
-    }
-
-    if (
-      (picture === undefined || picture === null)
-      && homePageOptions[`imagePath${i}`] === null
-    ) {
-      if (productTypeId !== 0 || description !== '') {
-        errors[`error${i}`] = 'All values must be set.';
-      }
-    }
-  }
-
-  return errors;
-}
 
 async function getNotificationDetails(accountId) {
   let notifications = await accountOperations.getNotificationsForAccount(
@@ -1797,36 +1765,6 @@ async function setNavigationBarHeaders(req, res) {
   return res.status(200).json({});
 }
 
-async function getOptions1To4Page(req, res) {
-  const { message } = req.session;
-  req.session.message = undefined;
-
-  const homePageOptions = await productOperations.getHomePageOptions();
-  const productTypes = await productOperations.getAllActiveProductTypes();
-  res.render('adminOptions1To4', {
-    user: req.user,
-    message,
-    homePageOptions,
-    productTypes,
-    companyDetails: companyInfo.getCompanyDetails(),
-  });
-}
-
-async function getOptions5To8Page(req, res) {
-  const { message } = req.session;
-  req.session.message = undefined;
-
-  const homePageOptions = await productOperations.getHomePageOptions();
-  const productTypes = await productOperations.getAllActiveProductTypes();
-  res.render('adminOptions5To8', {
-    user: req.user,
-    message,
-    homePageOptions,
-    productTypes,
-    companyDetails: companyInfo.getCompanyDetails(),
-  });
-}
-
 async function setHomePageBanner(req, res) {
   const { title } = req.body;
   const { description } = req.body;
@@ -1952,66 +1890,6 @@ async function getMainBannerSectionPage(req, res) {
     homePageMainBannerSection,
     companyDetails: companyInfo.getCompanyDetails(),
   });
-}
-
-async function updateHomePage1To4(req, res) {
-  let errors = {};
-  const ids = [
-    Number(req.body.productTypeId1),
-    Number(req.body.productTypeId2),
-    Number(req.body.productTypeId3),
-    Number(req.body.productTypeId4),
-  ];
-
-  if (!utilityHelper.checkNoDuplicateNonZeroNumbers(ids)) {
-    errors.error = 'You have selected a product type more than once.';
-    return res.status(400).json(errors);
-  }
-
-  errors = await validateDetails(req.body, req.files, 1, 4);
-
-  if (!isEmpty(errors)) {
-    return res.status(400).json(errors);
-  }
-
-  const s3PathMap = await productOperations.uploadPictures(
-    'HomePage/',
-    'Option_1_4',
-    req.files,
-  );
-  await productOperations.setHomePageOptions1To4(req.body, s3PathMap);
-  req.session.message = 'Options 1-4 Updated!';
-  return res.status(200).json({});
-}
-
-async function updateHomePage5To8(req, res) {
-  let errors = {};
-  const ids = [
-    Number(req.body.productTypeId5),
-    Number(req.body.productTypeId6),
-    Number(req.body.productTypeId7),
-    Number(req.body.productTypeId8),
-  ];
-
-  if (!utilityHelper.checkNoDuplicateNonZeroNumbers(ids)) {
-    errors.error = 'You have selected a product type more than once.';
-    return res.status(400).json(errors);
-  }
-
-  errors = await validateDetails(req.body, req.files, 5, 8);
-
-  if (!isEmpty(errors)) {
-    return res.status(400).json(errors);
-  }
-
-  const s3PathMap = await productOperations.uploadPictures(
-    'HomePage/',
-    'Option_5_8',
-    req.files,
-  );
-  await productOperations.setHomePageOptions5To8(req.body, s3PathMap);
-  req.session.message = 'Options 5-8 Updated!';
-  return res.status(200).json({});
 }
 
 async function deactivateAccount(req, res) {
@@ -2261,6 +2139,92 @@ async function updateOptionName(req, res) {
   return res.status(200).json({ id: newOption.id });
 }
 
+async function updateHomePageOption(req, res) {
+  const { id } = req.params;
+
+  const homePageOption = await homePageOperations.getHomePageOptionById(id);
+
+  if (!homePageOption) return res.status(400).json({ error: `No Home page option found with id ${id}.` });
+
+  const { productTypeId, description } = req.body;
+  const { files } = req;
+
+  if (productTypeId === undefined || productTypeId === null) return res.status(400).json({ error: "'productTypeId' must be set." });
+
+  const productType = await productOperations.getProductTypeById(productTypeId);
+  if (!productType) return res.status(400).json({ error: `No Product Type with id ${productTypeId}.` });
+
+  const existingHomePageOptionWithProductType = await homePageOperations.getHomePageOptionByProductTypeId(productTypeId);
+  if (existingHomePageOptionWithProductType && existingHomePageOptionWithProductType.id !== homePageOption.id) return res.status(400).json({ error: `Home Page Option at position ${existingHomePageOptionWithProductType.orderNo} is already using '${productType.productType}'` });
+
+  if (description === undefined || description === null || utilityHelper.isEmptyString(description)) return res.status(400).json({ error: "'description' must be set." });
+
+  if (homePageOption.imagePath === null && !files) { return res.status(400).json({ error: 'No image has been set.' }); }
+
+  if (Number(productTypeId) === homePageOption.productTypeFk && description === homePageOption.description
+   && !files) {
+    return res.status(400).json({ error: 'No changes made.' });
+  }
+
+  const updateData = {
+    description,
+    productTypeFk: productTypeId,
+  };
+
+  if (files && files.image) updateData.imagePath = await utilityHelper.uploadFile('homePageOptions', files.image);
+
+  await homePageOperations.updateHomePageOption(id, updateData, true);
+  req.session.message = 'Updated!';
+  return res.status(200).json({});
+}
+
+async function removeHomePageOption(req, res) {
+  const { id } = req.params;
+
+  const homePageOption = await homePageOperations.getHomePageOptionById(id);
+
+  if (!homePageOption) return res.status(400).json({ error: `No Home page option found with id ${id}.` });
+
+  const updateData = {
+    description: null,
+    productTypeFk: null,
+    imagePath: null,
+  };
+  await homePageOperations.updateHomePageOption(id, updateData, false);
+
+  return res.json({});
+}
+
+async function getHomePageOptions(req, res) {
+  const { message } = req.session;
+  req.session.message = undefined;
+
+  const homePageOptions = await homePageOperations.getHomePageOptionDetails();
+  res.render('adminHomePageOptions', {
+    user: req.user,
+    message,
+    homePageOptions,
+
+    companyDetails: companyInfo.getCompanyDetails(),
+  });
+}
+
+async function getHomePageOption(req, res) {
+  const { id } = req.params;
+  const { message } = req.session;
+  req.session.message = undefined;
+
+  const homePageOption = await homePageOperations.getHomePageOptionById(id);
+  const productTypes = await homePageOperations.getAllAvailableActiveProductTypes(homePageOption.productTypeFk);
+  res.render('adminHomePageOption', {
+    user: req.user,
+    message,
+    homePageOption,
+    productTypes,
+    companyDetails: companyInfo.getCompanyDetails(),
+  });
+}
+
 module.exports = {
   activate,
   addFaq,
@@ -2301,11 +2265,11 @@ module.exports = {
   getFaqPage,
   getFaqsPage,
   getFinishingMatrices,
+  getHomePageOption,
+  getHomePageOptions,
   getMainBannerSectionPage,
   getNavigationBarPage,
   getNotifications,
-  getOptions1To4Page,
-  getOptions5To8Page,
   getOptionsForOptionType,
   getOptionPage,
   getOptionTypesAndOptionForProduct,
@@ -2330,6 +2294,7 @@ module.exports = {
   getTemplatePage,
   getTemplatesPage,
   reactivateAccount,
+  removeHomePageOption,
   saveDeliveryOptions,
   saveFinishingAttributes,
   savePage1,
@@ -2339,8 +2304,7 @@ module.exports = {
   setHomePageMainBanner,
   setNavigationBarHeaders,
   setup2fa2Registration,
-  updateHomePage1To4,
-  updateHomePage5To8,
+  updateHomePageOption,
   updateOptionName,
   validate,
   verifyQuantities,

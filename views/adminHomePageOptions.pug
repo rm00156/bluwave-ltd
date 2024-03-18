@@ -1,0 +1,66 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+    // main
+    div
+
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                .container
+                    .row.mb-8
+                        .col-md-12
+                            // page header
+                            .d-md-flex.justify-content-between.align-items-center
+                                div
+                                    h2 Orders
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                            li.breadcrumb-item.active(aria-current='page') Home Page Options
+                                // button
+
+                    .row
+                        .col-xl-12.col-12.mb-5
+                            // card
+                            .card.h-100.card-lg
+                                .card-body.p-0(style="padding: 20px !important")
+                                    // table
+                                    .table-responsive
+                                        table.table.table-centered.table-hover.text-nowrap.table-borderless.mb-0.table-with-checkbox#homePageOptions(style="cursor:pointer")
+                                            thead.bg-light
+                                                tr
+                                                    th Postion 
+                                                    th Product Type 
+                                                    th Status
+                                                    
+                                            tbody 
+                                                each homePageOption in homePageOptions 
+                                                    tr(data-optionid=homePageOption.id)
+
+                                                        td 
+                                                            p.text-rest #{homePageOption.orderNo}
+                                                        td 
+                                                            p.text-rest #{homePageOption.productTypeFk === null ? '' : homePageOption.productType}
+                                                    
+                                                        td  
+                                                            if(homePageOption.status === 'Active')
+                                                                span.badge.bg-light-primary.text-dark-primary Active
+                                                            else 
+                                                                span.span.badge.bg-light-danger.text-dark-danger Inactive
+                                                        
+
+        +adminScripts()
+        script(src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
+        script(src="/js/homePageDisplayOptions.js")

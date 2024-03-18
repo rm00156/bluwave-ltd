@@ -2,6 +2,7 @@ const companyInfo = require('../utilty/company/companyInfo');
 const productOperations = require('../utilty/products/productOperations');
 const accountOperations = require('../utilty/account/accountOperations');
 const basketOperations = require('../utilty/basket/basketOperations');
+const homePageOperations = require('../utilty/homePage/homePageOperations');
 
 const notProduction = process.env.NODE_ENV !== 'production';
 
@@ -9,23 +10,6 @@ const queueOperations = !notProduction
   ? require('../utilty/queue/queueOperations')
   : null;
 const faqOperations = require('../utilty/faq/faqOperations');
-
-async function parseHomePageOptions(from, to, homePageOptions) {
-  const options = [];
-  for (let i = from; i <= to; i += 1) {
-    const productTypeId = homePageOptions[`productTypeFk${i}`];
-    if (productTypeId !== null && productTypeId !== undefined) {
-      options.push({
-        productType: await productOperations.getProductTypeById(productTypeId),
-        imagePath: homePageOptions[`imagePath${i}`],
-        description: homePageOptions[`description${i}`],
-      });
-    }
-  }
-  await Promise.all(options);
-
-  return options;
-}
 
 async function getHomePage(req, res) {
   const basketItems = await basketOperations.getActiveBasketItemsForAccount(
@@ -44,10 +28,10 @@ async function getHomePage(req, res) {
 
   const homePageMainBannerSection = await productOperations.getHomePageMainBannerSection();
 
-  const homePageOptions = await productOperations.getHomePageOptions();
+  const homePageOptions = await homePageOperations.getHomePageOptionDetails();
 
-  const homePageOptions1To4 = await parseHomePageOptions(1, 4, homePageOptions);
-  const homePageOptions5To8 = await parseHomePageOptions(5, 8, homePageOptions);
+  const homePageOptions1To4 = homePageOptions.filter((h) => h.orderNo >= 1 && h.orderNo <= 4);
+  const homePageOptions5To8 = homePageOptions.filter((h) => h.orderNo >= 5 && h.orderNo <= 8);
 
   res.render('home', {
     user: req.user,
@@ -328,7 +312,6 @@ module.exports = {
   getPrivacyPage,
   searchProductOrProductTypes,
   getTermsPage,
-  parseHomePageOptions,
   passwordEmailSentPage,
   passwordResetPage,
   requestForgottenPasswordEmail,

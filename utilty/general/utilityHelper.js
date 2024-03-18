@@ -1,9 +1,13 @@
 const logger = require('pino')();
 const bcrypt = require('bcrypt');
-// const { Upload } = require('@aws-sdk/lib-storage');
+const { Upload } = require('@aws-sdk/lib-storage');
 const {
   S3Client, /* GetObjectCommand, */ ListObjectsV2Command, DeleteObjectsCommand,
 } = require('@aws-sdk/client-s3');
+
+const env = process.env.NODE_ENV || 'development';
+const TEST = 'test';
+const DEVELOPMENT = 'development';
 
 function generateNumberCode() {
   let result = '';
@@ -127,6 +131,7 @@ function isEmptyString(str) {
   // Check if the trimmed string is empty
   return trimmedStr === '';
 }
+
 function createNewS3Client() {
   return new S3Client({
     region: process.env.region,
@@ -165,6 +170,45 @@ async function deleteS3Folder(folderPrefix) {
   }
 }
 
+async function uploadFile(folder, file) {
+  const s3 = new S3Client({
+    region: process.env.S3_REGION,
+    credentials: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+    },
+    endpoint: 'https://s3.eu-west-2.amazonaws.com',
+  });
+  const date = Date.now();
+  let testDevelopment = '';
+  if (env === TEST || env === DEVELOPMENT) {
+    testDevelopment = `${env}/`;
+  }
+
+  const blob = file.data;
+  const extension = getExtension(file.mimetype);
+  const fileName = `${testDevelopment}${folder}/${date}_${encodeURIComponent(
+    'home_page_display_option_picture',
+  )}.${extension}`;
+  const s3Path = `${process.env.S3_BUCKET_PATH}/${fileName}`;
+
+  const params = {
+    Bucket: process.env.S3_BUCKET,
+    Body: blob,
+    Key: fileName,
+    ACL: 'public-read',
+  };
+
+  const s3UploadPromise = new Upload({
+    client: s3,
+    params,
+  }).done();
+
+  await s3UploadPromise;
+
+  return s3Path;
+}
+
 module.exports = {
   checkNoDuplicateNonZeroNumbers,
   dateXAmountFromNow,
@@ -178,4 +222,5 @@ module.exports = {
   parseCommaSeperatedText,
   pauseForTimeInSecond,
   validPassword,
+  uploadFile,
 };
