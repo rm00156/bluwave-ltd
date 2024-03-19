@@ -58,7 +58,7 @@ async function getAllAvailableActiveProductTypes(productTypeId) {
   const productType = await productOperations.getProductTypeById(productTypeId);
 
   const homePageOptions = await getHomePageOptions();
-  const homePageOptionProductTypeIds = homePageOptions.map((h) => h.productTypeFk);
+  const homePageOptionProductTypeIds = homePageOptions.filter((h) => h.productTypeFk).map((m) => m.id);
 
   const availableProductTypes = await productOperations.getAllProductTypesNotInList(homePageOptionProductTypeIds);
   return [productType, ...availableProductTypes];

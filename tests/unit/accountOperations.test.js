@@ -6,9 +6,6 @@ const model = require('../../models');
 
 const accountIds = [];
 
-beforeAll(async () => {
-  await model.sequelize.sync();
-});
 describe('test creation of an account', () => {
   test('if email is not a valid error thrown', async () => {
     await expect(accountOperations.createAccount(2, 'reece', 'reece', 'fe', 'rer')).rejects.toThrow('SequelizeValidationError: Validation error: Validation isEmail on email failed');
