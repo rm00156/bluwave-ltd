@@ -7,7 +7,7 @@ function sendEmail() {
 
     $.ajax({
         type: 'post',
-        url: '/forgotten_password',
+        url: '/forgotten-password',
         data: {email: $('#email').val()},
         success: function(resp, xhr, status){
             if(status.status == 200) {

@@ -155,7 +155,7 @@ function setHomePageBanner(e) {
             }
         });
 
-        request.open('post','/admin_dashboard/home_page_main_banner/set');
+        request.open('post','/admin-dashboard/home-page-main-banner/set');
         request.send(data);
 
     } else {

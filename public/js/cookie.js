@@ -7,7 +7,7 @@ function acceptCookie()
 {
     $.ajax({
         type:'post',
-        url:'/accept_cookie',
+        url:'/accept-cookie',
         success:function(response, xhr, status)
         {
             console.log(response);

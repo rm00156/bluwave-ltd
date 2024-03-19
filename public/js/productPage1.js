@@ -235,10 +235,10 @@ function saveProductInformation() {
             return $('#nameError').text("'Product Name' must be set to save.");
         }
         const id = response.currentTarget.response.id;
-        return window.location = `/admin_dashboard/product/${id}/page1`;
+        return window.location = `/admin-dashboard/product/${id}/page1`;
     });
 
-    request.open('post', '/admin_dashboard/product/page1/save');
+    request.open('post', '/admin-dashboard/product/page1/save');
     request.send(data);
 }
 
@@ -539,10 +539,10 @@ function continueProductInformation() {
        }
         
         const id = response.currentTarget.response.id;
-        return window.location = `/admin_dashboard/product/${id}/page2`;
+        return window.location = `/admin-dashboard/product/${id}/page2`;
     });
 
-    request.open('post', '/admin_dashboard/product/page1/continue');
+    request.open('post', '/admin-dashboard/product/page1/continue');
     request.send(data);
 }
 

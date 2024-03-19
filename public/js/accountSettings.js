@@ -16,7 +16,7 @@ function deleteAccount() {
 
     $.ajax({
         type: 'delete',
-        url:'/delete_account',
+        url:'/delete-account',
         success: function(resp, xhr, status) {
             window.location = '/'
         }
@@ -30,7 +30,7 @@ function changePassword(e){
         $('#passwordError').text('');
         $.ajax({
             type:'post',
-            url: '/change_password',
+            url: '/change-password',
             data: {currentPassword: $('#currentPassword').val(), password: $('#password').val()},
             success: function(resp, xhr, status) {
                 if(status.status == 200) {
@@ -48,7 +48,7 @@ function validatePhoneNumber() {
     $('#phoneNumberError').text('');
     $.ajax({
         type: 'get',
-        url: '/validate_phone_number',
+        url: '/validate-phone-number',
         data: {phoneNumber: $('#phoneNumber').val()},
         success: function(response, xhr, status) {
 
@@ -73,7 +73,7 @@ function editProfile(e) {
 
         $.ajax({
             type: 'post',
-            url: '/edit_profile',
+            url: '/edit-profile',
             data: {name:name, phoneNumber: phoneNumber},
             success: function(resp, xhr, status) {
                 if(status.status == 200) {

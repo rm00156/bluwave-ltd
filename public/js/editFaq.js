@@ -24,7 +24,7 @@ function editFaq(e) {
         const data = { question: question, answer: answer, faqTypeId: faqTypeId, deleteFl: deleteFl };
         $.ajax({
             type: 'put',
-            url: '/admin_dashboard/faq/' + faqId,
+            url: '/admin-dashboard/faq/' + faqId,
             data: data,
             success: function (resp, xhr, status) {
 

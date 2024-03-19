@@ -7,7 +7,7 @@ function validatePhoneNumber() {
     $('#phoneNumberError').text('');
     $.ajax({
         type: 'get',
-        url: '/validate_phone_number',
+        url: '/validate-phone-number',
         data: {phoneNumber: $('#phoneNumber').val()},
         success: function(response, xhr, status) {
 

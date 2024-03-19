@@ -4,7 +4,7 @@ function isCustomer(req, res, next) {
   if (account.accountTypeFk === 2) {
     next();
   } else {
-    res.redirect('/admin_dashboard');
+    res.redirect('/admin-dashboard');
   }
 }
 

@@ -144,7 +144,7 @@ function addProductType(e) {
         request.addEventListener('load', function(response, xhr, status){
             
             if(request.status == 201) {
-                return window.location = '/admin_dashboard/product_types';
+                return window.location = '/admin-dashboard/product-types';
             } else {
                 
                 $('#error').text(response.currentTarget.response.error);
@@ -152,7 +152,7 @@ function addProductType(e) {
             
         });
 
-        request.open('post','/admin_dashboard/product_type/add');
+        request.open('post','/admin-dashboard/product-type/add');
         request.send(data);
 
     } else {

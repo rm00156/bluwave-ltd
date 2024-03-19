@@ -64,15 +64,15 @@ html(land="en")
                                     nav(aria-label='breadcrumb')
                                         ol.breadcrumb.mb-0
                                             li.breadcrumb-item
-                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                                a.text-inherit(href='/admin-dashboard') Dashboard
                                             li.breadcrumb-item
-                                                a.text-inherit(href='/admin_dashboard/option_types') Option Types
+                                                a.text-inherit(href='/admin-dashboard/option-types') Option Types
                                             li.breadcrumb-item
-                                                a.text-inherit(href=`/admin_dashboard/option_type/${optionType.id}`) #{optionType.optionType}
+                                                a.text-inherit(href=`/admin-dashboard/option-type/${optionType.id}`) #{optionType.optionType}
                                             li.breadcrumb-item.active(aria-current='page') #{option.name}
                                 // button
                                 div
-                                    a.btn.btn-light(href=`/admin_dashboard/option_type/${optionType.id}`) Back to #{optionType.name}
+                                    a.btn.btn-light(href=`/admin-dashboard/option-type/${optionType.id}`) Back to #{optionType.name}
                     // row
                     .row
                         .col-lg-12.col-12

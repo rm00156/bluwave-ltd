@@ -46,7 +46,7 @@ html(land="en")
                                     // tab pane
                                     #login-tab-pane.tab-pane.fade.show.active(role='tabpanel' aria-labelledby='login-tab' tabindex='0')
                                         //- h1.mb-1.h2.fw-bold Log in  
-                                        form(action="/checkout_login" method="post")
+                                        form(action="/checkout-login" method="post")
                                             .row.g-3.mt-4
                                                 // row
                                                 if(error)
@@ -105,7 +105,7 @@ html(land="en")
 
                                     #guest-tab-pane.tab-pane.fade(role='tabpanel' aria-labelledby='guest-tab' tabindex='0')
                                         
-                                        form(action="/checkout_as_guest" method="post")
+                                        form(action="/checkout-as-guest" method="post")
                                             .row.g-3.mt-4
                                                 
                                                 .col-12

@@ -29,7 +29,7 @@ function getOptions(e) {
 
     $.ajax({
         type: 'get',
-        url: '/getOptionsForOptionType',
+        url: '/get-options-for-option-type',
         data: data,
         success: function (response, xhr) {
 
@@ -172,7 +172,7 @@ function getQuantities() {
     const productId = $('#productId').val();
     $.ajax({
         type: 'get',
-        url: `/product/${productId}/get_quantities`,
+        url: `/product/${productId}/get-quantities`,
         success: function(data) {
             quantities = data;
         }
@@ -322,7 +322,7 @@ function populateFinishingMatrices() {
     const productId = $('#productId').val();
     $.ajax({
         type: 'get',
-        url: `/product/${productId}/get_finishing_matrices`,
+        url: `/product/${productId}/get-finishing-matrices`,
         success: function(data) {
 
             const matrices = data;
@@ -657,10 +657,10 @@ function saveFinishingAttributes(e) {
 
         request.addEventListener('load', function (response) {
 
-            submitter === 'save' ? location.reload() : window.location = `/admin_dashboard/product/${productId}/page5`;
+            submitter === 'save' ? location.reload() : window.location = `/admin-dashboard/product/${productId}/page5`;
         });
 
-        request.open('post', submitter === 'save' ? `/product/${productId}/save_finishing_attributes` : `/admin_dashboard/product/${productId}/page4/continue`);
+        request.open('post', submitter === 'save' ? `/product/${productId}/save-finishing-attributes` : `/admin-dashboard/product/${productId}/page4/continue`);
         request.send(data);
     }
 }

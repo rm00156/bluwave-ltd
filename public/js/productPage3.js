@@ -68,10 +68,10 @@ function savePrintingAttributes(e) {
 
         request.addEventListener('load', function (response) {
 
-            submitter === 'save' ? location.reload() : window.location = `/admin_dashboard/product/${productId}/page4`;
+            submitter === 'save' ? location.reload() : window.location = `/admin-dashboard/product/${productId}/page4`;
         });
 
-        request.open('post', submitter === 'save' ? `/product/${productId}/save_printing_attributes` : `/admin_dashboard/product/${productId}/page3/continue`);
+        request.open('post', submitter === 'save' ? `/product/${productId}/save-printing-attributes` : `/admin-dashboard/product/${productId}/page3/continue`);
         request.send(data);
     }
 }
@@ -80,7 +80,7 @@ function populateMatrixMap() {
     const productId = $('#productId').val();
     $.ajax({
         type: 'get',
-        url: `/product/${productId}/get_price_matrix_rows`,
+        url: `/product/${productId}/get-price-matrix-rows`,
         success: function(data) {
 
             const matrixRows = data;
@@ -150,11 +150,11 @@ function getOptions(e) {
 
     $.ajax({
         type: 'get',
-        url: '/getOptionsForOptionType',
+        url: '/get-options-for-option-type',
         data: data,
         success: function (response, xhr) {
             if (xhr.status == 404) {
-                window.location = '/admin_dashboard';
+                window.location = '/admin-dashboard';
                 console.log('error with getting options by option Type')
             } else {
 
@@ -611,7 +611,7 @@ function getQuantities() {
     const productId = $('#productId').val();
     $.ajax({
         type: 'get',
-        url: `/product/${productId}/get_quantities`,
+        url: `/product/${productId}/get-quantities`,
         success: function(data) {
             quantities = data;
             console.log(quantities)

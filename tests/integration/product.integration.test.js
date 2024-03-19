@@ -28,9 +28,9 @@ beforeEach(() => {
   productIds = [];
 });
 
-describe('post /admin_dashboard/product/:id/save', () => {
+describe('post /admin-dashboard/product/:id/save', () => {
   it('when product name is undefined or empty should receive 400 response', async () => {
-    const response = await agent.post('/admin_dashboard/product/page1/save');
+    const response = await agent.post('/admin-dashboard/product/page1/save');
     expect(response.status).toBe(400);
     expect(JSON.parse(response.error.text).error).toBe(
       "'Product Name' must be set to save.",
@@ -39,7 +39,7 @@ describe('post /admin_dashboard/product/:id/save', () => {
 
   it('when product name is empty or empty should receive 400 response', async () => {
     const response = await agent
-      .post('/admin_dashboard/product/page1/save')
+      .post('/admin-dashboard/product/page1/save')
       .send({ productName: '  ' });
     expect(response.status).toBe(400);
     expect(JSON.parse(response.error.text).error).toBe(
@@ -50,7 +50,7 @@ describe('post /admin_dashboard/product/:id/save', () => {
   it("when 'productId' is undefined and atleast the productName is defined and not empty save product succesfully making it inactive", async () => {
     const productName = 'ProductName';
     const response = await agent
-      .post('/admin_dashboard/product/page1/save')
+      .post('/admin-dashboard/product/page1/save')
       .send({ productName });
     expect(response.status).toBe(201);
     const productId = JSON.parse(response.body.id);
@@ -66,7 +66,7 @@ describe('post /admin_dashboard/product/:id/save', () => {
   it("when 'productId' is set not valid id, should return 400 response", async () => {
     const productName = 'ProductName';
     const response = await agent
-      .post('/admin_dashboard/product/page1/save')
+      .post('/admin-dashboard/product/page1/save')
       .send({ productName, productId: 0 });
     expect(response.status).toBe(400);
     expect(JSON.parse(response.error.text).error).toBe(
@@ -79,7 +79,7 @@ describe('post /admin_dashboard/product/:id/save', () => {
 
     const product = await productTestHelper.createTestProduct(false);
     const response = await agent
-      .post('/admin_dashboard/product/page1/save')
+      .post('/admin-dashboard/product/page1/save')
       .send({ productName, productId: product.id });
     expect(response.status).toBe(200);
 
@@ -100,7 +100,7 @@ describe('post /admin_dashboard/product/:id/save', () => {
   //     const product = await productTestHelper.createTestProduct(false);
   //     // try {
   //     const response = await agent
-  //       .post('/admin_dashboard/product/page1/save')
+  //       .post('/admin-dashboard/product/page1/save')
   //       .field('productName', productName)
   //       .field('productId', product.id)
   //       .field('bulletPoints', bulletPoints)

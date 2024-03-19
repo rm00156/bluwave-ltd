@@ -32,7 +32,7 @@ function saveChanges(){
     }
     $.ajax({
         type: 'post',
-        url: '/set_navigation_bar_headers',
+        url: '/set-navigation-bar-headers',
         data: data,
         success: function(resp, xhr, status) {
 

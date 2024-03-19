@@ -2,12 +2,12 @@ mixin adminSideNav()
     nav.navbar-vertical-nav.d-none.d-xl-block
         .navbar-vertical
             .px-4.py-5
-                a.navbar-brand(href='/admin_dashboard')
+                a.navbar-brand(href='/admin-dashboard')
                     img(src=companyDetails.COMPANY_LOGO style="width:100%" alt='Bluwave Company Logo')
             .navbar-vertical-content.flex-grow-1(data-simplebar='')
                 ul#sideNavbar.navbar-nav.flex-column
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard')
+                        a.nav-link(href='/admin-dashboard')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-house
@@ -15,13 +15,13 @@ mixin adminSideNav()
                     li.nav-item.mt-6.mb-3
                         span.nav-label Site Managements
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/products')
+                        a.nav-link(href='/admin-dashboard/products')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-cart
                                 span.nav-link-text Products
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/product_types')
+                        a.nav-link(href='/admin-dashboard/product-types')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-list-task
@@ -35,28 +35,28 @@ mixin adminSideNav()
                         #navCategoriesAccounts.collapse(data-bs-parent='#sideNavbar')
                             ul.nav.flex-column
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/create_admin_account')
+                                    a.nav-link(href='/admin-dashboard/create-admin-account')
                                         | Create Admin Account
                                 // Nav item
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/accounts')
+                                    a.nav-link(href='/admin-dashboard/accounts')
                                         | View Accounts
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/orders')
+                        a.nav-link(href='/admin-dashboard/orders')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-shop
                                 span.nav-link-text Orders
                     
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/option_types')
+                        a.nav-link(href='/admin-dashboard/option-types')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-option
                                 span.nav-link-text Option Types
 
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/navigation_bar_options')
+                        a.nav-link(href='/admin-dashboard/navigation-bar-options')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-segmented-nav
@@ -71,13 +71,13 @@ mixin adminSideNav()
                         #navHome.collapse(data-bs-parent='#sideNavbar')
                             ul.nav.flex-column
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/main_banner_section')
+                                    a.nav-link(href='/admin-dashboard/main-banner-section')
                                         | Main Banner Section
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/banner_section')
+                                    a.nav-link(href='/admin-dashboard/banner-section')
                                         | Second Banner Section
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/home_page_options')
+                                    a.nav-link(href='/admin-dashboard/home-page-options')
                                         | Display Options 1-8
                     li.nav-item
                         a.nav-link(href='/')
@@ -86,13 +86,13 @@ mixin adminSideNav()
                                     i.feather-icon.icon-monitor
                                 span.nav-link-text View Site   
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/templates')
+                        a.nav-link(href='/admin-dashboard/templates')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-files
                                 span.nav-link-text Templates
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/faqs')
+                        a.nav-link(href='/admin-dashboard/faqs')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-question-circle
@@ -100,13 +100,13 @@ mixin adminSideNav()
     nav#offcanvasExample.navbar-vertical-nav.offcanvas.offcanvas-start.navbar-offcanvac(tabindex='-1')
         .navbar-vertical
             .px-4.py-5.d-flex.justify-content-between.align-items-center
-                a.navbar-brand(href='/admin_dashboard' style="width:100%")
+                a.navbar-brand(href='/admin-dashboard' style="width:100%")
                     img(src=companyDetails.COMPANY_LOGO alt='Bluwave Company Logo' style="width:100%")
                 //- button.btn-close(type='button' data-bs-dismiss='offcanvas' aria-label='Close')
             .navbar-vertical-content.flex-grow-1(data-simplebar='')
                 ul.navbar-nav.flex-column
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard')
+                        a.nav-link(href='/admin-dashboard')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-house
@@ -114,13 +114,13 @@ mixin adminSideNav()
                     li.nav-item.mt-6.mb-3
                         span.nav-label Store Managements
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/products')
+                        a.nav-link(href='/admin-dashboard/products')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-cart
                                 span.nav-link-text Products
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/product_types')
+                        a.nav-link(href='/admin-dashboard/product-types')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-list-task
@@ -134,28 +134,28 @@ mixin adminSideNav()
                         #navOrders.collapse(data-bs-parent='#sideNavbar')
                             ul.nav.flex-column
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/create_admin_account')
+                                    a.nav-link(href='/admin-dashboard/create-admin-account')
                                         | Create Admin Account
                                 // Nav item
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/accounts')
+                                    a.nav-link(href='/admin-dashboard/accounts')
                                         | View Accounts
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/orders')
+                        a.nav-link(href='/admin-dashboard/orders')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-shop
                                 span.nav-link-text Orders
                     
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/option_types')
+                        a.nav-link(href='/admin-dashboard/option-types')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-option
                                 span.nav-link-text Option Types
 
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/navigation_bar_options')
+                        a.nav-link(href='/admin-dashboard/navigation-bar-options')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-segmented-nav
@@ -170,17 +170,17 @@ mixin adminSideNav()
                         #navHome.collapse(data-bs-parent='#sideNavbar')
                             ul.nav.flex-column
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/main_banner_section')
+                                    a.nav-link(href='/admin-dashboard/main-banner-section')
                                         | Main Banner Section
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/banner_section')
+                                    a.nav-link(href='/admin-dashboard/banner-section')
                                         | Second Banner Section
                                 li.nav-item
-                                    a.nav-link(href='/admin_dashboard/home_page_options')
+                                    a.nav-link(href='/admin-dashboard/home-page-options')
                                         | Display Options 1-8
                                 //- // Nav item
                                 //- li.nav-item
-                                //-     a.nav-link(href='/admin_dashboard/options_5_8')
+                                //-     a.nav-link(href='/admin-dashboard/options_5_8')
                                 //-         | Set Options 5-8
 
                     li.nav-item
@@ -191,13 +191,13 @@ mixin adminSideNav()
                                 span.nav-link-text View Site    
                     
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/templates')
+                        a.nav-link(href='/admin-dashboard/templates')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-files
                                 span.nav-link-text Templates
                     li.nav-item
-                        a.nav-link(href='/admin_dashboard/faqs')
+                        a.nav-link(href='/admin-dashboard/faqs')
                             .d-flex.align-items-center
                                 span.nav-link-icon
                                     i.bi.bi-question-circle

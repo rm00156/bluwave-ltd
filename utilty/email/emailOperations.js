@@ -49,7 +49,7 @@ async function sendForgottenPasswordEmail(accountId) {
   try {
     const account = await accountOperations.getAccountById(accountId);
     const forgottenPassword = await accountOperations.createForgottenPasswordRequest(account.id);
-    const link = `${process.env.WEBSITE_URL}reset_password/account/${account.id}/forgottenPassword/${forgottenPassword.token}`;
+    const link = `${process.env.WEBSITE_URL}reset-password/account/${account.id}/forgottenPassword/${forgottenPassword.token}`;
 
     const data = {
       link,

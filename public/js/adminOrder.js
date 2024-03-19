@@ -7,7 +7,7 @@ $(function(){
 
     $.ajax({
         type: 'get',
-        url:'/get_refund_types',
+        url:'/get-refund-types',
         success: function(resp, xhr, status) {
             console.log(resp)
             if(status.status == 200) {
@@ -38,7 +38,7 @@ function createRefund() {
 
     $.ajax({
         type: 'post',
-        url: '/create_refund',
+        url: '/create-refund',
         data: {refundTypeId: refundTypeId, amount:amount, orderId: orderId},
         success: function(resp, xhr, status) {
 
@@ -132,7 +132,7 @@ function validateLessThanOrEqualToOutstanding(input) {
 
    $.ajax({
         type: 'get',
-        url: '/get_outstanding_amount_for_order',
+        url: '/get-outstanding-amount-for-order',
         data: {purchaseBasketId: $('#orderId').val()},
         success: function(resp, xhr, status) {
             if(status.status == 200) {

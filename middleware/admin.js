@@ -43,7 +43,7 @@ async function isSecuredAdmin(req, res, next) {
 async function enterPassword(req, res, next) {
   const { password } = req.query;
   if (!utilityHelper.validPassword(req.user, password)) {
-    res.redirect('/setup_2fa');
+    res.redirect('/setup-2fa');
   } else {
     req.session.password = password;
     next();
@@ -58,7 +58,7 @@ async function adminRequire2faSetup(req, res, next) {
     !notProduction
     && (twoFactorAuth === null || !twoFactorAuth.authenticatedFl)
   ) {
-    return res.redirect('/setup_2fa');
+    return res.redirect('/setup-2fa');
   }
 
   return next();
@@ -86,7 +86,7 @@ async function isLoginRequire2faCode(req, res, next) {
   if (!notProduction && twoFactorAuth !== null && twoFactorAuth.authenticatedFl === true) {
     req.session.email = account.email;
     req.session.twoFa = true;
-    return res.redirect('/admin/login/step_two');
+    return res.redirect('/admin/login/step-two');
   }
 
   req.session.twoFa = false;
@@ -123,7 +123,7 @@ async function setup2fa(req, res, next) {
 
   if (twoFactorAuth !== null && twoFactorAuth.authenticatedFl === true) {
     req.session.message = undefined;
-    res.redirect('/admin_dashboard');
+    res.redirect('/admin-dashboard');
   } else {
     req.body.email = req.user.email;
     req.body.password = req.session.password;

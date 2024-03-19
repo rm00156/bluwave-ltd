@@ -9,13 +9,13 @@ mixin productNavigationHeader(product)
                     nav(aria-label='breadcrumb')
                         ol.breadcrumb.mb-0
                             li.breadcrumb-item
-                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                a.text-inherit(href='/admin-dashboard') Dashboard
                             li.breadcrumb-item
-                                a.text-inherit(href='/admin_dashboard/products') Products
+                                a.text-inherit(href='/admin-dashboard/products') Products
                             if(product)
                                 li.breadcrumb-item.active(aria-current='page') #{product.name}
                             else
                                 li.breadcrumb-item.active(aria-current='page') Add New Product
                 // button
                 div
-                    a.btn.btn-light(href='/admin_dashboard/products') Back to Products
+                    a.btn.btn-light(href='/admin-dashboard/products') Back to Products

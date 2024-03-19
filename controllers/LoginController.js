@@ -77,7 +77,7 @@ function adminLogin(req, res, next) {
     return req.logIn(user, (loginErr) => {
       if (loginErr) return next(loginErr);
 
-      return res.redirect('/admin_dashboard');
+      return res.redirect('/admin-dashboard');
     });
   })(req, res, next);
 }

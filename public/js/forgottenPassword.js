@@ -13,12 +13,12 @@ function submit(e) {
         const email = $('#email').val();
         $.ajax({
             type: 'post',
-            url: '/forgotten_password',
+            url: '/forgotten-password',
             data: {email:email},
             success: function(resp, xhr, status) {
                 if(status.status == 200) {
 
-                    window.location = '/forgotten_password_email_sent'
+                    window.location = '/forgotten-password-email-sent'
                 }
             },
             error: function(resp, xhr, status) {

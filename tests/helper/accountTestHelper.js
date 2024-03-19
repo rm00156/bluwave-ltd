@@ -27,7 +27,7 @@ async function setUpAdminAccountAndAgent() {
   );
 
   const response = await request(app)
-    .post('/admin_login')
+    .post('/admin-login')
     .send({ email, password });
   const agent = request.agent(app);
   agent.set('Cookie', response.headers['set-cookie']);

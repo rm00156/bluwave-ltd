@@ -37,13 +37,13 @@ html(land="en")
                                     nav(aria-label='breadcrumb')
                                         ol.breadcrumb.mb-0
                                             li.breadcrumb-item
-                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                                a.text-inherit(href='/admin-dashboard') Dashboard
                                             li.breadcrumb-item
-                                                a.text-inherit(href='/admin_dashboard/templates') Templates
+                                                a.text-inherit(href='/admin-dashboard/templates') Templates
                                             li.breadcrumb-item.active(aria-current='page') Add New Template
                                 // button
                                 div
-                                    a.btn.btn-light(href='/admin_dashboard/templates') Back to Templates
+                                    a.btn.btn-light(href='/admin-dashboard/templates') Back to Templates
                     // row
                     .row
                         .col-lg-12.col-12
@@ -53,7 +53,7 @@ html(land="en")
                                 .card-body.p-6
                                     h4.mb-4.h5 Template Information
                                     .row
-                                        form#form(method="post" action="/admin_dashboard/template/add")
+                                        form#form(method="post" action="/admin-dashboard/template/add")
                                             // input
                                             .mb-2
                                                 label.form-label  Status
