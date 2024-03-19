@@ -21,7 +21,7 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
 
     $.ajax({
         type: 'get',
-        url: `/product/${productId}/get_price_matrix_option_types_and_options`,
+        url: `/product/${productId}/get-price-matrix-option-types-and-options`,
         success: function(response, xhr) {
                 var optionsJson = response;
                 const keys = Object.keys(optionsJson);
@@ -51,7 +51,7 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
 
                 $.ajax({
                     type: 'get',
-                    url: `/product/${productId}/get_finishing_matrix_option_types_and_options`,
+                    url: `/product/${productId}/get-finishing-matrix-option-types-and-options`,
                     success: function(finishingResponse) {
                         var finishingOptionsJson = finishingResponse;
                         const keys = Object.keys(finishingOptionsJson);
@@ -117,7 +117,7 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
 
         $.ajax({
             type:'get',
-            url:'/get_quantity_price_table_details',
+            url:'/get-quantity-price-table-details',
             data:{options: JSON.stringify(selectedOptions), finishingOptions: JSON.stringify(selectedFinishingOptions),  productId: $('#productId').val()},
             success: function(response, xhr, status) {
                 if(status.status == 204) {
@@ -236,7 +236,7 @@ function addToBasket() {
 
     $.ajax({
         type: 'post',
-        url: '/add_to_basket',
+        url: '/add-to-basket',
         data: data,
         success: function(req, xhr, status) {
 
@@ -275,7 +275,7 @@ function editBasket(e) {
 
     $.ajax({
         type: 'post',
-        url: '/edit_basket_item',
+        url: '/edit-basket-item',
         data: data,
         success: function(req, xhr, status) {
 

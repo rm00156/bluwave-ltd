@@ -102,7 +102,7 @@ function handleAddDeliveryClick(event) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_types',
+        url: '/get-delivery-types',
         success: function (response, xhr, status) {
 
             if (status.status == 200) {
@@ -238,7 +238,7 @@ function handleRemoveDeliveryClick(event) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_types',
+        url: '/get-delivery-types',
         success: function (response, xhr, status) {
 
             if (status.status == 200) {
@@ -603,7 +603,7 @@ function createProduct(e) {
 
         request.addEventListener('load', function (response) {
 
-            return window.location = '/admin_dashboard/product/add_product';
+            return window.location = '/admin-dashboard/product/add_product';
 
 
             // var job = data.currentTarget.response;
@@ -611,7 +611,7 @@ function createProduct(e) {
             // jobs[job.id] = {id: job.id, state: "queued", totalSteps:job.totalSteps, productItemNumber: productItemNumber, productNumber: job.productNumber, productVariantId: job.productVariantId};
         });
 
-        request.open('post', '/create_product');
+        request.open('post', '/create-product');
         request.send(data);
 
     } else {
@@ -644,11 +644,11 @@ function getOptions(e) {
 
     $.ajax({
         type: 'get',
-        url: '/getOptionsForOptionType',
+        url: '/get-options-for-option-type',
         data: data,
         success: function (response, xhr) {
             if (xhr.status == 404) {
-                window.location = '/admin_dashboard';
+                window.location = '/admin-dashboard';
                 console.log('error with getting options by option Type')
             } else {
 
@@ -1086,7 +1086,7 @@ function updateAllDeliverySelects(e) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_type',
+        url: '/get-delivery-type',
         data: { id: previousDeliveryTypeId },
         success: function (response, xhr, status) {
             if (status.status == 200) {

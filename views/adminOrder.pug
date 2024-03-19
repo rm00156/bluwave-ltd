@@ -35,15 +35,15 @@ html(land="en")
                                     nav(aria-label='breadcrumb')
                                         ol.breadcrumb.mb-0
                                             li.breadcrumb-item
-                                                a.text-inherit(href='/admin_dashboard') Dashboard
+                                                a.text-inherit(href='/admin-dashboard') Dashboard
                                             li.breadcrumb-item
-                                                a.text-inherit(href='/admin_dashboard/accounts') Accounts
+                                                a.text-inherit(href='/admin-dashboard/accounts') Accounts
                                             li.breadcrumb-item
-                                                a.text-inherit(href='/admin_dashboard/account/' + account.id + '/orders') Account
+                                                a.text-inherit(href='/admin-dashboard/account/' + account.id + '/orders') Account
                                             li.breadcrumb-item.active(aria-current='page') Order
                                 // button
                                 div
-                                    a.btn.btn-primary(href=(account.guestFl ? '/admin_dashboard/orders' : '/admin_dashboard/account/' + account.id + '/orders')) Back to all orders
+                                    a.btn.btn-primary(href=(account.guestFl ? '/admin-dashboard/orders' : '/admin-dashboard/account/' + account.id + '/orders')) Back to all orders
 
 
                     .row
@@ -73,7 +73,7 @@ html(land="en")
                                                         br
                                                         | #{order.phoneNumber}
                                                     if(account.guestFl == false)
-                                                        a(href='/admin_dashboard/account/' + account.id) View Profile
+                                                        a(href='/admin-dashboard/account/' + account.id) View Profile
                                             // address
                                             .col-lg-4.col-md-4.col-12
 

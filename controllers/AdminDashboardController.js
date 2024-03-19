@@ -162,7 +162,7 @@ async function createAdmin(req, res) {
       );
 
       req.session.message = 'Admin account created!';
-      res.redirect('/admin_dashboard');
+      res.redirect('/admin-dashboard');
     }
   });
 }
@@ -187,7 +187,7 @@ async function setup2fa2Registration(req, res, next) {
     );
 
     req.session.message = '2FA has been successfully set up';
-    return res.redirect('/admin_dashboard');
+    return res.redirect('/admin-dashboard');
   })(req, res, next);
 }
 
@@ -247,7 +247,7 @@ async function getProductPage2(req, res) {
 
   if (product === null) {
     // message
-    return res.redirect('/admin_dashboard/products');
+    return res.redirect('/admin-dashboard/products');
   }
   const quantities = await productOperations.getAllQuantities();
   const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(product.id);
@@ -285,7 +285,7 @@ async function getProductPage3(req, res) {
 
   if (product === null) {
     // message
-    return res.redirect('/admin_dashboard/products');
+    return res.redirect('/admin-dashboard/products');
   }
   const optionTypes = await productOperations.getOptionTypesNotUsedByFinishingMatrixForProduct(
     product.id,
@@ -342,7 +342,7 @@ async function getProductPage4(req, res) {
 
   if (product === null) {
     // message
-    return res.redirect('/admin_dashboard/products');
+    return res.redirect('/admin-dashboard/products');
   }
   const optionTypes = await productOperations.getOptionTypesNotUsedByPricingMatrixForProduct(
     product.id,
@@ -396,7 +396,7 @@ async function getProductPage5(req, res) {
 
   if (product === null) {
     // message
-    return res.redirect('/admin_dashboard/products');
+    return res.redirect('/admin-dashboard/products');
   }
 
   const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
@@ -727,7 +727,7 @@ async function getProductPage(req, res) {
   const { message } = req.session;
   req.session.message = undefined;
   // TODO
-  if (product === null) return res.redirect('/admin_dashboard');
+  if (product === null) return res.redirect('/admin-dashboard');
 
   const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(
     productId,
@@ -1393,7 +1393,7 @@ async function getAccountsPage(req, res) {
 async function getAccountPage(req, res) {
   const { id } = req.params;
   const account = await accountOperations.getAccountById(id);
-  if (account.guestFl === true) return res.redirect('/admin_dashboard/accounts');
+  if (account.guestFl === true) return res.redirect('/admin-dashboard/accounts');
 
   const { message } = req.session;
   req.session.message = undefined;
@@ -1408,7 +1408,7 @@ async function getAccountPage(req, res) {
 async function getAccountDeletePage(req, res) {
   const { id } = req.params;
   const account = await accountOperations.getAccountById(id);
-  if (account.guestFl === true) return res.redirect('/admin_dashboard/accounts');
+  if (account.guestFl === true) return res.redirect('/admin-dashboard/accounts');
   const orders = await orderOperations.getSuccessfulOrdersForAccountId(id);
   const { message } = req.session;
   req.session.message = undefined;
@@ -1424,7 +1424,7 @@ async function getAccountDeletePage(req, res) {
 async function getAccountEmailsPage(req, res) {
   const { id } = req.params;
   const account = await accountOperations.getAccountById(id);
-  if (account.guestFl === true) return res.redirect('/admin_dashboard/accounts');
+  if (account.guestFl === true) return res.redirect('/admin-dashboard/accounts');
   const emails = await emailOperations.getEmailsForByEmailAddress(
     account.email,
   );
@@ -1439,7 +1439,7 @@ async function getAccountEmailsPage(req, res) {
 async function getAccountOrdersPage(req, res) {
   const { id } = req.params;
   const account = await accountOperations.getAccountById(id);
-  if (account.guestFl === true) return res.redirect('/admin_dashboard/accounts');
+  if (account.guestFl === true) return res.redirect('/admin-dashboard/accounts');
   const orders = await orderOperations.getSuccessfulOrdersForAccountId(id);
   return res.render('adminAccountOrders', {
     user: req.user,
@@ -1914,7 +1914,7 @@ async function getDeactivatePage(req, res) {
   const product = await productOperations.getProductById(productId);
   if (!product) {
     // error
-    return res.redirect('/admin_dashboard/products');
+    return res.redirect('/admin-dashboard/products');
   }
 
   // check is active
@@ -1949,7 +1949,7 @@ async function getActivatePage(req, res) {
   const product = await productOperations.getProductById(productId);
   if (!product) {
     // error
-    return res.redirect('/admin_dashboard/products');
+    return res.redirect('/admin-dashboard/products');
   }
 
   const priceMatrix = await productOperations.getPriceMatrixForProductId(
@@ -2028,17 +2028,17 @@ async function validate(req, res) {
   }
 
   if (product.deleteFl === false) {
-    return res.redirect(`/admin_dashboard/product/${productId}/page5`);
+    return res.redirect(`/admin-dashboard/product/${productId}/page5`);
   }
 
   const isValid = await productOperations.isProductValid(product);
   if (!isValid.isValid) {
     const { page } = isValid;
 
-    return res.redirect(`/admin_dashboard/product/${productId}/${page}`);
+    return res.redirect(`/admin-dashboard/product/${productId}/${page}`);
   }
 
-  return res.redirect(`/admin_dashboard/product/${productId}/activate`);
+  return res.redirect(`/admin-dashboard/product/${productId}/activate`);
 }
 
 async function getFinishingMatrices(req, res) {

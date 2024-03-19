@@ -788,7 +788,7 @@ function editProduct(e) {
 
         request.addEventListener('load', function (response) {
 
-            return window.location = '/admin_dashboard/product/' + $('#productId').val();
+            return window.location = '/admin-dashboard/product/' + $('#productId').val();
 
 
             // var job = data.currentTarget.response;
@@ -796,7 +796,7 @@ function editProduct(e) {
             // jobs[job.id] = {id: job.id, state: "queued", totalSteps:job.totalSteps, productItemNumber: productItemNumber, productNumber: job.productNumber, productVariantId: job.productVariantId};
         });
 
-        request.open('post', '/edit_product');
+        request.open('post', '/edit-product');
         request.send(data);
 
     } else {
@@ -828,7 +828,7 @@ function handleAddDeliveryClick(event) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_types',
+        url: '/get-delivery-types',
         success: function (response, xhr, status) {
 
             if (status.status == 200) {
@@ -967,7 +967,7 @@ function handleRemoveDeliveryClick(event) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_types',
+        url: '/get-delivery-types',
         success: function (response, xhr, status) {
 
             if (status.status == 200) {
@@ -1013,7 +1013,7 @@ function updateAllDeliverySelects(e) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_type',
+        url: '/get-delivery-type',
         data: { id: previousDeliveryTypeId },
         success: function (response, xhr, status) {
             if (status.status == 200) {

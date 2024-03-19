@@ -11,7 +11,7 @@ function removeBasketItem(e) {
     const data = {basketItemId: basketItemId};
     $.ajax({
         type:'delete',
-        url:'/remove_basket_item',
+        url:'/remove-basket-item',
         data: data,
         success: function(req, xhr, status){
 
@@ -32,7 +32,7 @@ function updateQuantity(e) {
 
     $.ajax({
         type: 'put',
-        url: '/update_basket_quantity',
+        url: '/update-basket-quantity',
         data: data,
         success: function(req, xhr, status) {
             if(status.status == 200){

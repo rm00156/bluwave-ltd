@@ -3,6 +3,6 @@ $(function(){
 
     $('#products tbody').on('click', 'tr', function(e) {
         var productId = e.currentTarget.getAttribute('data-productid');
-        window.location = `/admin_dashboard/product/${productId}/page1`;
+        window.location = `/admin-dashboard/product/${productId}/page1`;
       });
 })

@@ -19,9 +19,9 @@ beforeEach(async () => {
   await homePageOptionHelper.createHomePageOptions();
 });
 
-describe('put /home_page_option/:id/remove', () => {
+describe('put /home-page-option/:id/remove', () => {
   it('if option not found error response 400', async () => {
-    const response = await agent.put('/home_page_option/0/remove');
+    const response = await agent.put('/home-page-option/0/remove');
     expect(response.status).toBe(400);
     expect(JSON.parse(response.text).error).toBe('No Home page option found with id 0.');
   });
@@ -29,7 +29,7 @@ describe('put /home_page_option/:id/remove', () => {
   it('option has been reset where all values are cleared and status is inactive', async () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(1);
 
-    const response = await agent.put(`/home_page_option/${homePageOption.id}/remove`);
+    const response = await agent.put(`/home-page-option/${homePageOption.id}/remove`);
     expect(response.status).toBe(200);
     const updatedHomePageOption = await homePageOperations.getHomePageOptionById(homePageOption.id);
     expect(updatedHomePageOption.description).toBeNull();
@@ -39,9 +39,9 @@ describe('put /home_page_option/:id/remove', () => {
   });
 });
 
-describe('put /home_page_option/:id/update', () => {
+describe('put /home-page-option/:id/update', () => {
   it('if option not found error response 400', async () => {
-    const response = await agent.put('/home_page_option/0/update');
+    const response = await agent.put('/home-page-option/0/update');
     expect(response.status).toBe(400);
     expect(JSON.parse(response.text).error).toBe('No Home page option found with id 0.');
   });
@@ -49,7 +49,7 @@ describe('put /home_page_option/:id/update', () => {
   it('when productType not set return error response 400', async () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(1);
 
-    const response = await agent.put(`/home_page_option/${homePageOption.id}/update`);
+    const response = await agent.put(`/home-page-option/${homePageOption.id}/update`);
 
     expect(response.status).toBe(400);
     expect(JSON.parse(response.text).error).toBe("'productTypeId' must be set.");
@@ -59,7 +59,7 @@ describe('put /home_page_option/:id/update', () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(1);
 
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .send({ productTypeId: homePageOption.productTypeFk });
 
     expect(response.status).toBe(400);
@@ -70,7 +70,7 @@ describe('put /home_page_option/:id/update', () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(1);
 
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .send({ productTypeId: homePageOption.productTypeFk, description: '  ' });
 
     expect(response.status).toBe(400);
@@ -81,7 +81,7 @@ describe('put /home_page_option/:id/update', () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(2);
 
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .send({ productTypeId: 2, description: 'new description' });
 
     expect(response.status).toBe(400);
@@ -92,7 +92,7 @@ describe('put /home_page_option/:id/update', () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(2);
     const productTypeId = 1;
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .send({ productTypeId, description: 'new description' });
 
     expect(response.status).toBe(400);
@@ -106,7 +106,7 @@ describe('put /home_page_option/:id/update', () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(1);
 
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .send({ productTypeId: homePageOption.productTypeFk, description: homePageOption.description });
 
     expect(response.status).toBe(400);
@@ -117,7 +117,7 @@ describe('put /home_page_option/:id/update', () => {
     const homePageOption = await homePageOperations.getHomePageOptionById(1);
 
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .send({ productTypeId: 0, description: homePageOption.description });
 
     expect(response.status).toBe(400);
@@ -129,7 +129,7 @@ describe('put /home_page_option/:id/update', () => {
     const newProductTypeId = 2;
     const newDescription = 'new description';
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .send({ productTypeId: newProductTypeId, description: newDescription });
 
     expect(response.status).toBe(200);
@@ -146,7 +146,7 @@ describe('put /home_page_option/:id/update', () => {
     const newProductTypeId = 2;
     const newDescription = 'new description';
     const response = await agent
-      .put(`/home_page_option/${homePageOption.id}/update`)
+      .put(`/home-page-option/${homePageOption.id}/update`)
       .field('productTypeId', newProductTypeId)
       .field('description', newDescription)
       .attach('image', path.join(__dirname, './flyer.svg'));

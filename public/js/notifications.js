@@ -23,7 +23,7 @@ function markAsRead() {
 
     $.ajax({
         type: 'delete',
-        url: '/delete_all_notifications',
+        url: '/delete-all-notifications',
         success: function(resp, xhr, status) {
 
             if(status.status == 200) {
@@ -36,7 +36,7 @@ function markAsRead() {
 function populateNotifications() {
     $.ajax({
         type: 'get',
-        url: '/get_notifications',
+        url: '/get-notifications',
         success: function (resp, xhr, status) {
             if (status.status == 200) {
                 console.log(resp);
@@ -56,7 +56,7 @@ function populateNotifications() {
                     li.addEventListener('click', function () {
                         $.ajax({
                             type: 'delete',
-                            url: '/delete_notification',
+                            url: '/delete-notification',
                             data: { id: note.id },
                             success: function (resp, xhr, status) {
                                 if (status.status == 200) {

@@ -560,7 +560,7 @@ async function checkout(req, res) {
     customer_email: email,
     client_reference_id: purchaseBasket.id,
     mode: 'payment',
-    success_url: `${url}/purchase_successful/${purchaseBasket.id}`,
+    success_url: `${url}/purchase-successful/${purchaseBasket.id}`,
     cancel_url: `${url}/checkout`,
   });
 
@@ -604,7 +604,7 @@ async function sessionCompleted(req, res) {
       const text = `${orderDetails.fullName} just made order of £${parseFloat(
         orderDetails.total,
       ).toFixed(2)}`;
-      const link = `/admin_dashboard/order/${orderDetails.id}`;
+      const link = `/admin-dashboard/order/${orderDetails.id}`;
       await accountOperations.createNotificationForAdminAccounts(text, link);
     } catch (err) {
       logger.error(err);

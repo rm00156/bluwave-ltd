@@ -49,7 +49,7 @@ function addTemplate(e) {
             
         });
 
-        request.open('post','/admin_dashboard/template/add');
+        request.open('post','/admin-dashboard/template/add');
         request.send(data);
 
     } else {

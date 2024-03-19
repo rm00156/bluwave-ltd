@@ -3,7 +3,7 @@ $(function () {
 
   $('#optionTypes tbody').on('click', 'tr', function (e) {
     var optionTypeId = e.currentTarget.getAttribute('data-optiontypeid');
-    window.location = '/admin_dashboard/option_type/' + optionTypeId;
+    window.location = '/admin-dashboard/option-type/' + optionTypeId;
   });
 
   $('#form').on('submit', addOptionType);
@@ -18,7 +18,7 @@ function addOptionType(e) {
 
     $.ajax({
       type: 'post',
-      url: '/admin_dashboard/option_type/add',
+      url: '/admin-dashboard/option-type/add',
       data: { optionType: optionType },
       success: function (response, xhr, status) {
 

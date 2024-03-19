@@ -6,7 +6,7 @@ $(function () {
         datumTokenizer: Bloodhound.tokenizers.whitespace,
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: '/customer_search?search=%QUERY',
+            url: '/customer-search?search=%QUERY',
             wildcard: '%QUERY',
             transform: function (resp) {
 
@@ -35,7 +35,7 @@ $(function () {
 // function search() {
 //     $.ajax({
 //         type: 'get',
-//         url: '/customer_search',
+//         url: '/customer-search',
 //         data: { search: $('#search').val() },
 //         success: function (resp, xhr, status) {
 //             if (status.status == 200) {

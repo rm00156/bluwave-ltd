@@ -165,7 +165,7 @@ function setHomePageOption(e) {
             
         });
 
-        request.open('put',`/home_page_option/${homePageOptionId}/update`);
+        request.open('put',`/home-page-option/${homePageOptionId}/update`);
         request.send(data);
 
     } 

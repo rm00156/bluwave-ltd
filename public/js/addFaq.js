@@ -25,7 +25,7 @@ function addFaq(e) {
         };
 
         $.ajax({
-            url: '/admin_dashboard/faq/add',
+            url: '/admin-dashboard/faq/add',
             type: 'post',
             data: data,
             success: function(resp, xhr, status) {

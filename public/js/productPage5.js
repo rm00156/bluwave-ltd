@@ -55,7 +55,7 @@ function handleRemoveDeliveryClick(event) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_types',
+        url: '/get-delivery-types',
         success: function (response, xhr, status) {
 
             if (status.status == 200) {
@@ -88,7 +88,7 @@ function handleAddDeliveryClick(event) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_types',
+        url: '/get-delivery-types',
         success: function (response, xhr, status) {
 
             if (status.status == 200) {
@@ -224,7 +224,7 @@ function updateAllDeliverySelects(e) {
 
     $.ajax({
         type: 'get',
-        url: '/get_delivery_type',
+        url: '/get-delivery-type',
         data: { id: previousDeliveryTypeId },
         success: function (response, xhr, status) {
             if (status.status == 200) {
@@ -299,7 +299,7 @@ function continueToPage6(e) {
             // jobs[job.id] = {id: job.id, state: "queued", totalSteps:job.totalSteps, productItemNumber: productItemNumber, productNumber: job.productNumber, productVariantId: job.productVariantId};
         });
 
-        request.open('post', `/product/${productId}/save_delivery_options`);
+        request.open('post', `/product/${productId}/save-delivery-options`);
         request.send(data);
     }
 }
@@ -310,7 +310,7 @@ function setupDeliveryIds() {
     const productId = $('#productId').val();
     $.ajax({
         type: 'get',
-        url: `/product/${productId}/get_product_deliveries`,
+        url: `/product/${productId}/get-product-deliveries`,
         success: function(productDeliveries) {
             productDeliveries.forEach(delivery => {
                 selectedDeliveryIds.push(delivery.deliveryTypeFk);

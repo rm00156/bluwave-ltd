@@ -3,6 +3,6 @@ $(function(){
 
     $('#orders tbody').on('click', 'tr', function(e) {
         var orderId = e.currentTarget.getAttribute('data-orderid');
-        window.location = '/admin_dashboard/order/' + orderId;
+        window.location = '/admin-dashboard/order/' + orderId;
       });
 })

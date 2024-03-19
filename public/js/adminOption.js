@@ -17,7 +17,7 @@ function displayModal(productsWithPrintingOption, productsWithFinishingOption) {
     productsWithPrintingOption.forEach(p => {
 
         const link = document.createElement('a');
-        link.href = `/admin_dashboard/product/${p.productId}/page3`;
+        link.href = `/admin-dashboard/product/${p.productId}/page3`;
         link.append(p.name);
 
         const linkRow = document.createElement('div');
@@ -31,7 +31,7 @@ function displayModal(productsWithPrintingOption, productsWithFinishingOption) {
     productsWithFinishingOption.forEach(p => {
 
         const link = document.createElement('a');
-        link.href = `/admin_dashboard/product/${p.productId}/page4`;
+        link.href = `/admin-dashboard/product/${p.productId}/page4`;
         link.append(p.name);
 
         const linkRow = document.createElement('div');
@@ -47,7 +47,7 @@ function displayModal(productsWithPrintingOption, productsWithFinishingOption) {
     // templates.forEach(t => {
 
     //     const link = document.createElement('a');
-    //     link.href = `/admin_dashboard/template/${t.id}`;
+    //     link.href = `/admin-dashboard/template/${t.id}`;
     //     link.append(p.name);
 
     //     column1.append(link);
@@ -106,7 +106,7 @@ function update(e, isWithWarnings) {
             }
 
 
-            return window.location = `/admin_dashboard/option/${response.currentTarget.response.id}`;
+            return window.location = `/admin-dashboard/option/${response.currentTarget.response.id}`;
 
 
             // var job = data.currentTarget.response;

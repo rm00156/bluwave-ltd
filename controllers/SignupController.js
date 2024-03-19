@@ -92,7 +92,7 @@ async function signup(req, res, next) {
   await queueOperations.addSendSigupEmail(req.user.id);
   return passport.authenticate('local', {
     successRedirect: checkout !== 'checkout' ? '/' : '/checkout',
-    failureRedirect: checkout !== 'checkout' ? '/signup' : '/checkout_login',
+    failureRedirect: checkout !== 'checkout' ? '/signup' : '/checkout-login',
     failureFlash: true,
   })(req, res, next);
 

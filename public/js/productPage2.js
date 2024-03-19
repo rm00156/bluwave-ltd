@@ -45,12 +45,12 @@ function save(override) {
         if(error) {
             // TO-DO
         } else {
-            window.location = `/admin_dashboard/product/${productId}/page3`;
+            window.location = `/admin-dashboard/product/${productId}/page3`;
         }
     });
 
 
-    request.open('post', `/product/${productId}/save_quantities`);
+    request.open('post', `/product/${productId}/save-quantities`);
     request.send(data);
 }
 
@@ -83,7 +83,7 @@ function verify(quantities, productId) {
         
     });
 
-    request.open('get', `/product/${productId}/verify_quantities?quantities=${encoded}`);
+    request.open('get', `/product/${productId}/verify-quantities?quantities=${encoded}`);
     request.send(data);
 }
 

@@ -53,7 +53,7 @@ function editTemplate(e) {
             
         });
 
-        request.open('put','/admin_dashboard/template/' + templateId);
+        request.open('put','/admin-dashboard/template/' + templateId);
         request.send(data);
 
     } else {

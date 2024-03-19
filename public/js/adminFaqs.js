@@ -3,7 +3,7 @@ $(function () {
   
     $('#faqs tbody').on('click', 'tr', function (e) {
       var faqId = e.currentTarget.getAttribute('data-faqid');
-      window.location = '/admin_dashboard/faq/' + faqId;
+      window.location = '/admin-dashboard/faq/' + faqId;
     });
     // $('#form').on('submit', addProductType);
   })

@@ -14,11 +14,11 @@ function activate(e) {
                 // const error = response.currentTarget.response.error;
                 const page = response.currentTarget.response.page;
                 
-                return window.location = `/admin_dashboard/product/${productId}/${page}`;
+                return window.location = `/admin-dashboard/product/${productId}/${page}`;
             }
             
         
-            return window.location = `/admin_dashboard/product/${productId}/page1`;
+            return window.location = `/admin-dashboard/product/${productId}/page1`;
 
         });
 

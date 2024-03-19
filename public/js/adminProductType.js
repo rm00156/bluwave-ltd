@@ -155,13 +155,13 @@ function editProductType(e) {
 
         request.addEventListener('load', function(response){
             if(request.status == 200) {
-                return window.location = '/admin_dashboard/product_type/' + $('#productTypeId').val();
+                return window.location = '/admin-dashboard/product-type/' + $('#productTypeId').val();
             } else {
                 $('#error').text(response.currentTarget.response.error);
             }
         });
 
-        request.open('post','/admin_dashboard/product_type/edit_product_type');
+        request.open('post','/admin-dashboard/product-type/edit-product-type');
         request.send(data);
 
     } else {

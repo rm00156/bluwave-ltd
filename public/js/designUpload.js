@@ -13,7 +13,7 @@ function removeFileGroupItem(e) {
     console.log('reece')
     $.ajax({
         type: 'delete',
-        url: '/remove_file_group_item',
+        url: '/remove-file-group-item',
         data: data,
         success: function(req, xhr, status) {
 
@@ -46,6 +46,6 @@ function uploadPicture(e) {
         
     });
 
-    request.open('post','/design_upload');
+    request.open('post','/design-upload');
     request.send(data);
 }

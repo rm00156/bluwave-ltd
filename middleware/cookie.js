@@ -71,7 +71,7 @@ async function isCheckoutAsGuest(req, res, next) {
       return next();
     }
 
-    return res.redirect('/checkout_login');
+    return res.redirect('/checkout-login');
   }
 
   return next();

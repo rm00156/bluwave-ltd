@@ -14,7 +14,7 @@ mixin productSideBar(type, statuses)
                 // nav item
 
                 li.nav-item
-                    a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product ? product.id : 0}/page1` class=(type=='page1' ? 'active' : ''))
+                    a.nav-link(aria-current='page' href=`/admin-dashboard/product/${product ? product.id : 0}/page1` class=(type=='page1' ? 'active' : ''))
                         //- i.feather-icon.icon-shopping-bag.me-2
                         //- <i class="bi bi-check-square-fill me-2"></i>
                         | Product Information
@@ -26,42 +26,42 @@ mixin productSideBar(type, statuses)
                             <i class="bi bi-check-square-fill"></i>
                 if(product)
                     li.nav-item
-                        a.nav-link(aria-current='page' disabled href=`/admin_dashboard/product/${product.id}/page2` class=(type=='page2' ? 'active' : ''))
+                        a.nav-link(aria-current='page' disabled href=`/admin-dashboard/product/${product.id}/page2` class=(type=='page2' ? 'active' : ''))
                             //- i.feather-icon.icon-shopping-bag.me-2
                             | Quantities
                     if(quantityGroup)
                         li.nav-item
-                            a.nav-link(aria-current='page' disabled href=`/admin_dashboard/product/${product.id}/page3` class=(type=='page3' ? 'active' : ''))
+                            a.nav-link(aria-current='page' disabled href=`/admin-dashboard/product/${product.id}/page3` class=(type=='page3' ? 'active' : ''))
                                 //- i.feather-icon.icon-shopping-bag.me-2
                                 | Printing Attributes
                     
                     if(priceMatrix)
                         li.nav-item
-                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/page4` class=(type=='page4' ? 'active' : ''))
+                            a.nav-link(aria-current='page' href=`/admin-dashboard/product/${product.id}/page4` class=(type=='page4' ? 'active' : ''))
                                 //- i.feather-icon.icon-shopping-bag.me-2
                                 | Finishing Attributes
                     
                     if(priceMatrix)
                         li.nav-item
-                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/page5` class=(type=='page5' ? 'active' : ''))
+                            a.nav-link(aria-current='page' href=`/admin-dashboard/product/${product.id}/page5` class=(type=='page5' ? 'active' : ''))
                                 //- i.feather-icon.icon-shopping-bag.me-2
                                 | Delivery Options
 
                     //- if(productDeliveries.length > 0)
                         li.nav-item
-                            a.nav-link(aria-current='page' /*href=`/admin_dashboard/product/${product.id}/page6`*/  class=(type=='page6' ? 'active' : ''))
+                            a.nav-link(aria-current='page' /*href=`/admin-dashboard/product/${product.id}/page6`*/  class=(type=='page6' ? 'active' : ''))
                                 //- i.feather-icon.icon-shopping-bag.me-2
                                 | Discounts
                     
                     if(product.deleteFl == false)
                         li.nav-item
-                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/deactivate` class=(type=='deactivate' ? 'active' : ''))
+                            a.nav-link(aria-current='page' href=`/admin-dashboard/product/${product.id}/deactivate` class=(type=='deactivate' ? 'active' : ''))
                                 //- i.feather-icon.icon-shopping-bag.me-2
                                 | Deactivate 
                     
                     if(product.deleteFl == true && isValid)
                         li.nav-item
-                            a.nav-link(aria-current='page' href=`/admin_dashboard/product/${product.id}/activate` class=(type=='activate' ? 'active' : ''))
+                            a.nav-link(aria-current='page' href=`/admin-dashboard/product/${product.id}/activate` class=(type=='activate' ? 'active' : ''))
                                 //- i.feather-icon.icon-shopping-bag.me-2
                                 | Activate 
 

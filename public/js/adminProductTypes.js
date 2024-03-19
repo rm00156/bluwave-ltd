@@ -3,7 +3,7 @@ $(function () {
 
   $('#productTypes tbody').on('click', 'tr', function (e) {
     var productTypeId = e.currentTarget.getAttribute('data-producttypeid');
-    window.location = '/admin_dashboard/product_type/' + productTypeId;
+    window.location = '/admin-dashboard/product-type/' + productTypeId;
   });
   $('#form').on('submit', addProductType);
 })
@@ -17,7 +17,7 @@ function addProductType(e) {
 
     $.ajax({
       type: 'post',
-      url: '/admin_dashboard/product_type/add',
+      url: '/admin-dashboard/product-type/add',
       data: { productType: productType },
       success: function (response, xhr, status) {
 
