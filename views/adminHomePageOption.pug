@@ -62,8 +62,9 @@ html(land="en")
                                         ol.breadcrumb.mb-0
                                             li.breadcrumb-item
                                                 a.text-inherit(href='/admin_dashboard') Dashboard
-                                            
-                                            li.breadcrumb-item.active(aria-current='page') Home Page Options - Position #{homePageOption.orderNo}
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin_dashboard/home_page_options') Home Page Options
+                                            li.breadcrumb-item.active(aria-current='page') Home Page Option - Position #{homePageOption.orderNo}
                                 // button
                     section
                         .container
