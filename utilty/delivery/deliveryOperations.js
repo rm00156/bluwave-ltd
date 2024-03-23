@@ -154,6 +154,15 @@ async function getDeliveryOptionsForProducts(productIds) {
   });
 }
 
+async function getAllDeliveryOptionsForProduct(productFk) {
+  return models.productDelivery.findAll({
+    where: {
+      productFk,
+      deleteFl: false,
+    },
+  });
+}
+
 async function createShippingDetail(
   accountId,
   fullName,
@@ -191,6 +200,7 @@ async function getShippingDetailById(id) {
 }
 
 module.exports = {
+  createDeliveryOptionForProduct,
   getAllActiveDeliveryTypes,
   createDeliveryOptionsForProduct,
   getProductDeliveriesForProduct,
@@ -199,4 +209,5 @@ module.exports = {
   getDeliveryOptionsForProducts,
   createShippingDetail,
   getShippingDetailById,
+  getAllDeliveryOptionsForProduct,
 };

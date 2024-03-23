@@ -1,17 +1,16 @@
 const path = require('path');
 const homePageOptionHelper = require('../helper/homePageOptionHelper');
 const utilityHelper = require('../../utilty/general/utilityHelper');
+const generalTestHelper = require('../helper/generalTestHelper');
 
 const accountTestHelper = require('../helper/accountTestHelper');
 const homePageOperations = require('../../utilty/homePage/homePageOperations');
 const productOperations = require('../../utilty/products/productOperations');
 
-let adminAccount;
 let agent;
 
 beforeAll(async () => {
   const adminSetup = await accountTestHelper.setUpAdminAccountAndAgent();
-  adminAccount = adminSetup.adminAccount;
   agent = adminSetup.agent;
 });
 
@@ -163,7 +162,7 @@ describe('put /home-page-option/:id/update', () => {
 });
 
 afterAll(async () => {
-  await accountTestHelper.deleteAccountById(adminAccount.id);
+  await generalTestHelper.truncateTables(['accounts']);
 });
 
 afterEach(async () => {

@@ -19,9 +19,7 @@ const utilityHelper = require('../utilty/general/utilityHelper');
 const models = require('../models');
 
 async function getNotificationDetails(accountId) {
-  let notifications = await accountOperations.getNotificationsForAccount(
-    accountId,
-  );
+  let notifications = await accountOperations.getNotificationsForAccount(accountId);
   const numberOfNotifications = notifications.length;
   notifications = notifications.slice(0, 3);
   notifications = notifications.map((n) => ({
@@ -45,20 +43,9 @@ function getOptionsIdsFromOptionTypesAndOptionsMap(optionTypesAndOptions) {
   return result;
 }
 
-function hasNewMatrixBeenCreated(
-  newOptions,
-  existingOptions,
-  newQuantities,
-  exisitingQuantities,
-) {
-  const optionsTheSame = utilityHelper.hasTheSameItems(
-    newOptions,
-    existingOptions,
-  );
-  const quantitiesTheSame = utilityHelper.hasTheSameItems(
-    newQuantities,
-    exisitingQuantities,
-  );
+function hasNewMatrixBeenCreated(newOptions, existingOptions, newQuantities, exisitingQuantities) {
+  const optionsTheSame = utilityHelper.hasTheSameItems(newOptions, existingOptions);
+  const quantitiesTheSame = utilityHelper.hasTheSameItems(newQuantities, exisitingQuantities);
 
   return optionsTheSame === false || quantitiesTheSame === false;
 }
@@ -80,24 +67,16 @@ function addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, request) {
 }
 
 async function renderSetup2fa(req, res, error) {
-  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(
-    req.user.id,
-  );
+  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(req.user.id);
 
   let secret;
   let qrCode;
   if (twoFactorAuth === null) {
-    const qrInfo = GoogleAuthenticator.register(
-      `${companyInfo.getCompanyDetails().COMPANY_NAME} (${req.user.email})`,
-    );
+    const qrInfo = GoogleAuthenticator.register(`${companyInfo.getCompanyDetails().COMPANY_NAME} (${req.user.email})`);
     secret = qrInfo.secret;
     qrCode = qrInfo.qr;
 
-    await accountOperations.createTwoFactorAuthForAccountId(
-      req.user.id,
-      secret,
-      qrCode,
-    );
+    await accountOperations.createTwoFactorAuthForAccountId(req.user.id, secret, qrCode);
   } else {
     secret = twoFactorAuth.secret;
     qrCode = twoFactorAuth.qrCode;
@@ -153,13 +132,7 @@ async function createAdmin(req, res) {
       logger.error(errors);
       rerenderCreateAdmin(errors, req, res);
     } else {
-      await accountOperations.createAccount(
-        1,
-        req.body.email,
-        req.body.name,
-        req.body.phoneNumber,
-        req.body.password,
-      );
+      await accountOperations.createAccount(1, req.body.email, req.body.name, req.body.phoneNumber, req.body.password);
 
       req.session.message = 'Admin account created!';
       res.redirect('/admin-dashboard');
@@ -181,10 +154,7 @@ async function setup2fa2Registration(req, res, next) {
       return renderSetup2fa(req, res, true);
     }
 
-    await accountOperations.complete2FaSetupForAccountId(
-      account.id,
-      req.body.secret,
-    );
+    await accountOperations.complete2FaSetupForAccountId(account.id, req.body.secret);
 
     req.session.message = '2FA has been successfully set up';
     return res.redirect('/admin-dashboard');
@@ -208,23 +178,13 @@ async function getProductPage1(req, res) {
 
   let quantityGroup = null;
   if (product) {
-    quantityGroup = await productOperations.getQuantityGroupForProductId(
-      product.id,
-    );
+    quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   }
 
-  const priceMatrix = product
-    ? await productOperations.getPriceMatrixForProductId(product.id)
-    : null;
-  const finishingMatrices = product
-    ? await productOperations.getFinishingMatricesForProductId(product.id)
-    : [];
-  const productDeliveries = product
-    ? await deliveryOperations.getProductDeliveriesForProduct(product.id)
-    : [];
-  const isValid = product
-    ? await productOperations.isProductValid(product)
-    : { isValid: false };
+  const priceMatrix = product ? await productOperations.getPriceMatrixForProductId(product.id) : null;
+  const finishingMatrices = product ? await productOperations.getFinishingMatricesForProductId(product.id) : [];
+  const productDeliveries = product ? await deliveryOperations.getProductDeliveriesForProduct(product.id) : [];
+  const isValid = product ? await productOperations.isProductValid(product) : { isValid: false };
   const { message } = req.session;
   req.session.message = undefined;
   res.render('productPage1', {
@@ -252,13 +212,9 @@ async function getProductPage2(req, res) {
   const quantities = await productOperations.getAllQuantities();
   const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(product.id);
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
 
-  const quantityGroup = await productOperations.getQuantityGroupForProductId(
-    product.id,
-  );
+  const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
   const isValid = await productOperations.isProductValid(product);
@@ -287,31 +243,19 @@ async function getProductPage3(req, res) {
     // message
     return res.redirect('/admin-dashboard/products');
   }
-  const optionTypes = await productOperations.getOptionTypesNotUsedByFinishingMatrixForProduct(
-    product.id,
-  );
+  const optionTypes = await productOperations.getOptionTypesNotUsedByFinishingMatrixForProduct(product.id);
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
 
-  const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(
-    product.id,
-  );
+  const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(product.id);
   const optionTypesAndOptionsWithAllOptions = await productOperations.addAllOptionTypesToOptionTypesAndOptionJson(
     optionTypesAndOptions,
   );
-  const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(
-    product.id,
-  );
-  const selectedOptionTypes = matrixRows.length === 0
-    ? []
-    : matrixRows[0][0].options.map((o) => o.optionType);
+  const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(product.id);
+  const selectedOptionTypes = matrixRows.length === 0 ? [] : matrixRows[0][0].options.map((o) => o.optionType);
   const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(product.id);
 
-  const quantityGroup = await productOperations.getQuantityGroupForProductId(
-    product.id,
-  );
+  const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
   const isValid = await productOperations.isProductValid(product);
@@ -344,17 +288,11 @@ async function getProductPage4(req, res) {
     // message
     return res.redirect('/admin-dashboard/products');
   }
-  const optionTypes = await productOperations.getOptionTypesNotUsedByPricingMatrixForProduct(
-    product.id,
-  );
+  const optionTypes = await productOperations.getOptionTypesNotUsedByPricingMatrixForProduct(product.id);
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
 
-  const optionTypesAndOptions = await productOperations.getFinishingMatrixOptionTypesAndOptionsForProduct(
-    product.id,
-  );
+  const optionTypesAndOptions = await productOperations.getFinishingMatrixOptionTypesAndOptionsForProduct(product.id);
 
   const optionTypeAndOptionsWithAllOptions = await productOperations.addAllOptionTypesToOptionTypesAndOptionToFinishingJson(
     optionTypesAndOptions,
@@ -364,9 +302,7 @@ async function getProductPage4(req, res) {
   const selectedOptionTypes = [];
   const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(product.id);
 
-  const quantityGroup = await productOperations.getQuantityGroupForProductId(
-    product.id,
-  );
+  const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
   const isValid = await productOperations.isProductValid(product);
@@ -401,12 +337,8 @@ async function getProductPage5(req, res) {
 
   const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
-  const quantityGroup = await productOperations.getQuantityGroupForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+  const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
   const isValid = await productOperations.isProductValid(product);
@@ -437,10 +369,7 @@ async function verifyQuantities(req, res) {
   }
   const quantities = JSON.parse(req.query.quantities);
 
-  const verification = await productOperations.verifyQuantities(
-    productId,
-    quantities,
-  );
+  const verification = await productOperations.verifyQuantities(productId, quantities);
   return res.status(200).json(verification);
 }
 
@@ -453,9 +382,7 @@ async function getPriceMatrixRows(req, res) {
     return res.status(400).json({ error: 'Product no found.' });
   }
 
-  const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(
-    productId,
-  );
+  const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(productId);
   return res.status(200).json(matrixRows);
 }
 
@@ -474,44 +401,25 @@ async function continuePage3(req, res) {
   const pricesNotSet = quantityGroups.filter((q) => q.prices === '');
 
   if (pricesNotSet.length > 0) {
-    return res
-      .status(400)
-      .json({ error: 'All prices must be set to continue.' });
+    return res.status(400).json({ error: 'All prices must be set to continue.' });
   }
   // validate row values
   // make sure every single one is present else fail
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
 
   if (priceMatrix) {
     // update
     await productOperations.deletePriceMatrixForProduct(productId);
-    await productOperations.createPrintingAttributes(
-      productId,
-      options,
-      rows,
-      true,
-    );
-  } else {
-    // create option group
-    // items
-    // and price matrix
-
-    await productOperations.createPrintingAttributes(
-      productId,
-      options,
-      rows,
-      true,
-    );
   }
+
+  const newPriceMatrix = await productOperations.createPrintingAttributes(productId, options, rows, true);
 
   const updatedProduct = await productOperations.getProductById(productId);
   const isValid = await productOperations.isProductValid(updatedProduct);
   await productOperations.setProductStatusComplete(productId, isValid.isValid);
 
-  return res.status(200).json({});
+  return res.status(200).json({ newPriceMatrix });
 }
 
 async function continuePage4(req, res) {
@@ -524,13 +432,9 @@ async function continuePage4(req, res) {
     return res.status(400).json({ error: 'Product no found.' });
   }
 
-  const isComplete = await productOperations.isAllFinishingMatricesComplete(
-    matrices,
-  );
+  const isComplete = await productOperations.isAllFinishingMatricesComplete(matrices);
   if (!isComplete) {
-    return res
-      .status(400)
-      .json({ error: 'All prices must be set to continue.' });
+    return res.status(400).json({ error: 'All prices must be set to continue.' });
   }
 
   // update
@@ -554,9 +458,7 @@ async function savePrintingAttributes(req, res) {
     return res.status(400).json({ error: 'Product no found.' });
   }
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
   // need validation to determine whether its completed
   if (priceMatrix) {
     // update
@@ -591,23 +493,15 @@ async function saveDeliveryOptions(req, res) {
   const invalidOptions = deliveryOptions.filter((d) => d.price === '');
 
   if (invalidOptions.length > 0) {
-    return res
-      .status(400)
-      .json({ error: 'All delivery option prices must be set to continue.' });
+    return res.status(400).json({ error: 'All delivery option prices must be set to continue.' });
   }
 
   const existingDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
 
   if (existingDeliveries.length > 0) {
-    await deliveryOperations.updateProductDeliveriesForProduct(
-      productId,
-      deliveryOptions,
-    );
+    await deliveryOperations.updateProductDeliveriesForProduct(productId, deliveryOptions);
   } else {
-    await deliveryOperations.createDeliveryOptionsForProduct(
-      productId,
-      deliveryOptions,
-    );
+    await deliveryOperations.createDeliveryOptionsForProduct(productId, deliveryOptions);
   }
 
   const updatedProduct = await productOperations.getProductById(productId);
@@ -650,9 +544,7 @@ async function getQuantities(req, res) {
     return res.status(400).json({ error: 'Product no found.' });
   }
 
-  const quantities = await productOperations.getQuantitiesForProduct(
-    product.id,
-  );
+  const quantities = await productOperations.getQuantitiesForProduct(product.id);
 
   return res.status(200).json(quantities);
 }
@@ -683,22 +575,14 @@ async function saveQuantities(req, res) {
 
   if (!create) {
     // update quantities for group
-    const quantityGroup = await productOperations.getQuantityGroupForProductId(
-      productId,
-    );
-    await productOperations.updateQuantitiesForQuantityGroup(
-      quantityGroup,
-      quantities,
-    );
+    const quantityGroup = await productOperations.getQuantityGroupForProductId(productId);
+    await productOperations.updateQuantitiesForQuantityGroup(quantityGroup, quantities);
     // deactivate product
     await productOperations.deactivateProduct(product.id, false);
   } else {
     // new
     // create
-    await productOperations.createQuantityGroupAndSetQuantities(
-      productId,
-      quantities,
-    );
+    await productOperations.createQuantityGroupAndSetQuantities(productId, quantities);
   }
 
   const updatedProduct = await productOperations.getProductById(productId);
@@ -710,9 +594,7 @@ async function saveQuantities(req, res) {
 
 async function getOptionsForOptionType(req, res) {
   const { optionTypeId } = req.query;
-  const options = await productOperations.getOptionsForOptionTypeId(
-    optionTypeId,
-  );
+  const options = await productOperations.getOptionsForOptionTypeId(optionTypeId);
 
   return res.status(200).json(options);
 }
@@ -729,17 +611,13 @@ async function getProductPage(req, res) {
   // TODO
   if (product === null) return res.redirect('/admin-dashboard');
 
-  const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(
-    productId,
-  );
+  const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
   const optionTypeAndOptionsWithAllOptions = await productOperations.addAllOptionTypesToOptionTypesAndOptionJson(
     optionTypesAndOptions,
   );
   const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(productId);
 
-  const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(
-    productId,
-  );
+  const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(productId);
   const selectedOptionTypes = matrixRows[0][0].options.map((o) => o.optionType);
 
   const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
@@ -768,9 +646,7 @@ async function continuePage1(req, res) {
   const { description } = req.body;
   const { subDescription } = req.body;
   const { subDescriptionTitle } = req.body;
-  const bulletPoints = utilityHelper.parseCommaSeperatedText(
-    req.body.bulletPoints,
-  );
+  const bulletPoints = utilityHelper.parseCommaSeperatedText(req.body.bulletPoints);
   const { productId } = req.body;
 
   const productDetails = {
@@ -782,17 +658,11 @@ async function continuePage1(req, res) {
   };
   let s3PathMap = new Map();
   if (files !== null) {
-    s3PathMap = await productOperations.uploadPictures(
-      'Products/',
-      productName,
-      files,
-    );
+    s3PathMap = await productOperations.uploadPictures('Products/', productName, files);
   }
   // verify productName is not empty
   if (productName === '') {
-    return res
-      .status(400)
-      .json({ error: "'Product Name' must be set to save." });
+    return res.status(400).json({ error: "'Product Name' must be set to save." });
   }
 
   // validate
@@ -803,27 +673,16 @@ async function continuePage1(req, res) {
     bulletPoints,
   );
 
-  const errors = await productOperations.validateProductInformationDetails(
-    updatedProductDetails,
-  );
+  const errors = await productOperations.validateProductInformationDetails(updatedProductDetails);
   if (!isEmpty(errors)) {
-    if (
-      !files
-      || !files['1Blob']
-      || Object.keys(errors).length !== 1
-      || !errors.picture1
-    ) return res.status(400).json(errors);
+    if (!files || !files['1Blob'] || Object.keys(errors).length !== 1 || !errors.picture1) return res.status(400).json(errors);
   }
   if (productId === 'undefined') {
     // create product
     updatedProductDetails.deleteFl = true;
 
     updatedProductDetails.versionNo = 1;
-    const product = await productOperations.createProduct(
-      updatedProductDetails,
-      s3PathMap,
-      bulletPoints,
-    );
+    const product = await productOperations.createProduct(updatedProductDetails, s3PathMap, bulletPoints);
     // req.session.message = 'Saved' ;
     return res.status(201).json({ id: product.id });
   }
@@ -849,7 +708,9 @@ async function continuePage1(req, res) {
 
 async function createProductFromProductDetails(productDetails, bulletPoints, files) {
   const updatedProductDetails = { ...productDetails, deleteFl: true, versionNo: 1 };
-  const s3PathMap = files !== null && files !== undefined ? (await productOperations.uploadPictures('Products/', updatedProductDetails.name, files)) : new Map();
+  const s3PathMap = files !== null && files !== undefined
+    ? await productOperations.uploadPictures('Products/', updatedProductDetails.name, files)
+    : new Map();
   const product = await productOperations.createProduct(updatedProductDetails, s3PathMap, bulletPoints);
   return product;
 }
@@ -861,9 +722,7 @@ async function savePage1(req, res) {
   const { description } = req.body;
   const { subDescription } = req.body;
   const { subDescriptionTitle } = req.body;
-  const bulletPoints = utilityHelper.parseCommaSeperatedText(
-    req.body.bulletPoints,
-  );
+  const bulletPoints = utilityHelper.parseCommaSeperatedText(req.body.bulletPoints);
   const { productId } = req.body;
   const productDetails = {
     name: productName,
@@ -875,9 +734,7 @@ async function savePage1(req, res) {
 
   // verify productName is not empty
   if (!productName || utilityHelper.isEmptyString(productName)) {
-    return res
-      .status(400)
-      .json({ error: "'Product Name' must be set to save." });
+    return res.status(400).json({ error: "'Product Name' must be set to save." });
   }
 
   if (productId === 'undefined' || productId === undefined) {
@@ -893,7 +750,9 @@ async function savePage1(req, res) {
     return res.status(400).json({ error: 'Product no found.' });
   }
 
-  const s3PathMap = files !== null && files !== undefined ? (await productOperations.uploadPictures('Products/', productName, files)) : new Map();
+  const s3PathMap = files !== null && files !== undefined
+    ? await productOperations.uploadPictures('Products/', productName, files)
+    : new Map();
   // update existing product
   addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, req.body);
 
@@ -994,11 +853,7 @@ async function getAddTemplatePage(req, res) {
 
 async function addTemplate(req, res) {
   const { files } = req;
-  const s3PathMap = await productOperations.uploadPictures(
-    'Templates/',
-    'Size',
-    files,
-  );
+  const s3PathMap = await productOperations.uploadPictures('Templates/', 'Size', files);
   const body = {
     bleedAreaWidth: req.body.bleedAreaWidth,
     bleedAreaHeight: req.body.bleedAreaHeight,
@@ -1044,11 +899,7 @@ async function editTemplate(req, res) {
 
   const { files } = req;
   if (files) {
-    const s3PathMap = await productOperations.uploadPictures(
-      'Templates/',
-      'Size',
-      files,
-    );
+    const s3PathMap = await productOperations.uploadPictures('Templates/', 'Size', files);
 
     if (s3PathMap.get('pdfTemplate')) {
       body.pdfPath = s3PathMap.get('pdfTemplate');
@@ -1146,9 +997,7 @@ async function createProduct(req, res) {
   const { description } = req.body;
   const { subDescription } = req.body;
   const { subDescriptionTitle } = req.body;
-  const bulletPoints = utilityHelper.parseCommaSeperatedText(
-    req.body.bulletPoints,
-  );
+  const bulletPoints = utilityHelper.parseCommaSeperatedText(req.body.bulletPoints);
   const options = utilityHelper.parseCommaSeperatedText(req.body.options);
   const quantities = utilityHelper.parseCommaSeperatedText(req.body.quantities);
   const deleteFl = JSON.parse(req.body.deleteFl);
@@ -1167,31 +1016,13 @@ async function createProduct(req, res) {
   const transaction = await models.sequelize.transaction();
 
   try {
-    const s3PathMap = await productOperations.uploadPictures(
-      'Products/',
-      productName,
-      files,
-    );
-    const product = await productOperations.createProduct(
-      productDetails,
-      s3PathMap,
-      bulletPoints,
-    );
+    const s3PathMap = await productOperations.uploadPictures('Products/', productName, files);
+    const product = await productOperations.createProduct(productDetails, s3PathMap, bulletPoints);
 
     // create priceMatrix object
-    const priceMatrix = await productOperations.createPriceMatrix(
-      product.id,
-      options,
-      quantities,
-    );
-    await productOperations.createPriceMatrixRowsAndQuantityPrices(
-      priceMatrix.id,
-      rows,
-    );
-    await deliveryOperations.createDeliveryOptionsForProduct(
-      product.id,
-      deliveryOptions,
-    );
+    const priceMatrix = await productOperations.createPriceMatrix(product.id, options, quantities);
+    await productOperations.createPriceMatrixRowsAndQuantityPrices(priceMatrix.id, rows);
+    await deliveryOperations.createDeliveryOptionsForProduct(product.id, deliveryOptions);
     req.session.message = `Product ${product.name} has been successfully created`;
   } catch (err) {
     logger.error(err);
@@ -1206,9 +1037,7 @@ async function createProduct(req, res) {
 
 async function getOptionTypesAndOptionForProduct(req, res) {
   const { productId } = req.query;
-  const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(
-    productId,
-  );
+  const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
   const parsedOptionTypesAndOptions = await productOperations.parseOptionTypesAndOption(optionTypesAndOptions);
 
   res.status(200).json(parsedOptionTypesAndOptions);
@@ -1223,9 +1052,7 @@ async function editProduct(req, res) {
   const { description } = req.body;
   const { subDescription } = req.body;
   const { subDescriptionTitle } = req.body;
-  const bulletPoints = utilityHelper.parseCommaSeperatedText(
-    req.body.bulletPoints,
-  );
+  const bulletPoints = utilityHelper.parseCommaSeperatedText(req.body.bulletPoints);
   const options = utilityHelper.parseCommaSeperatedText(req.body.options);
   const quantities = utilityHelper.parseCommaSeperatedText(req.body.quantities);
   const deleteFl = JSON.parse(req.body.deleteFl);
@@ -1234,11 +1061,7 @@ async function editProduct(req, res) {
   // const transaction = await models.sequelize.transaction();
 
   try {
-    const s3PathMap = await productOperations.uploadPictures(
-      'Products/',
-      productName,
-      files,
-    );
+    const s3PathMap = await productOperations.uploadPictures('Products/', productName, files);
     addToS3PathMapPicturesThatNeedToBeRemoved(s3PathMap, req.body);
 
     const productDetails = {
@@ -1254,38 +1077,17 @@ async function editProduct(req, res) {
     };
     await productOperations.updateProduct(productDetails);
 
-    const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(
-      productId,
-    );
-    const existingOptionIds = getOptionsIdsFromOptionTypesAndOptionsMap(
-      optionTypesAndOptions,
-    );
+    const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
+    const existingOptionIds = getOptionsIdsFromOptionTypesAndOptionsMap(optionTypesAndOptions);
     const exisitingQuantities = await productOperations.getSelectedQuantitiesForProductById(productId);
     const existingQuantityIds = exisitingQuantities.map((q) => q.id.toString());
-    await deliveryOperations.updateProductDeliveriesForProduct(
-      productId,
-      deliveryOptions,
-    );
+    await deliveryOperations.updateProductDeliveriesForProduct(productId, deliveryOptions);
 
-    if (
-      hasNewMatrixBeenCreated(
-        options,
-        existingOptionIds,
-        quantities,
-        existingQuantityIds,
-      )
-    ) {
+    if (hasNewMatrixBeenCreated(options, existingOptionIds, quantities, existingQuantityIds)) {
       // delete active priceMatrix For product
       await productOperations.deletePriceMatrixForProduct(productId);
-      const priceMatrix = await productOperations.createPriceMatrix(
-        productId,
-        options,
-        quantities,
-      );
-      await productOperations.createPriceMatrixRowsAndQuantityPrices(
-        priceMatrix.id,
-        rows,
-      );
+      const priceMatrix = await productOperations.createPriceMatrix(productId, options, quantities);
+      await productOperations.createPriceMatrixRowsAndQuantityPrices(priceMatrix.id, rows);
     } else {
       // then just update
       await productOperations.updatePriceMatrixRowPrices(rows);
@@ -1320,14 +1122,10 @@ async function getProductTypePage(req, res) {
 async function editProductType(req, res) {
   const { productTypeName } = req.body;
   const { productTypeId } = req.body;
-  const existingProductType = await productOperations.getProductTypeByType(
-    productTypeName,
-  );
+  const existingProductType = await productOperations.getProductTypeByType(productTypeName);
 
   if (existingProductType && existingProductType.id !== Number(productTypeId)) {
-    return res
-      .status(400)
-      .json({ error: 'Product Type with this name already exists.' });
+    return res.status(400).json({ error: 'Product Type with this name already exists.' });
   }
 
   const { files } = req;
@@ -1338,11 +1136,7 @@ async function editProductType(req, res) {
   try {
     let s3PathMap = null;
     if (files !== null) {
-      s3PathMap = await productOperations.uploadPictures(
-        'ProductTypes/',
-        productTypeName,
-        files,
-      );
+      s3PathMap = await productOperations.uploadPictures('ProductTypes/', productTypeName, files);
     }
 
     const productTypeDetails = {
@@ -1425,9 +1219,7 @@ async function getAccountEmailsPage(req, res) {
   const { id } = req.params;
   const account = await accountOperations.getAccountById(id);
   if (account.guestFl === true) return res.redirect('/admin-dashboard/accounts');
-  const emails = await emailOperations.getEmailsForByEmailAddress(
-    account.email,
-  );
+  const emails = await emailOperations.getEmailsForByEmailAddress(account.email);
   return res.render('adminAccountEmails', {
     user: req.user,
     account,
@@ -1452,23 +1244,14 @@ async function getAccountOrdersPage(req, res) {
 async function getAccountOrderPage(req, res) {
   const purchaseBasketId = req.params.id;
 
-  const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(
-    purchaseBasketId,
-  );
+  const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId);
 
   const account = await accountOperations.getAccountById(order.accountFk);
   const { shippingDetailFk } = order;
-  const shippingDetail = shippingDetailFk === null
-    ? null
-    : await deliveryOperations.getShippingDetailById(shippingDetailFk);
-  const basketItems = await basketOperations.getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(
-    purchaseBasketId,
-  );
+  const shippingDetail = shippingDetailFk === null ? null : await deliveryOperations.getShippingDetailById(shippingDetailFk);
+  const basketItems = await basketOperations.getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchaseBasketId);
   const refunds = await refundOperations.getRefundsForOrder(purchaseBasketId);
-  const isNewRefundPossible = refundOperations.isRefundPossibleForOrder(
-    refunds,
-    order.total,
-  );
+  const isNewRefundPossible = refundOperations.isRefundPossibleForOrder(refunds, order.total);
   const { message } = req.session;
   req.session.message = undefined;
 
@@ -1503,9 +1286,7 @@ async function createRefund(req, res) {
   const { refundTypeId } = req.body;
 
   const purchaseBasketId = req.body.orderId;
-  const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(
-    purchaseBasketId,
-  );
+  const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId);
   const amount = refundTypeId === 2 ? order.total : req.body.amount;
   const refundAmount = parseFloat(amount) * 100;
 
@@ -1522,11 +1303,7 @@ async function createRefund(req, res) {
     });
   }
 
-  await refundOperations.createRefund(
-    purchaseBasketId,
-    refundTypeId,
-    refundAmount,
-  );
+  await refundOperations.createRefund(purchaseBasketId, refundTypeId, refundAmount);
 
   req.session.message = 'Refund Successful';
   return res.status(200).json({});
@@ -1535,14 +1312,9 @@ async function createRefund(req, res) {
 async function getOustandingAmountOfOrder(req, res) {
   const { purchaseBasketId } = req.query;
 
-  const purchaseBasket = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(
-    purchaseBasketId,
-  );
+  const purchaseBasket = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId);
   const refunds = await refundOperations.getRefundsForOrder(purchaseBasketId);
-  const max = await refundOperations.maxRefundPossibleForOrder(
-    refunds,
-    purchaseBasket.total,
-  );
+  const max = await refundOperations.maxRefundPossibleForOrder(refunds, purchaseBasket.total);
 
   res.status(200).json({ max });
 }
@@ -1600,10 +1372,7 @@ async function addOption(req, res) {
   const { optionTypeId } = req.body;
   const { option } = req.body;
 
-  const existingOption = await productOperations.getOptionByNameAndType(
-    option,
-    optionTypeId,
-  );
+  const existingOption = await productOperations.getOptionByNameAndType(option, optionTypeId);
 
   if (existingOption) {
     return res.status(400).json({
@@ -1619,14 +1388,10 @@ async function addOption(req, res) {
 async function addOptionType(req, res) {
   const { optionType } = req.body;
 
-  const existingOptionType = await productOperations.getOptionTypeByName(
-    optionType,
-  );
+  const existingOptionType = await productOperations.getOptionTypeByName(optionType);
 
   if (existingOptionType) {
-    return res
-      .status(400)
-      .json({ error: 'Option Type with this name already exists.' });
+    return res.status(400).json({ error: 'Option Type with this name already exists.' });
   }
 
   await productOperations.createOptionType(optionType);
@@ -1641,9 +1406,7 @@ async function getOptionPage(req, res) {
 
   if (!option) return res.status(400).json({ error: 'Option not found' });
 
-  const optionType = await productOperations.getOptionTypeById(
-    option.optionTypeFk,
-  );
+  const optionType = await productOperations.getOptionTypeById(option.optionTypeFk);
 
   return res.render('adminOption', {
     user: req.user,
@@ -1663,14 +1426,10 @@ async function getAddProductTypePage(req, res) {
 async function addProductType(req, res) {
   const { productTypeName } = req.body;
 
-  const existingProductType = await productOperations.getProductTypeByType(
-    productTypeName,
-  );
+  const existingProductType = await productOperations.getProductTypeByType(productTypeName);
 
   if (existingProductType) {
-    return res
-      .status(400)
-      .json({ error: 'Product Type with this name already exists.' });
+    return res.status(400).json({ error: 'Product Type with this name already exists.' });
   }
 
   const { files } = req;
@@ -1681,11 +1440,7 @@ async function addProductType(req, res) {
   try {
     let s3PathMap = null;
     if (files !== null) {
-      s3PathMap = await productOperations.uploadPictures(
-        'ProductTypes/',
-        productTypeName,
-        files,
-      );
+      s3PathMap = await productOperations.uploadPictures('ProductTypes/', productTypeName, files);
     }
 
     const productTypeDetails = {
@@ -1743,9 +1498,7 @@ async function setNavigationBarHeaders(req, res) {
   ];
 
   if (!utilityHelper.checkNoDuplicateNonZeroNumbers(ids)) {
-    return res
-      .status(400)
-      .json({ error: 'You have selected a product type more than once.' });
+    return res.status(400).json({ error: 'You have selected a product type more than once.' });
   }
   const transaction = await models.sequelize.transaction();
 
@@ -1754,9 +1507,7 @@ async function setNavigationBarHeaders(req, res) {
   } catch (err) {
     logger.error(err);
     await transaction.rollback();
-    return res
-      .status(400)
-      .json({ error: 'Unable to make the update. Contact support.' });
+    return res.status(400).json({ error: 'Unable to make the update. Contact support.' });
   }
 
   await transaction.commit();
@@ -1780,17 +1531,8 @@ async function setHomePageBanner(req, res) {
     if (bannerBlob === undefined) {
       return res.status(400).json({ error: 'Banner Image must be set' });
     }
-    const s3PathMap = await productOperations.uploadPictures(
-      'HomePage/',
-      'Banner',
-      req.files,
-    );
-    await productOperations.createHomePageBannerSection(
-      title,
-      productType,
-      description,
-      s3PathMap.get('banner'),
-    );
+    const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Banner', req.files);
+    await productOperations.createHomePageBannerSection(title, productType, description, s3PathMap.get('banner'));
     req.session.message = 'Home Page Second Banner Section Set Up!';
     return res.status(201).json({});
   }
@@ -1803,11 +1545,7 @@ async function setHomePageBanner(req, res) {
   };
 
   if (bannerBlob !== undefined) {
-    const s3PathMap = await productOperations.uploadPictures(
-      'HomePage/',
-      'Banner',
-      req.files,
-    );
+    const s3PathMap = await productOperations.uploadPictures('HomePage/', 'Banner', req.files);
     data.imagePath = s3PathMap.get('banner');
   }
 
@@ -1828,17 +1566,8 @@ async function setHomePageMainBanner(req, res) {
     if (bannerBlob === undefined) {
       return res.status(400).json({ error: 'Banner Image must be set' });
     }
-    const s3PathMap = await productOperations.uploadPictures(
-      'HomePage/',
-      'MainBanner',
-      req.files,
-    );
-    await productOperations.createHomePageMainBannerSection(
-      title,
-      buttonText,
-      description,
-      s3PathMap.get('banner'),
-    );
+    const s3PathMap = await productOperations.uploadPictures('HomePage/', 'MainBanner', req.files);
+    await productOperations.createHomePageMainBannerSection(title, buttonText, description, s3PathMap.get('banner'));
     req.session.message = 'Home Page Main Banner Section Set Up!';
     return res.status(201).json({});
   }
@@ -1851,11 +1580,7 @@ async function setHomePageMainBanner(req, res) {
   };
 
   if (bannerBlob !== undefined) {
-    const s3PathMap = await productOperations.uploadPictures(
-      'HomePage/',
-      'MainBanner',
-      req.files,
-    );
+    const s3PathMap = await productOperations.uploadPictures('HomePage/', 'MainBanner', req.files);
     data.imagePath = s3PathMap.get('banner');
   }
 
@@ -1921,12 +1646,8 @@ async function getDeactivatePage(req, res) {
 
   // if not do nothing
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
-  const quantityGroup = await productOperations.getQuantityGroupForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+  const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
   const isValid = await productOperations.isProductValid(product);
@@ -1952,12 +1673,8 @@ async function getActivatePage(req, res) {
     return res.redirect('/admin-dashboard/products');
   }
 
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(
-    product.id,
-  );
-  const quantityGroup = await productOperations.getQuantityGroupForProductId(
-    product.id,
-  );
+  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+  const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
   const isValid = await productOperations.isProductValid(product);
@@ -1991,9 +1708,7 @@ async function activate(req, res) {
   const isValid = await productOperations.isProductValid(product);
 
   if (!isValid.isValid) {
-    return res
-      .status(400)
-      .json({ error: `${isValid.page} is not valid.`, page: isValid.page });
+    return res.status(400).json({ error: `${isValid.page} is not valid.`, page: isValid.page });
   }
 
   await productOperations.activateProduct(product.id);
@@ -2079,10 +1794,7 @@ async function updateOptionName(req, res) {
   if (option.name === name) return res.status(400).json({ error: 'No Change made.' });
 
   // check whether name already exists for the same optiontype
-  const existingOption = await productOperations.getOptionByNameAndType(
-    name,
-    option.optionTypeFk,
-  );
+  const existingOption = await productOperations.getOptionByNameAndType(name, option.optionTypeFk);
 
   if (existingOption) {
     return res.status(400).json({
@@ -2091,40 +1803,23 @@ async function updateOptionName(req, res) {
   }
 
   const {
-    productsWithPrintingOption,
-    productsWithFinishingOption,
-    optionGroupItemIds,
-    finishingMatrixRowIds,
+    productsWithPrintingOption, productsWithFinishingOption, optionGroupItemIds, finishingMatrixRowIds,
   } = await productOperations.getProductsWhichCurrentlyUseOptionId(id);
 
-  if (
-    productsWithPrintingOption.length > 0
-    || productsWithFinishingOption.length > 0
-  ) {
+  if (productsWithPrintingOption.length > 0 || productsWithFinishingOption.length > 0) {
     if (withWarnings) {
-      return res
-        .status(500)
-        .json({ productsWithFinishingOption, productsWithPrintingOption });
+      return res.status(500).json({ productsWithFinishingOption, productsWithPrintingOption });
     }
   }
 
-  const newOption = await productOperations.createOption(
-    name,
-    option.optionTypeFk,
-  );
+  const newOption = await productOperations.createOption(name, option.optionTypeFk);
 
   if (optionGroupItemIds.length > 0) {
-    await productOperations.updateOptionForOptionGroupItems(
-      optionGroupItemIds,
-      newOption.id,
-    );
+    await productOperations.updateOptionForOptionGroupItems(optionGroupItemIds, newOption.id);
   }
 
   if (finishingMatrixRowIds.length > 0) {
-    await productOperations.updateOptionForFinishingMatrixRows(
-      finishingMatrixRowIds,
-      newOption.id,
-    );
+    await productOperations.updateOptionForFinishingMatrixRows(finishingMatrixRowIds, newOption.id);
   }
 
   const templates = await productOperations.getTemplatesForSizeOptions([id]);
@@ -2155,14 +1850,21 @@ async function updateHomePageOption(req, res) {
   if (!productType) return res.status(400).json({ error: `No Product Type with id ${productTypeId}.` });
 
   const existingHomePageOptionWithProductType = await homePageOperations.getHomePageOptionByProductTypeId(productTypeId);
-  if (existingHomePageOptionWithProductType && existingHomePageOptionWithProductType.id !== homePageOption.id) return res.status(400).json({ error: `Home Page Option at position ${existingHomePageOptionWithProductType.orderNo} is already using '${productType.productType}'` });
+  if (existingHomePageOptionWithProductType && existingHomePageOptionWithProductType.id !== homePageOption.id) {
+    return res
+      .status(400)
+      .json({
+        error: `Home Page Option at position ${existingHomePageOptionWithProductType.orderNo} is already using '${productType.productType}'`,
+      });
+  }
 
   if (description === undefined || description === null || utilityHelper.isEmptyString(description)) return res.status(400).json({ error: "'description' must be set." });
 
-  if (homePageOption.imagePath === null && !files) { return res.status(400).json({ error: 'No image has been set.' }); }
+  if (homePageOption.imagePath === null && !files) {
+    return res.status(400).json({ error: 'No image has been set.' });
+  }
 
-  if (Number(productTypeId) === homePageOption.productTypeFk && description === homePageOption.description
-   && !files) {
+  if (Number(productTypeId) === homePageOption.productTypeFk && description === homePageOption.description && !files) {
     return res.status(400).json({ error: 'No changes made.' });
   }
 
@@ -2225,6 +1927,93 @@ async function getHomePageOption(req, res) {
   });
 }
 
+async function cloneProduct(req, res) {
+  const { id } = req.params;
+  const product = await productOperations.getProductById(id);
+  if (!product) {
+    // error
+    return res.status(400).json({ error: 'Product no found.' });
+  }
+
+  const clonedProductDetails = { ...product.get() };
+  clonedProductDetails.name = `${clonedProductDetails.name} - Clone`;
+  clonedProductDetails.id = undefined;
+  clonedProductDetails.deleteFl = true;
+  clonedProductDetails.versionNo = 1;
+
+  const clonedProduct = await productOperations.createProduct(clonedProductDetails, new Map(), []);
+  const productQuantities = await productOperations.getQuantitiesForProduct(product.id);
+  if (productQuantities.length > 0) {
+    await productOperations.createQuantityGroupAndSetQuantities(
+      clonedProduct.id,
+      productQuantities.map((q) => q.id),
+    );
+    // extract
+    const productPriceMatrixDetails = await productOperations.getPriceMatrixDetailsForProductId(product.id);
+    if (productPriceMatrixDetails.length > 0) {
+      let optionIds = [];
+      productPriceMatrixDetails.forEach((productPriceMatrixDetail) => {
+        productPriceMatrixDetail.forEach((obj) => {
+          optionIds = [...optionIds, ...obj.options];
+        });
+      });
+
+      const uniqueOptionIds = Array.from(new Set(optionIds.map((o) => o.id)));
+
+      const rows = [];
+      productPriceMatrixDetails.forEach((priceMatrixDetails) => {
+        const row = { quantityGroup: [] };
+        priceMatrixDetails.forEach((priceMatrix) => {
+          if (!row.optionIdGroup) {
+            row.optionIdGroup = priceMatrix.options.map((o) => o.id);
+          }
+          row.quantityGroup.push({ id: priceMatrix.quantityFk, price: priceMatrix.price === null ? '' : priceMatrix.price });
+        });
+        rows.push(row);
+      });
+
+      await productOperations.createPrintingAttributes(clonedProduct.id, uniqueOptionIds, rows, true);
+    }
+
+    const finishingMatricesDetails = await productOperations.getFinishingMatricesDetailsForProductId(product.id);
+    if (finishingMatricesDetails.length > 0) {
+      const finishingMatrices = [];
+
+      finishingMatricesDetails.forEach((finishingMatrixDetails) => {
+        const rowsMap = new Map();
+        const rows = [];
+        finishingMatrixDetails.rows.forEach((matrixRow) => {
+          const { orderNo } = matrixRow;
+          if (!rowsMap.has(orderNo)) {
+            rowsMap.set(orderNo, { optionId: [matrixRow.optionId], quantityGroup: [] });
+          }
+
+          rowsMap.get(orderNo).quantityGroup.push({ id: matrixRow.quantityFk, price: matrixRow.price === null ? '' : matrixRow.price });
+        });
+
+        rowsMap.forEach((value) => {
+          rows.push(value);
+        });
+
+        finishingMatrices.push(rows);
+      });
+
+      await productOperations.createFinishingMatrices(clonedProduct.id, finishingMatrices);
+    }
+  }
+
+  const deliveryOptionsForProduct = await deliveryOperations.getAllDeliveryOptionsForProduct(product.id);
+
+  if (deliveryOptionsForProduct.length > 0) {
+    const deliveryOptions = deliveryOptionsForProduct.map((d) => ({ price: d.price, deliveryId: d.deliveryTypeFk }));
+    await deliveryOperations.createDeliveryOptionsForProduct(clonedProduct.id, deliveryOptions);
+  }
+
+  req.session.message = 'Clone Successful';
+
+  return res.status(200).json({ id: clonedProduct.id });
+}
+
 module.exports = {
   activate,
   addFaq,
@@ -2232,6 +2021,7 @@ module.exports = {
   addOptionType,
   addProductType,
   addTemplate,
+  cloneProduct,
   continuePage1,
   continuePage3,
   continuePage4,
