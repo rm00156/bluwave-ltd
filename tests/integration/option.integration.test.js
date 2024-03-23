@@ -1,10 +1,11 @@
 const Sequelize = require('sequelize');
 const productOperations = require('../../utilty/products/productOperations');
 const accountTestHelper = require('../helper/accountTestHelper');
+const generalTestHelper = require('../helper/generalTestHelper');
 
 const models = require('../../models');
 
-let adminAccount;
+// let adminAccount;
 let productType;
 let quantity;
 const optionTypeName = 'Size';
@@ -20,7 +21,7 @@ beforeAll(async () => {
   quantity = await productOperations.getQuantityByName(25);
 
   const adminSetup = await accountTestHelper.setUpAdminAccountAndAgent();
-  adminAccount = adminSetup.adminAccount;
+  // adminAccount = adminSetup.adminAccount;
   agent = adminSetup.agent;
 });
 
@@ -264,6 +265,8 @@ describe('post /option/:id/update', () => {
 });
 
 afterEach(async () => {
+  await generalTestHelper.truncateTables(['products', 'quantityGroupItems', 'quantityGroups', 'finishingMatrices',
+    'finishingMatrixRows', 'optionGroupItems', 'priceMatrixRowQuantityPrices', 'priceMatrices', 'priceMatrixRows']);
   await models.option.update(
     {
       deleteFl: true,
@@ -280,5 +283,5 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await accountTestHelper.deleteAccountById(adminAccount.id);
+  await generalTestHelper.truncateTables(['accounts']);
 });

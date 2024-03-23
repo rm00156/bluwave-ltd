@@ -36,6 +36,23 @@ async function getQuantityGroupForProductId(productId) {
   });
 }
 
+async function getQuantityGroupById(id) {
+  return models.quantityGroup.findOne({
+    where: {
+      id,
+    },
+  });
+}
+
+async function getQuantityGroupItemsByQuantityGroup(quantityGroupFk) {
+  return models.quantityGroupItem.findAll({
+    where: {
+      quantityGroupFk,
+      deleteFl: false,
+    },
+  });
+}
+
 async function createQuantityGroupItem(quantityGroupId, quantityId) {
   await models.quantityGroupItem.create({
     quantityGroupFk: quantityGroupId,
@@ -68,6 +85,14 @@ async function getOptionsByIds(options) {
       id: {
         [Op.in]: options,
       },
+      deleteFl: false,
+    },
+  });
+}
+
+async function getAllOptions() {
+  return models.option.findAll({
+    where: {
       deleteFl: false,
     },
   });
@@ -112,11 +137,7 @@ async function getPrintingAttributeType() {
   return getAttributeTypeByType('Printing');
 }
 
-async function createPriceMatrixRowQuantityPrices(
-  priceMatrixRowId,
-  quantityId,
-  price,
-) {
+async function createPriceMatrixRowQuantityPrices(priceMatrixRowId, quantityId, price) {
   return models.priceMatrixRowQuantityPrice.create({
     priceMatrixRowFk: priceMatrixRowId,
     quantityFk: quantityId,
@@ -143,31 +164,21 @@ async function handleGetRowDetail(optionGroupId, rows, result) {
   let row = result.filter((o) => o.optionGroupFk === optionGroupId);
   row = row.sort((a, b) => a.quantity - b.quantity);
   // get optionGroupItems
-  const optionGroupItems = await getOptionGroupItemsForOptionGroup(
-    optionGroupId,
-  );
+  const optionGroupItems = await getOptionGroupItemsForOptionGroup(optionGroupId);
 
   const updatedRow = row.map((r) => ({ ...r, options: optionGroupItems }));
   rows.push(updatedRow);
 }
 
 async function getRowDetails(result) {
-  const optionGroupIds = Array.from(
-    new Set(result.map((o) => o.optionGroupFk)),
-  );
+  const optionGroupIds = Array.from(new Set(result.map((o) => o.optionGroupFk)));
   const rows = [];
-  await Promise.all(
-    optionGroupIds.map((optionGroupId) => handleGetRowDetail(optionGroupId, rows, result)),
-  );
+  await Promise.all(optionGroupIds.map((optionGroupId) => handleGetRowDetail(optionGroupId, rows, result)));
 
   return rows;
 }
 
-async function createFinishingMatrixRowQuantityPrice(
-  finishingMatrixRowId,
-  quantityId,
-  price,
-) {
+async function createFinishingMatrixRowQuantityPrice(finishingMatrixRowId, quantityId, price) {
   return models.finishingMatrixRowQuantityPrice.create({
     finishingMatrixRowFk: finishingMatrixRowId,
     quantityFk: quantityId,
@@ -288,10 +299,7 @@ async function getFinishingMatricesForProductId(productId) {
   });
 }
 
-async function deleteOptionTypeGroupAndItemsForProductId(
-  productId,
-  attributeType,
-) {
+async function deleteOptionTypeGroupAndItemsForProductId(productId, attributeType) {
   await models.sequelize.query(
     'update optionTypeGroupItems as otgi1 '
       + ' inner join optionTypeGroupItems as otgi2 on otgi1.id = otgi2.id '
@@ -321,11 +329,7 @@ async function deleteOptionTypeGroupAndItemsForProductId(
   );
 }
 
-function updateProductDetailsWithPicturesAndBulletPoints(
-  s3PathMap,
-  productDetails,
-  bulletPoints,
-) {
+function updateProductDetailsWithPicturesAndBulletPoints(s3PathMap, productDetails, bulletPoints) {
   const updatedProductDetails = { ...productDetails };
   s3PathMap.forEach((value, key) => {
     updatedProductDetails[`image${key}Path`] = value;
@@ -342,10 +346,7 @@ function updateProductDetailsWithPicturesAndBulletPoints(
   return updatedProductDetails;
 }
 
-async function getFinishingMatrixRowQuantityPricesForProductIdAndOptionType(
-  productId,
-  optionType,
-) {
+async function getFinishingMatrixRowQuantityPricesForProductIdAndOptionType(productId, optionType) {
   return models.sequelize.query(
     'select distinct q.quantity, o.name as optionName, o.id as optionId, fmr.*, fq.*, fq.id as finishingMatrixRowQuantityPriceId from finishingMatrices fm '
       + ' inner join finishingMatrixRows fmr on fmr.finishingMatrixFk = fm.id '
@@ -413,8 +414,7 @@ async function getAllActiveProducts() {
 
 async function getAllProducts() {
   return models.sequelize.query(
-    'select p.*, pt.productType from products p '
-      + ' inner join productTypes pt on p.productTypeFk = pt.id ',
+    'select p.*, pt.productType from products p inner join productTypes pt on p.productTypeFk = pt.id ',
     { type: models.sequelize.QueryTypes.SELECT },
   );
 }
@@ -479,8 +479,7 @@ async function getAllOptionTypes() {
 
 async function getAllOptionTypesWithOptions() {
   return models.sequelize.query(
-    'select distinct ot.* from optionTypes ot '
-      + ' inner join options o on o.optionTypeFk = ot.id where o.deleteFl = false',
+    'select distinct ot.* from optionTypes ot inner join options o on o.optionTypeFk = ot.id where o.deleteFl = false',
     { type: models.sequelize.QueryTypes.SELECT },
   );
 }
@@ -494,10 +493,7 @@ async function getAllQuantities() {
   });
 }
 
-function updateQuantityPriceTableToIncludeFinishingMatrixTable(
-  quantityPriceTable,
-  finishingQuantityPriceMap,
-) {
+function updateQuantityPriceTableToIncludeFinishingMatrixTable(quantityPriceTable, finishingQuantityPriceMap) {
   const updatedQuantityPriceTable = quantityPriceTable.map((q) => {
     const { quantityId } = q;
     const { pricePer, price } = finishingQuantityPriceMap.get(quantityId);
@@ -567,9 +563,7 @@ async function getQuantityPriceTable(options, finishingOptions, productId) {
     const finishingQuantityPriceMap = new Map();
 
     quantities.forEach((quantityId) => {
-      const finishingQuantityRows = finishingPriceTable.filter(
-        (f) => f.quantityId === quantityId,
-      );
+      const finishingQuantityRows = finishingPriceTable.filter((f) => f.quantityId === quantityId);
 
       let price = 0;
       let pricePer = 0;
@@ -582,10 +576,7 @@ async function getQuantityPriceTable(options, finishingOptions, productId) {
       finishingQuantityPriceMap.set(quantityId, { price, pricePer });
     });
 
-    return updateQuantityPriceTableToIncludeFinishingMatrixTable(
-      quantityPriceTable,
-      finishingQuantityPriceMap,
-    );
+    return updateQuantityPriceTableToIncludeFinishingMatrixTable(quantityPriceTable, finishingQuantityPriceMap);
     // quantityPriceTable.forEach((qr) => {
     //   const { quantityId } = qr;
     //   const { pricePer, price } = finishingQuantityPriceMap.get(quantityId);
@@ -670,29 +661,23 @@ async function mapToFinishingObject(productId, results) {
 
     map.set(optionType, { options: newOptions, rows: [] });
   });
-  await Promise.all(
-    Object.entries(map).map(async ([optionType, value]) => {
-      const rowQuantityPrices = await getFinishingMatrixRowQuantityPricesForProductIdAndOptionType(
-        productId,
-        optionType,
-      );
-      const { options } = value;
 
-      for (let i = 0; i < options.length; i += 1) {
-        const option = options[i];
-        const rowItems = rowQuantityPrices.filter(
-          (rq) => rq.optionId === option.optionId,
-        );
-        const sortedRowItems = rowItems.sort((a, b) => a.quantity - b.quantity);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [optionType, value] of map.entries()) {
+    // eslint-disable-next-line no-await-in-loop
+    const rowQuantityPrices = await getFinishingMatrixRowQuantityPricesForProductIdAndOptionType(productId, optionType);
+    const { options } = value;
+    const rows = [];
+    for (let i = 0; i < options.length; i += 1) {
+      const option = options[i];
+      const rowItems = rowQuantityPrices.filter((rq) => rq.optionId === option.optionId);
+      const sortedRowItems = rowItems.sort((a, b) => a.quantity - b.quantity);
 
-        const existingRows = options.rows;
-        existingRows.push(sortedRowItems);
-        options.rows = existingRows;
-      }
+      rows.push(sortedRowItems);
+    }
 
-      map.set(optionType, options);
-    }),
-  );
+    map.set(optionType, { options, rows });
+  }
 
   const mapAsObject = Object.fromEntries(map);
 
@@ -748,9 +733,7 @@ async function uploadPictures(folder, productName, files) {
       const blob = value.data;
       const extension = utilityHelper.getExtension(value.mimetype);
       const fileName = `picture${index}`;
-      const s3Path = `${
-        process.env.S3_BUCKET_PATH
-      }/${testDevelopment}${folder}${productName}/${date}_${encodeURIComponent(
+      const s3Path = `${process.env.S3_BUCKET_PATH}/${testDevelopment}${folder}${productName}/${date}_${encodeURIComponent(
         fileName,
       )}.${extension}`;
       const params = {
@@ -774,16 +757,15 @@ async function uploadPictures(folder, productName, files) {
 }
 
 async function createProduct(productDetails, s3PathMap, bulletPoints) {
-  const updatedProductDetails = updateProductDetailsWithPicturesAndBulletPoints(
-    s3PathMap,
-    productDetails,
-    bulletPoints,
-  );
+  const updatedProductDetails = updateProductDetailsWithPicturesAndBulletPoints(s3PathMap, productDetails, bulletPoints);
 
-  return models.product.create({
-    ...updatedProductDetails,
-    status: 'Incomplete',
-  });
+  const update = updatedProductDetails.status
+    ? updatedProductDetails
+    : {
+      ...updatedProductDetails,
+      status: 'Incomplete',
+    };
+  return models.product.create(update);
 }
 
 async function createDefaultProduct(name, productTypeFk, status) {
@@ -799,13 +781,7 @@ async function createDefaultProduct(name, productTypeFk, status) {
 async function validateProductInformationDetails(productDetails) {
   const errors = {};
   const {
-    name,
-    productTypeFk,
-    image1Path,
-    description,
-    subDescriptionTitle,
-    subDescription,
-    descriptionPoint1,
+    name, productTypeFk, image1Path, description, subDescriptionTitle, subDescription, descriptionPoint1,
   } = productDetails;
 
   if (name === null || name === '') errors.name = "'Product Name' must be set to continue.";
@@ -817,23 +793,11 @@ async function validateProductInformationDetails(productDetails) {
 
   if (description === undefined || description === null || description === '') errors.description = "'Main Product Description'' must be set to continue.";
 
-  if (
-    subDescriptionTitle === undefined
-    || subDescriptionTitle === null
-    || subDescriptionTitle === ''
-  ) errors.subDescriptionTitle = "'Sub Product Description Title' must be set to continue.";
+  if (subDescriptionTitle === undefined || subDescriptionTitle === null || subDescriptionTitle === '') errors.subDescriptionTitle = "'Sub Product Description Title' must be set to continue.";
 
-  if (
-    subDescription === undefined
-    || subDescription === null
-    || subDescription === ''
-  ) errors.subDescription = "'Sub Product Description' must be set to continue.";
+  if (subDescription === undefined || subDescription === null || subDescription === '') errors.subDescription = "'Sub Product Description' must be set to continue.";
 
-  if (
-    descriptionPoint1 === undefined
-    || descriptionPoint1 === null
-    || descriptionPoint1 === ''
-  ) errors.descriptionBulletPoint = "'Description Bullet Point' must be set to continue.";
+  if (descriptionPoint1 === undefined || descriptionPoint1 === null || descriptionPoint1 === '') errors.descriptionBulletPoint = "'Description Bullet Point' must be set to continue.";
 
   return errors;
 }
@@ -844,10 +808,7 @@ async function createPriceMatrix(productId, options, isComplete) {
   // create optiontypegroup
   // then optiontypegroupitems
   const attributeType = await getPrintingAttributeType();
-  const optionTypeGroup = await createOptionTypeGroup(
-    productId,
-    attributeType.id,
-  );
+  const optionTypeGroup = await createOptionTypeGroup(productId, attributeType.id);
   const optionsObject = await getOptionsByIds(options);
   const optionTypeIds = new Set();
 
@@ -878,11 +839,7 @@ async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
     // eslint-disable-next-line no-await-in-loop
     const optionGroup = await createOptionGroup();
     // eslint-disable-next-line no-await-in-loop
-    const priceMatrixRow = await createPriceMatrixRow(
-      priceMatrixId,
-      optionGroup.id,
-      orderNo,
-    );
+    const priceMatrixRow = await createPriceMatrixRow(priceMatrixId, optionGroup.id, orderNo);
     const optionIds = row.optionIdGroup;
     for (let j = 0; j < optionIds.length; j += 1) {
       const optionId = optionIds[j];
@@ -952,9 +909,7 @@ async function parseOptionTypesAndOption(optionTypesAndOptions) {
 
 async function handleAddingOptionTypesForPricingJson(optionTypeAndOption) {
   const { optionTypeId } = optionTypeAndOption[0];
-  const selectedOptionNames = optionTypeAndOption
-    .map((o1) => o1.name)
-    .join(', ');
+  const selectedOptionNames = optionTypeAndOption.map((o1) => o1.name).join(', ');
   const allOptions = await getOptionsForOptionTypeId(optionTypeId);
 
   return optionTypeAndOption.map((o) => ({
@@ -964,16 +919,12 @@ async function handleAddingOptionTypesForPricingJson(optionTypeAndOption) {
   }));
 }
 
-async function addAllOptionTypesToOptionTypesAndOptionJson(
-  optionTypesAndOptions,
-) {
+async function addAllOptionTypesToOptionTypesAndOptionJson(optionTypesAndOptions) {
   if (optionTypesAndOptions) {
     const result = new Map();
     await Promise.all(
       Object.keys(optionTypesAndOptions).map(async (key) => {
-        result[key] = await handleAddingOptionTypesForPricingJson(
-          optionTypesAndOptions[key],
-        );
+        result[key] = await handleAddingOptionTypesForPricingJson(optionTypesAndOptions[key]);
       }),
     );
 
@@ -985,9 +936,7 @@ async function addAllOptionTypesToOptionTypesAndOptionJson(
 
 async function handleAddingOptionTypesForFinishingJson(optionTypeAndOption) {
   const { optionTypeId } = optionTypeAndOption.options[0];
-  const selectedOptionNames = optionTypeAndOption.options
-    .map((o1) => o1.name)
-    .join(', ');
+  const selectedOptionNames = optionTypeAndOption.options.map((o1) => o1.name).join(', ');
   const allOptions = await getOptionsForOptionTypeId(optionTypeId);
 
   const modifiedOptions = optionTypeAndOption.options.map((o) => ({
@@ -1002,16 +951,12 @@ async function handleAddingOptionTypesForFinishingJson(optionTypeAndOption) {
   };
 }
 
-async function addAllOptionTypesToOptionTypesAndOptionToFinishingJson(
-  optionTypesAndOptions,
-) {
+async function addAllOptionTypesToOptionTypesAndOptionToFinishingJson(optionTypesAndOptions) {
   if (optionTypesAndOptions) {
     const result = new Map();
     await Promise.all(
       Object.keys(optionTypesAndOptions).map(async (key) => {
-        result[key] = await handleAddingOptionTypesForFinishingJson(
-          optionTypesAndOptions[key],
-        );
+        result[key] = await handleAddingOptionTypesForFinishingJson(optionTypesAndOptions[key]);
       }),
     );
 
@@ -1126,10 +1071,7 @@ async function updatePriceMatrixRowPrices(rows) {
 
     quantityGroup.forEach(async (item) => {
       const { priceMatrixRowQuantityPriceId } = item;
-      await updatePriceMatrixRowQuantityPriceById(
-        priceMatrixRowQuantityPriceId,
-        item.price,
-      );
+      await updatePriceMatrixRowQuantityPriceById(priceMatrixRowQuantityPriceId, item.price);
     });
   });
 }
@@ -1214,14 +1156,10 @@ async function searchProductTypesByName(search) {
 }
 
 async function searchProductsByName(search) {
-  return models.sequelize.query(
-    "select concat('/shop/', name) as link, name from products "
-      + ' where name like :search ',
-    {
-      replacements: { search: `%${search}%` },
-      type: models.sequelize.QueryTypes.SELECT,
-    },
-  );
+  return models.sequelize.query("select concat('/shop/', name) as link, name from products where name like :search ", {
+    replacements: { search: `%${search}%` },
+    type: models.sequelize.QueryTypes.SELECT,
+  });
 }
 
 async function getOptionTypeById(id) {
@@ -1354,12 +1292,7 @@ async function getHomePageBannerSection() {
   });
 }
 
-async function createHomePageBannerSection(
-  title,
-  productTypeId,
-  description,
-  path,
-) {
+async function createHomePageBannerSection(title, productTypeId, description, path) {
   return models.homePageBannerSection.create({
     id: 1,
     title,
@@ -1387,12 +1320,7 @@ async function getHomePageMainBannerSection() {
   });
 }
 
-async function createHomePageMainBannerSection(
-  title,
-  buttonText,
-  description,
-  path,
-) {
+async function createHomePageMainBannerSection(title, buttonText, description, path) {
   return models.homePageMainBannerSection.create({
     id: 1,
     title,
@@ -1423,17 +1351,14 @@ async function getTemplatesForSizeOptions(options) {
 }
 
 async function getTemplates() {
-  return models.sequelize.query(
-    'select t.*, o.name from templates t '
-      + ' inner join options o on t.sizeOptionFk = o.id ',
-    { type: models.sequelize.QueryTypes.SELECT },
-  );
+  return models.sequelize.query('select t.*, o.name from templates t inner join options o on t.sizeOptionFk = o.id ', {
+    type: models.sequelize.QueryTypes.SELECT,
+  });
 }
 
 async function getTemplate(id) {
   const result = await models.sequelize.query(
-    'select t.*, o.name from templates t '
-      + ' inner join options o on t.sizeOptionFk = o.id where t.id = :id',
+    'select t.*, o.name from templates t  inner join options o on t.sizeOptionFk = o.id where t.id = :id',
     { replacements: { id }, type: models.sequelize.QueryTypes.SELECT },
   );
   return result.length === 0 ? null : result[0];
@@ -1441,9 +1366,7 @@ async function getTemplate(id) {
 
 async function getAvailableSizeOptionsForNewTemplate() {
   return models.sequelize.query(
-    'select * from options o '
-      + ' where o.id not in (select sizeOptionFk from templates) '
-      + ' and o.optionTypeFk = 1 ',
+    'select * from options o  where o.id not in (select sizeOptionFk from templates) and o.optionTypeFk = 1 ',
     { type: models.sequelize.QueryTypes.SELECT },
   );
 }
@@ -1462,13 +1385,7 @@ async function updateTemplate(id, body) {
 
 async function isProductInformationDetailsComplete(details) {
   const {
-    name,
-    productTypeFk,
-    image1Path,
-    description,
-    subDescriptionTitle,
-    subDescription,
-    descriptionPoint1,
+    name, productTypeFk, image1Path, description, subDescriptionTitle, subDescription, descriptionPoint1,
   } = details;
 
   if (name === null || name === '') return false;
@@ -1480,23 +1397,11 @@ async function isProductInformationDetailsComplete(details) {
 
   if (description === undefined || description === null || description === '') return false;
 
-  if (
-    subDescriptionTitle === undefined
-    || subDescriptionTitle === null
-    || subDescriptionTitle === ''
-  ) return false;
+  if (subDescriptionTitle === undefined || subDescriptionTitle === null || subDescriptionTitle === '') return false;
 
-  if (
-    subDescription === undefined
-    || subDescription === null
-    || subDescription === ''
-  ) return false;
+  if (subDescription === undefined || subDescription === null || subDescription === '') return false;
 
-  if (
-    descriptionPoint1 === undefined
-    || descriptionPoint1 === null
-    || descriptionPoint1 === ''
-  ) return false;
+  if (descriptionPoint1 === undefined || descriptionPoint1 === null || descriptionPoint1 === '') return false;
 
   return true;
 }
@@ -1512,14 +1417,9 @@ async function verifyQuantities(productId, quantities) {
     };
   }
 
-  const exisitingQuantities = await getSelectedQuantitiesForProductById(
-    productId,
-  );
+  const exisitingQuantities = await getSelectedQuantitiesForProductById(productId);
   const existingQuantityIds = exisitingQuantities.map((q) => q.id.toString());
-  const quantitiesTheSame = utilityHelper.hasTheSameItems(
-    quantities,
-    existingQuantityIds,
-  );
+  const quantitiesTheSame = utilityHelper.hasTheSameItems(quantities, existingQuantityIds);
 
   if (quantitiesTheSame) {
     return { valid: false, warning: false, message: 'No changes made.' };
@@ -1541,19 +1441,14 @@ async function verifyQuantities(productId, quantities) {
 }
 
 async function setQuantitiesForQuantityGroup(quantityGroup, quantities) {
-  await Promise.all(
-    quantities.map((quantityId) => createQuantityGroupItem(quantityGroup.id, quantityId)),
-  );
+  await Promise.all(quantities.map((quantityId) => createQuantityGroupItem(quantityGroup.id, quantityId)));
 }
 
 async function removeAllQuantitesFromQuantityGroup(quantityGroup) {
-  await models.sequelize.query(
-    'delete from quantityGroupItems where quantityGroupFk = :id',
-    {
-      replacements: { id: quantityGroup.id },
-      type: models.sequelize.QueryTypes.DELETE,
-    },
-  );
+  await models.sequelize.query('delete from quantityGroupItems where quantityGroupFk = :id', {
+    replacements: { id: quantityGroup.id },
+    type: models.sequelize.QueryTypes.DELETE,
+  });
 }
 
 async function getQuantitiesForQuantityGroup(quantityGroupId) {
@@ -1598,11 +1493,7 @@ async function getFinishingMatrixRowsForQuantityGroup(quantityGroupId) {
   );
 }
 
-async function updatePriceMatrixRowQuantityPricesQuantityChange(
-  quantityGroupId,
-  removedQuantities,
-  addQuantities,
-) {
+async function updatePriceMatrixRowQuantityPricesQuantityChange(quantityGroupId, removedQuantities, addQuantities) {
   if (removedQuantities.length > 0) {
     await models.sequelize.query(
       ' delete pq1 from priceMatrixRowQuantityPrices as pq1 '
@@ -1622,9 +1513,7 @@ async function updatePriceMatrixRowQuantityPricesQuantityChange(
   }
 
   // get pricematrix rows not deleted
-  const priceMatrixRows = await getPriceMatrixRowsForQuantityGroup(
-    quantityGroupId,
-  );
+  const priceMatrixRows = await getPriceMatrixRowsForQuantityGroup(quantityGroupId);
 
   const promises = [];
   for (let i = 0; i < priceMatrixRows.length; i += 1) {
@@ -1633,19 +1522,13 @@ async function updatePriceMatrixRowQuantityPricesQuantityChange(
     for (let j = 0; j < addQuantities.length; j += 1) {
       const addQuantity = addQuantities[j];
 
-      promises.push(
-        createPriceMatrixRowQuantityPrices(priceMatrixRow.id, addQuantity, null),
-      );
+      promises.push(createPriceMatrixRowQuantityPrices(priceMatrixRow.id, addQuantity, null));
     }
   }
   await Promise.all(promises);
 }
 
-async function updateFinishingMatrixRowQuantityPricesQuantityChange(
-  quantityGroupId,
-  removedQuantities,
-  addQuantities,
-) {
+async function updateFinishingMatrixRowQuantityPricesQuantityChange(quantityGroupId, removedQuantities, addQuantities) {
   if (removedQuantities.length > 0) {
     await models.sequelize.query(
       ' delete fq1 from finishingMatrixRowQuantityPrices as fq1 '
@@ -1663,9 +1546,7 @@ async function updateFinishingMatrixRowQuantityPricesQuantityChange(
       },
     );
   }
-  const finishingMatrixRows = await getFinishingMatrixRowsForQuantityGroup(
-    quantityGroupId,
-  );
+  const finishingMatrixRows = await getFinishingMatrixRowsForQuantityGroup(quantityGroupId);
 
   const promises = [];
   for (let i = 0; i < finishingMatrixRows.length; i += 1) {
@@ -1673,22 +1554,14 @@ async function updateFinishingMatrixRowQuantityPricesQuantityChange(
     for (let j = 0; j < addQuantities.length; j += 1) {
       const addQuantity = addQuantities[j];
 
-      promises.push(
-        createFinishingMatrixRowQuantityPrice(
-          finishingMatrixRow.id,
-          addQuantity,
-          null,
-        ),
-      );
+      promises.push(createFinishingMatrixRowQuantityPrice(finishingMatrixRow.id, addQuantity, null));
     }
   }
   await Promise.all(promises);
 }
 
 async function updateQuantitiesForQuantityGroup(quantityGroup, quantities) {
-  const existingQuantities = await getQuantitiesForQuantityGroup(
-    quantityGroup.id,
-  );
+  const existingQuantities = await getQuantitiesForQuantityGroup(quantityGroup.id);
   const existingQuantityIds = existingQuantities.map((q) => q.id.toString());
   const remove = [];
   const add = [];
@@ -1705,16 +1578,8 @@ async function updateQuantitiesForQuantityGroup(quantityGroup, quantities) {
 
   await setQuantitiesForQuantityGroup(quantityGroup, quantities);
 
-  await updatePriceMatrixRowQuantityPricesQuantityChange(
-    quantityGroup.id,
-    remove,
-    add,
-  );
-  await updateFinishingMatrixRowQuantityPricesQuantityChange(
-    quantityGroup.id,
-    remove,
-    add,
-  );
+  await updatePriceMatrixRowQuantityPricesQuantityChange(quantityGroup.id, remove, add);
+  await updateFinishingMatrixRowQuantityPricesQuantityChange(quantityGroup.id, remove, add);
   // update pricematrixrowquantityprices
   // update finisingmatrices
 }
@@ -1729,6 +1594,7 @@ async function createPrintingAttributes(productId, options, rows) {
   const isComplete = await isMatrixDetailsComplete(rows);
   const priceMatrix = await createPriceMatrix(productId, options, isComplete);
   await createPriceMatrixRowsAndQuantityPrices(priceMatrix.id, rows);
+  return priceMatrix;
 }
 
 async function deletePriceMatrixForProduct(productId) {
@@ -1768,9 +1634,7 @@ async function getFinishingMatrixRowsForMatrix(matrixId) {
 }
 
 async function getFinishingMatrixDetail(finishingMatrix, result) {
-  const finishingMatrixRows = await getFinishingMatrixRowsForMatrix(
-    finishingMatrix.id,
-  );
+  const finishingMatrixRows = await getFinishingMatrixRowsForMatrix(finishingMatrix.id);
 
   const matrixDetails = {
     id: finishingMatrix.id,
@@ -1784,19 +1648,12 @@ async function getFinishingMatricesDetailsForProductId(productId) {
   const finishingMatrices = await getFinishingMatricesForProductId(productId);
   const result = [];
 
-  await Promise.all(
-    finishingMatrices.map((finishingMatrix) => getFinishingMatrixDetail(finishingMatrix, result)),
-  );
+  await Promise.all(finishingMatrices.map((finishingMatrix) => getFinishingMatrixDetail(finishingMatrix, result)));
 
   return result;
 }
 
-async function createFinishingMatrix(
-  productId,
-  optionTypeId,
-  orderNo,
-  isComplete,
-) {
+async function createFinishingMatrix(productId, optionTypeId, orderNo, isComplete) {
   const quantityGroup = await getQuantityGroupForProductId(productId);
   return models.finishingMatrix.create({
     productFk: productId,
@@ -1811,9 +1668,7 @@ async function createFinishingMatrix(
 
 async function getOptionTypeFromOptionId(optionId) {
   const optionTypes = await models.sequelize.query(
-    'select ot.* from options o '
-      + ' inner join optionTypes ot on o.optionTypeFk = ot.id '
-      + ' where o.id = :id ',
+    'select ot.* from options o inner join optionTypes ot on o.optionTypeFk = ot.id where o.id = :id ',
     { replacements: { id: optionId }, type: models.sequelize.QueryTypes.SELECT },
   );
 
@@ -1840,31 +1695,18 @@ async function createFinishingMatrices(productId, matrices) {
     // eslint-disable-next-line no-await-in-loop
     const optionType = await getOptionTypeFromOptionId(matrix[0].optionId[0]);
     // eslint-disable-next-line no-await-in-loop
-    const finishingMatrix = await createFinishingMatrix(
-      productId,
-      optionType.id,
-      i + 1,
-      isComplete,
-    );
+    const finishingMatrix = await createFinishingMatrix(productId, optionType.id, i + 1, isComplete);
     for (let j = 0; j < matrix.length; j += 1) {
       const row = matrix[j];
       const { quantityGroup } = row;
       const optionId = row.optionId[0];
       // eslint-disable-next-line no-await-in-loop
-      const finishingMatrixRow = await createFinishingMatrixRow(
-        finishingMatrix.id,
-        optionId,
-        j + 1,
-      );
+      const finishingMatrixRow = await createFinishingMatrixRow(finishingMatrix.id, optionId, j + 1);
 
       for (let k = 0; k < quantityGroup.length; k += 1) {
         const quantityItem = quantityGroup[k];
         // eslint-disable-next-line no-await-in-loop
-        await createFinishingMatrixRowQuantityPrice(
-          finishingMatrixRow.id,
-          quantityItem.id,
-          quantityItem.price,
-        );
+        await createFinishingMatrixRowQuantityPrice(finishingMatrixRow.id, quantityItem.id, quantityItem.price);
       }
     }
   }
@@ -1925,9 +1767,7 @@ async function deleteFinishingPriceMatricesForProduct(productId) {
 }
 
 async function isAllFinishingMatricesComplete(matrices) {
-  const isCompletedArray = await Promise.all(
-    matrices.map((matrix) => isMatrixDetailsComplete(matrix)),
-  );
+  const isCompletedArray = await Promise.all(matrices.map((matrix) => isMatrixDetailsComplete(matrix)));
   return !isCompletedArray.includes(false);
 }
 
@@ -1945,9 +1785,7 @@ async function isProductValid(product) {
 
   const finishingMatrices = await getFinishingMatricesForProductId(product.id);
 
-  const incompleteMatrices = finishingMatrices.filter(
-    (f) => f.status === 'Incomplete',
-  );
+  const incompleteMatrices = finishingMatrices.filter((f) => f.status === 'Incomplete');
   if (incompleteMatrices.length > 0) return { isValid: false, page: 'page4' };
 
   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
@@ -2081,10 +1919,7 @@ async function updateOptionForOptionGroupItems(optionGroupItemIds, optionId) {
   );
 }
 
-async function updateOptionForFinishingMatrixRows(
-  finishingMatrixRowIds,
-  optionId,
-) {
+async function updateOptionForFinishingMatrixRows(finishingMatrixRowIds, optionId) {
   await models.finishingMatrixRow.update(
     {
       optionFk: optionId,
@@ -2259,4 +2094,7 @@ module.exports = {
   getPriceMatrixRowsForQuantityGroup,
   getPriceMatrixRowsForProductId,
   getAllProductTypesNotInList,
+  getQuantityGroupById,
+  getQuantityGroupItemsByQuantityGroup,
+  getAllOptions,
 };

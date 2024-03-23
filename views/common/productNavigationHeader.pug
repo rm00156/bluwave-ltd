@@ -18,4 +18,6 @@ mixin productNavigationHeader(product)
                                 li.breadcrumb-item.active(aria-current='page') Add New Product
                 // button
                 div
+                    if(product)
+                        button.btn.btn-dark#clone(type="button" style="margin-right: 10px" data-product-id=product.id) Clone Product
                     a.btn.btn-light(href='/admin-dashboard/products') Back to Products

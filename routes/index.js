@@ -311,4 +311,7 @@ router.get(
   adminRequire2faSetup,
   adminDashboardController.getMainBannerSectionPage,
 );
+
+router.post('/product/:id/clone', isAdmin, adminRequire2faSetup, adminDashboardController.cloneProduct);
+
 module.exports = router;
