@@ -24,7 +24,7 @@ const redisUrlParse = require('redis-url-parse');
 require('./passport_setup')(passport);
 const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
 const redisUrlParsed = redisUrlParse(REDIS_URL);
-const { host, password } = redisUrlParsed;
+const { host, port, password } = redisUrlParsed;
 const app = express();
 
 const redisConfig = {
@@ -33,8 +33,9 @@ const redisConfig = {
 }
 
 if(REDIS_URL.includes('rediss://')) {
-  redisConfig['password']= password;
-  redisConfig['tls'] = {
+  redisConfig.password = password;
+  redisConfig.port = Number(port);
+  redisConfig.tls = {
     rejectUnauthorized: false
   }
 }
