@@ -22,7 +22,7 @@ const companyInfo = require('./utilty/company/companyInfo');
 const redisUrlParse = require('redis-url-parse');
 
 require('./passport_setup')(passport);
-const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
+const REDIS_URL = process.env.REDIS_TLS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
 const redisUrlParsed = redisUrlParse(REDIS_URL);
 const { host, port, password } = redisUrlParsed;
 const app = express();
