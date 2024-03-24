@@ -29,7 +29,7 @@ const redisClient = redis.createClient({
 });
 
 redisClient.connect().catch((err) => {
-  logger.err(err);
+  logger.error(err);
 });
 const models = require('./models');
 
