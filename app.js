@@ -19,14 +19,20 @@ const upload = require('express-fileupload');
 const flash = require('connect-flash');
 const indexRouter = require('./routes/index');
 const companyInfo = require('./utilty/company/companyInfo');
-require('./passport_setup')(passport);
+const redisUrlParse = require('redis-url-parse');
 
+require('./passport_setup')(passport);
+const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
+const redisUrlParsed = redisUrlParse(REDIS_URL);
+const { host} = redisUrlParsed;
 const app = express();
 
 const redisClient = redis.createClient({
-  host: process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379',
+  host: REDIS_URL.includes('rediss://') ? host : REDIS_URL,
   port: 6379, // Default Redis port
 });
+
+
 
 redisClient.connect().catch((err) => {
   logger.error(err);
