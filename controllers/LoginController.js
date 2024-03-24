@@ -93,10 +93,11 @@ async function adminLoginStepTwo(req, res) {
 }
 
 function logout(req, res) {
-  req.logout();
-  req.session.destroy();
-  res.clearCookie('bluwave_ecommerce_user_data');
-  res.redirect('/');
+  req.logout(() => {
+    req.session.destroy();
+    res.clearCookie('bluwave_ecommerce_user_data');
+    res.redirect('/');
+  });
 }
 
 async function getLoginPage(req, res) {
@@ -120,6 +121,8 @@ function login(req, res, next) {
     return req.logIn(account, async (loginErr) => {
       if (loginErr) return next(loginErr);
 
+      await accountOperations.createCookie(account.id, 60000 * 60 * 24 * 7, res);
+      // we need to clear any cookie and create new cookie
       return res.redirect(`/account/${account.id}/orders`);
     });
   })(req, res, next);

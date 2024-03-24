@@ -1,6 +1,6 @@
 const request = require('supertest');
 const models = require('../../models');
-const { app } = require('../../app');
+const { app, redisClient } = require('../../app');
 const accountOperations = require('../../utilty/account/accountOperations');
 
 async function deleteAccountById(id) {
@@ -35,7 +35,12 @@ async function setUpAdminAccountAndAgent() {
   return { adminAccount, agent };
 }
 
+function closeRedisClientConnection() {
+  redisClient.quit();
+}
+
 module.exports = {
+  closeRedisClientConnection,
   deleteAccountById,
   setUpAdminAccountAndAgent,
 };

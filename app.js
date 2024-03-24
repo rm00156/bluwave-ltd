@@ -12,7 +12,8 @@ const morgan = require('morgan');
 const logger = require('pino')();
 const passport = require('passport');
 const session = require('express-session');
-const MemoryStore = require('memorystore')(session);
+const RedisStore = require('connect-redis').default;
+const redis = require('redis');
 const bodyParser = require('body-parser');
 const upload = require('express-fileupload');
 const flash = require('connect-flash');
@@ -22,6 +23,14 @@ require('./passport_setup')(passport);
 
 const app = express();
 
+const redisClient = redis.createClient({
+  host: process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379',
+  port: 6379, // Default Redis port
+});
+
+redisClient.connect().catch((err) => {
+  logger.err(err);
+});
 const models = require('./models');
 
 let socket;
@@ -61,7 +70,8 @@ app.use(session(
     secret: process.env.SECRET,
     saveUninitialized: false,
     resave: false,
-    store: new MemoryStore({ checkPeriod: 86400000 }),
+    store: new RedisStore({ client: redisClient }),
+
   },
 ));
 app.use(passport.initialize());
@@ -90,5 +100,6 @@ app.use((error, req, res) => {
 
 module.exports = {
   app,
+  redisClient,
   setSocket,
 };
