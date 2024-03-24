@@ -4,7 +4,7 @@
   "description": "Bluwave ecommerce website",
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles  --coverage"
   },
   "engines": {
     "node": "^20.1.0",
@@ -23,6 +23,7 @@
     "bootstrap-select": "^1.13.18",
     "bull": "^4.8.4",
     "connect-flash": "^0.1.1",
+    "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.6",
     "croppie": "2.6.5",
     "dateformat": "^5.0.3",
@@ -31,7 +32,7 @@
     "express": "^4.18.1",
     "express-async-errors": "^3.1.1",
     "express-fileupload": "^1.4.0",
-    "express-session": "^1.17.3",
+    "express-session": "^1.18.0",
     "foreman": "^3.0.1",
     "fs": "0.0.1-security",
     "fs-extra": "^7.0.1",
@@ -52,7 +53,7 @@
     "nodemailer": "^6.7.5",
     "nodemailer-express-handlebars": "^3.3.0",
     "nodemon": "^1.19.4",
-    "passport": "^0.4.1",
+    "passport": "^0.7.0",
     "passport-2fa-totp": "0.0.1",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

@@ -163,6 +163,7 @@ describe('put /home-page-option/:id/update', () => {
 
 afterAll(async () => {
   await generalTestHelper.truncateTables(['accounts']);
+  accountTestHelper.closeRedisClientConnection();
 });
 
 afterEach(async () => {
