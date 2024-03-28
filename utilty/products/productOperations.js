@@ -147,6 +147,17 @@ async function createPriceMatrixRowQuantityPrices(priceMatrixRowId, quantityId, 
   });
 }
 
+async function createPriceMatrixRowQuantityPricesForRow(priceMatrixRowId, quantityDetails) {
+  let query = 'insert into priceMatrixRowQuantityPrices (priceMatrixRowFk, quantityFk, price, deleteFl, versionNo) values ';
+  quantityDetails.forEach((q) => {
+    query += `(${priceMatrixRowId}, ${q.id}, ${q.price}, false, 1),`;
+  });
+
+  query = query.slice(0, -1);
+
+  await models.sequelize.query(query, { type: models.sequelize.QueryTypes.INSERT });
+}
+
 async function getOptionGroupItemsForOptionGroup(optionGroupId) {
   return models.sequelize.query(
     'select o.name, o.id, ot.optionType from optionGroupItems ogi '
@@ -802,6 +813,17 @@ async function validateProductInformationDetails(productDetails) {
   return errors;
 }
 
+async function createPriceMatrixForProduct(productFk, optionTypeGroupFk, status, quantityGroupFk) {
+  return models.priceMatrix.create({
+    productFk,
+    optionTypeGroupFk,
+    status,
+    quantityGroupFk,
+    deleteFl: false,
+    versionNo: 1,
+  });
+}
+
 async function createPriceMatrix(productId, options, isComplete) {
   // from options list, u have the id
   // from the list of ids get the distinct optionType ids
@@ -822,14 +844,23 @@ async function createPriceMatrix(productId, options, isComplete) {
 
   const quantityGroup = await getQuantityGroupForProductId(productId);
 
-  return models.priceMatrix.create({
-    productFk: productId,
-    optionTypeGroupFk: optionTypeGroup.id,
-    status: isComplete ? 'Complete' : 'Incomplete',
-    quantityGroupFk: quantityGroup.id,
-    deleteFl: false,
-    verisonNo: 1,
+  return createPriceMatrixForProduct(
+    productId,
+    optionTypeGroup.id,
+    isComplete ? 'Complete' : 'Incomplete',
+    quantityGroup.id,
+  );
+}
+
+async function createOptionGroupItems(optionGroupId, optionIds) {
+  let query = 'insert into optionGroupItems (optionGroupFk, optionFk, deleteFl, versionNo) values ';
+  optionIds.forEach((id) => {
+    query += `(${optionGroupId}, ${id}, false, 1),`;
   });
+
+  query = query.slice(0, -1);
+
+  await models.sequelize.query(query, { type: models.sequelize.QueryTypes.INSERT });
 }
 
 async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
@@ -841,22 +872,13 @@ async function createPriceMatrixRowsAndQuantityPrices(priceMatrixId, rows) {
     // eslint-disable-next-line no-await-in-loop
     const priceMatrixRow = await createPriceMatrixRow(priceMatrixId, optionGroup.id, orderNo);
     const optionIds = row.optionIdGroup;
-    for (let j = 0; j < optionIds.length; j += 1) {
-      const optionId = optionIds[j];
-      // eslint-disable-next-line no-await-in-loop
-      await createOptionGroupItem(optionGroup.id, optionId);
-    }
+    // eslint-disable-next-line no-await-in-loop
+    await createOptionGroupItems(optionGroup.id, optionIds);
     const quantities = row.quantityGroup;
 
-    for (let k = 0; k < quantities.length; k += 1) {
-      const quantity = quantities[k];
-      // eslint-disable-next-line no-await-in-loop
-      await createPriceMatrixRowQuantityPrices(
-        priceMatrixRow.id,
-        quantity.id,
-        quantity.price === '' ? null : quantity.price,
-      );
-    }
+    const quantityDetails = quantities.map((q) => ({ id: q.id, price: q.price === '' ? null : q.price }));
+    // eslint-disable-next-line no-await-in-loop
+    await createPriceMatrixRowQuantityPricesForRow(priceMatrixRow.id, quantityDetails);
 
     orderNo += 1;
   }
@@ -1992,6 +2014,15 @@ async function getAllProductTypesNotInList(ids) {
     order: [['productType', 'ASC']],
   });
 }
+
+async function getPriceMatrixRowQuantityPriceForRow(priceMatrixRowFk) {
+  return models.priceMatrixRowQuantityPrice.findAll({
+    where: {
+      priceMatrixRowFk,
+    },
+  });
+}
+
 module.exports = {
   getQuantityByName,
   createQuantity,
@@ -2097,4 +2128,12 @@ module.exports = {
   getQuantityGroupById,
   getQuantityGroupItemsByQuantityGroup,
   getAllOptions,
+  createOptionGroupItems,
+  createPriceMatrixRowQuantityPricesForRow,
+  createPriceMatrixForProduct,
+  createQuantityGroup,
+  createPriceMatrixRow,
+  getPriceMatrixRowQuantityPriceForRow,
+  getPrintingAttributeType,
+  createOptionTypeGroup,
 };

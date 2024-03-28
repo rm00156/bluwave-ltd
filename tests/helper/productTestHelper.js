@@ -66,6 +66,15 @@ async function createTestProductWithDelivery() {
   };
 }
 
+async function createPriceMatrix() {
+  const product = await createTestProduct(true);
+  const attributeType = await productOperations.getPrintingAttributeType();
+  const optionTypeGroup = await productOperations.createOptionTypeGroup(product.id, attributeType.id);
+  const quantityGroup = await productOperations.createQuantityGroup(product.id);
+
+  return productOperations.createPriceMatrixForProduct(product.id, optionTypeGroup.id, 'Complete', quantityGroup.id);
+}
+
 async function truncateQuantityGroupItemsAndGroups() {
   await models.quantityGroupItem.destroy({ truncate: true });
   await models.quantityGroup.destroy({ truncate: true });
@@ -73,6 +82,7 @@ async function truncateQuantityGroupItemsAndGroups() {
 
 module.exports = {
   // createCompleteTestProduct,
+  createPriceMatrix,
   createTestProduct,
   createTestProductWithDelivery,
   createTestProductWithFinishingMatrices,

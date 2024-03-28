@@ -4,7 +4,7 @@
   "description": "Bluwave ecommerce website",
   "scripts": {
     "start": "node ./bin/www",
-    "test": "jest --detectOpenHandles  --coverage"
+    "test": "jest --detectOpenHandles"
   },
   "engines": {
     "node": "^20.1.0",
