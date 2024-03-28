@@ -12,7 +12,8 @@ const morgan = require('morgan');
 const logger = require('pino')();
 const passport = require('passport');
 const session = require('express-session');
-const RedisStore = require('connect-redis').default;
+// const RedisStore = require('connect-redis').default;
+const MemoryStore = require('memorystore')(session);
 const redis = require('redis');
 const bodyParser = require('body-parser');
 const upload = require('express-fileupload');
@@ -77,8 +78,8 @@ app.use(session(
     secret: process.env.SECRET,
     saveUninitialized: false,
     resave: false,
-    store: new RedisStore({ client: redisClient }),
-
+    // store: new RedisStore({ client: redisClient }),
+    store: new MemoryStore({ checkPeriod: 86400000 }),
   },
 ));
 app.use(passport.initialize());
