@@ -36,9 +36,9 @@ const app = express();
 
 
 
-redisClient.connect().catch((err) => {
-  logger.error(err);
-});
+// redisClient.connect().catch((err) => {
+//   logger.error(err);
+// });
 const models = require('./models');
 
 let socket;
@@ -108,6 +108,6 @@ app.use((error, req, res) => {
 
 module.exports = {
   app,
-  redisClient,
+  // redisClient,
   setSocket,
 };
