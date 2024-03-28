@@ -26,9 +26,11 @@ const app = express();
 
 const redisClient = redis.createClient({
   url: REDIS_URL,
-  tls: {
-    rejectUnauthorized: false
-  }
+  socket: {
+    tls: {
+      rejectUnauthorized: false,
+    },
+  },
 });
 
 
