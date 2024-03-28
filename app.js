@@ -22,17 +22,17 @@ const indexRouter = require('./routes/index');
 const companyInfo = require('./utilty/company/companyInfo');
 
 require('./passport_setup')(passport);
-const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
+// const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
 const app = express();
 
-const redisClient = redis.createClient({
-  url: REDIS_URL,
-  socket: {
-    tls: {
-      rejectUnauthorized: false,
-    },
-  },
-});
+// const redisClient = redis.createClient({
+//   url: REDIS_URL,
+//   socket: {
+//     tls: {
+//       rejectUnauthorized: false,
+//     },
+//   },
+// });
 
 
 
