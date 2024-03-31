@@ -284,5 +284,5 @@ afterEach(async () => {
 
 afterAll(async () => {
   await generalTestHelper.truncateTables(['accounts']);
-  accountTestHelper.closeRedisClientConnection();
+  // accountTestHelper.closeRedisClientConnection();
 });
