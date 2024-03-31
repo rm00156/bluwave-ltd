@@ -438,7 +438,7 @@ async function continuePage4(req, res) {
   }
 
   // update
-  await productOperations.deleteFinishingPriceMatricesForProduct(product.id);
+  await productOperations.deleteFinishingMatricesForProduct(product.id);
   await productOperations.createFinishingMatrices(productId, matrices);
 
   const updatedProduct = await productOperations.getProductById(productId);
@@ -525,7 +525,7 @@ async function saveFinishingAttributes(req, res) {
 
   if (finishingMatrices.length > 0) {
     // update
-    await productOperations.deleteFinishingPriceMatricesForProduct(product.id);
+    await productOperations.deleteFinishingMatricesForProduct(product.id);
   }
   await productOperations.createFinishingMatrices(productId, matrices);
   const updatedProduct = await productOperations.getProductById(productId);

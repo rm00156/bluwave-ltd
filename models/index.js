@@ -8,8 +8,8 @@ const sequelize = new Sequelize(env === 'test' ? process.env.TEST_DATABASE_NAME 
   dialect: process.env.DATABASE_DIALECT,
   logging: env !== 'test' && env !== 'development',
   pool: {
-    max:12,
-  }
+    max: 12,
+  },
 });
 const db = {};
 
