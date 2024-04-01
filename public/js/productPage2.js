@@ -60,7 +60,6 @@ function verify(quantities, productId) {
     request.responseType = 'json';
     $('#error').text('');
     // data.append('quantities', quantities);
-    console.log(quantities)
     const encoded = encodeURIComponent(JSON.stringify(quantities));
     request.addEventListener('load', function (response) {
 
