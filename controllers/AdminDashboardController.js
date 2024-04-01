@@ -367,9 +367,14 @@ async function verifyQuantities(req, res) {
     // error
     return res.status(400).json({ error: 'Product no found.' });
   }
-  const quantities = JSON.parse(req.query.quantities);
 
-  const verification = await productOperations.verifyQuantities(productId, quantities);
+  const { quantities } = req.query;
+  if (quantities === undefined) return res.status(400).json({ error: 'No quantities set.' });
+
+  const parsedQuantities = JSON.parse(req.query.quantities);
+  if (parsedQuantities.length === 0) return res.status(400).json({ error: 'No quantities set.' });
+
+  const verification = await productOperations.verifyQuantities(productId, parsedQuantities);
   return res.status(200).json(verification);
 }
 

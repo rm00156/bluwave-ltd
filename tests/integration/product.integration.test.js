@@ -8,7 +8,7 @@ const utilityHelper = require('../../utilty/general/utilityHelper');
 const deliveryOperations = require('../../utilty/delivery/deliveryOperations');
 
 // let productType;
-// let quantity;
+let quantities;
 // const optionTypeName = 'Size';
 // const productTypeName = 'Bookmarks';
 // let optionType;
@@ -19,7 +19,7 @@ beforeAll(async () => {
 
   // productType = await productOperations.getProductTypeByType(productTypeName);
 
-  // quantity = await productOperations.getQuantityByName(25);
+  quantities = await productOperations.getAllQuantities();
 
   const adminSetup = await accountTestHelper.setUpAdminAccountAndAgent();
   agent = adminSetup.agent;
@@ -110,7 +110,6 @@ describe('post /product/:id/clone', () => {
   });
 
   it('when cloned product just has product details and quantities set', async () => {
-    const quantities = await productOperations.getAllQuantities();
     const quantity = quantities[0];
     const productQuantityIds = [quantity.id];
     const { product } = await productTestHelper.createTestProductWithQuantities(productQuantityIds);
@@ -148,7 +147,6 @@ describe('post /product/:id/clone', () => {
   });
 
   it('when cloned product just has product details, quantities and price matrix set', async () => {
-    const quantities = await productOperations.getAllQuantities();
     const quantity = quantities[0];
     const quantity2 = quantities[1];
     const productQuantityIds = [quantity.id, quantity2.id];
@@ -173,7 +171,6 @@ describe('post /product/:id/clone', () => {
           { id: quantity2.id, price: '11.00' },
         ],
       },
-
     ];
 
     const {
@@ -235,7 +232,6 @@ describe('post /product/:id/clone', () => {
   });
 
   it('when cloned product just has product details, quantities and finishing matrix set', async () => {
-    const quantities = await productOperations.getAllQuantities();
     const quantity = quantities[0];
     const quantity2 = quantities[1];
     const productQuantityIds = [quantity.id, quantity2.id];
@@ -243,7 +239,22 @@ describe('post /product/:id/clone', () => {
     const option = options[0];
     const option2 = options[1];
     const productMatrices = [
-      [{ optionId: [option.id], quantityGroup: [{ id: quantity.id, price: '12' }, { id: quantity2.id, price: '2' }] }, { optionId: [option2.id], quantityGroup: [{ id: quantity.id, price: '12' }, { id: quantity2.id, price: '1' }] }],
+      [
+        {
+          optionId: [option.id],
+          quantityGroup: [
+            { id: quantity.id, price: '12' },
+            { id: quantity2.id, price: '2' },
+          ],
+        },
+        {
+          optionId: [option2.id],
+          quantityGroup: [
+            { id: quantity.id, price: '12' },
+            { id: quantity2.id, price: '1' },
+          ],
+        },
+      ],
     ];
 
     const { product, quantityGroup, finishingMatrices } = await productTestHelper.createTestProductWithFinishingMatrices(
@@ -368,15 +379,14 @@ describe('/admin-dashboard/product/page1/continue', () => {
   it('when no image uploaded should receive 400 response', async () => {
     const productTypes = await productOperations.getAllProductTypes();
     const productType = productTypes[0];
-    const response = await agent.post('/admin-dashboard/product/page1/continue')
-      .send({
-        productName: 'Product',
-        productTypeId: productType.id,
-        description: 'description',
-        subDescription: 'subDescription',
-        subDescriptionTitle: 'subDescriptionTitle',
-        bulletPoints: 'Hello,Bye',
-      });
+    const response = await agent.post('/admin-dashboard/product/page1/continue').send({
+      productName: 'Product',
+      productTypeId: productType.id,
+      description: 'description',
+      subDescription: 'subDescription',
+      subDescriptionTitle: 'subDescriptionTitle',
+      bulletPoints: 'Hello,Bye',
+    });
     expect(response.status).toBe(400);
     const errors = JSON.parse(response.error.text);
     expect(errors).not.toBeNull();
@@ -387,7 +397,8 @@ describe('/admin-dashboard/product/page1/continue', () => {
   it('when image 1 has not been set should receive 400 response', async () => {
     const productTypes = await productOperations.getAllProductTypes();
     const productType = productTypes[0];
-    const response = await agent.post('/admin-dashboard/product/page1/continue')
+    const response = await agent
+      .post('/admin-dashboard/product/page1/continue')
       .field('productName', 'Product')
       .field('productTypeId', productType.id)
       .field('description', 'description')
@@ -412,7 +423,8 @@ describe('/admin-dashboard/product/page1/continue', () => {
     const newSubDescriptionTitle = 'New Sub Description Title';
     const bulletPoints = ['Hello', 'Bye', 'New'];
 
-    const response = await agent.post('/admin-dashboard/product/page1/continue')
+    const response = await agent
+      .post('/admin-dashboard/product/page1/continue')
       .field('productName', newProductName)
       .field('productTypeId', productType.id)
       .field('description', newDescription)
@@ -446,7 +458,8 @@ describe('/admin-dashboard/product/page1/continue', () => {
     const newSubDescriptionTitle = 'New Sub Description Title';
     const bulletPoints = ['Hello', 'Bye', 'New'];
 
-    const response = await agent.post('/admin-dashboard/product/page1/continue')
+    const response = await agent
+      .post('/admin-dashboard/product/page1/continue')
       .field('productName', newProductName)
       .field('productTypeId', productType.id)
       .field('description', newDescription)
@@ -473,7 +486,8 @@ describe('/admin-dashboard/product/page1/continue', () => {
   it('when all page 1 values set and existing product id incorrect should receive 400 response', async () => {
     const productTypes = await productOperations.getAllProductTypes();
     const productType = productTypes[0];
-    const response = await agent.post('/admin-dashboard/product/page1/continue')
+    const response = await agent
+      .post('/admin-dashboard/product/page1/continue')
       .field('productName', 'Product')
       .field('productTypeId', productType.id)
       .field('description', 'description')
@@ -488,6 +502,115 @@ describe('/admin-dashboard/product/page1/continue', () => {
     expect(errors).not.toBeNull();
     expect(Object.keys(errors).length).toBe(1);
     expect(errors.error).toBe('Product no found.');
+  });
+});
+
+describe('get /product/:id/verify-quantities', () => {
+  it('when product not found should return 400 response', async () => {
+    const response = await agent.get(`/product/${0}/verify-quantities`);
+    expect(response.status).toBe(400);
+    const errors = JSON.parse(response.error.text);
+    expect(errors).not.toBeNull();
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.error).toBe('Product no found.');
+  });
+
+  it('when product set and quantities not defined found should return 400 response', async () => {
+    const product = await productTestHelper.createTestProduct(false);
+    const response = await agent.get(`/product/${product.id}/verify-quantities`);
+    expect(response.status).toBe(400);
+    const errors = JSON.parse(response.error.text);
+    expect(errors).not.toBeNull();
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.error).toBe('No quantities set.');
+  });
+
+  it('when product set and quantities is empty array found should return 400 response', async () => {
+    const encodedQuantities = encodeURIComponent(JSON.stringify([]));
+    const product = await productTestHelper.createTestProduct(false);
+    const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
+    expect(response.status).toBe(400);
+    const errors = JSON.parse(response.error.text);
+    expect(errors).not.toBeNull();
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.error).toBe('No quantities set.');
+  });
+
+  it('when product set and quantities set for first time should return 200 response', async () => {
+    const encodedQuantities = encodeURIComponent(JSON.stringify([quantities[0].id.toString(), quantities[1].id.toString()]));
+    const product = await productTestHelper.createTestProduct(false);
+    const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
+    expect(response.status).toBe(200);
+    const responseBody = JSON.parse(response.text);
+    expect(responseBody.valid).toBe(true);
+    expect(responseBody.warning).toBe(false);
+    expect(responseBody.message).toBe(false);
+    expect(responseBody.create).toBe(true);
+  });
+
+  it('when product set and quantities set to same existing quantities should return 200 response where valid is false', async () => {
+    const quantityIds = [quantities[0].id.toString(), quantities[1].id.toString()];
+    const encodedQuantities = encodeURIComponent(JSON.stringify(quantityIds));
+    const { product } = await productTestHelper.createTestProductWithQuantities(quantityIds);
+    const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
+    expect(response.status).toBe(200);
+    const responseBody = JSON.parse(response.text);
+    expect(responseBody.valid).toBe(false);
+    expect(responseBody.warning).toBe(false);
+    expect(responseBody.message).toBe('No changes made.');
+  });
+
+  it("when product set and quantities set where price matrix doesn't exist should return 200 response where valid is true with warning false", async () => {
+    const quantityIds = [quantities[0].id.toString(), quantities[1].id.toString()];
+    const encodedQuantities = encodeURIComponent(JSON.stringify(quantityIds));
+    const { product } = await productTestHelper.createTestProductWithQuantities([quantities[0].id.toString()]);
+    const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
+    expect(response.status).toBe(200);
+    const responseBody = JSON.parse(response.text);
+    expect(responseBody.valid).toBe(true);
+    expect(responseBody.warning).toBe(false);
+    expect(responseBody.message).toBe(null);
+  });
+
+  it('when product set and quantities set where price matrix exist should return 200 response where valid is true with warning true', async () => {
+    const quantity = quantities[0];
+    const quantity2 = quantities[1];
+    const options = await productOperations.getAllOptions();
+    const option = options[0];
+    const option2 = options[1];
+    const productOptionIds = [option.id, option2.id];
+    const priceMatrixRows = [
+      {
+        optionIdGroup: [option.id],
+        quantityGroup: [
+          { id: quantity.id, price: '' },
+          { id: quantity2.id, price: '5.00' },
+        ],
+      },
+
+      {
+        optionIdGroup: [option2.id],
+        quantityGroup: [
+          { id: quantity.id, price: '12' },
+          { id: quantity2.id, price: '11.00' },
+        ],
+      },
+    ];
+    const quantityIds = [quantity.id.toString(), quantity2.id.toString()];
+    const encodedQuantities = encodeURIComponent(JSON.stringify([...quantityIds, quantities[2].id.toString()]));
+    const { product } = await productTestHelper.createTestProductWithPriceMatrix(
+      quantityIds,
+      productOptionIds,
+      priceMatrixRows,
+    );
+    const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
+    expect(response.status).toBe(200);
+    const responseBody = JSON.parse(response.text);
+    expect(responseBody.valid).toBe(true);
+    expect(responseBody.warning).toBe(true);
+    expect(responseBody.message).toBe(
+      "Are you sure you wish to make this change? \nMaking this change will alter the existing 'Price' and 'Finishing' matrices and existing prices will be lost.",
+    );
   });
 });
 
