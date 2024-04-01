@@ -1,3 +1,5 @@
+const path = require('path');
+
 const productOperations = require('../../utilty/products/productOperations');
 const accountTestHelper = require('../helper/accountTestHelper');
 const productTestHelper = require('../helper/productTestHelper');
@@ -339,6 +341,153 @@ describe('post /product/:id/clone', () => {
     expect(clonedProductDeliveries.map((d) => ({ price: d.price, deliveryTypeFk: d.deliveryTypeFk }))).toEqual(
       productDeliveries.map((d) => ({ price: d.price, deliveryTypeFk: d.deliveryTypeFk })),
     );
+  });
+});
+
+describe('/admin-dashboard/product/page1/continue', () => {
+  it('when product name is undefined or empty should receive 400 response', async () => {
+    const response = await agent.post('/admin-dashboard/product/page1/continue');
+    expect(response.status).toBe(400);
+    expect(JSON.parse(response.error.text).error).toBe("'Product Name' must be set to save.");
+  });
+
+  it('when product information is not valid should receive 400 response', async () => {
+    const response = await agent.post('/admin-dashboard/product/page1/continue').send({ productName: 'Product' });
+    expect(response.status).toBe(400);
+    const errors = JSON.parse(response.error.text);
+    expect(errors).not.toBeNull();
+
+    expect(errors.productType).toBe("'Product Type' must be set to continue.");
+    expect(errors.description).toBe("'Main Product Description'' must be set to continue.");
+    expect(errors.descriptionBulletPoint).toBe("'Description Bullet Point' must be set to continue.");
+    expect(errors.picture1).toBe('Make sure the main picture has been set to continue.');
+    expect(errors.subDescription).toBe("'Sub Product Description' must be set to continue.");
+    expect(errors.subDescriptionTitle).toBe("'Sub Product Description Title' must be set to continue.");
+  });
+
+  it('when no image uploaded should receive 400 response', async () => {
+    const productTypes = await productOperations.getAllProductTypes();
+    const productType = productTypes[0];
+    const response = await agent.post('/admin-dashboard/product/page1/continue')
+      .send({
+        productName: 'Product',
+        productTypeId: productType.id,
+        description: 'description',
+        subDescription: 'subDescription',
+        subDescriptionTitle: 'subDescriptionTitle',
+        bulletPoints: 'Hello,Bye',
+      });
+    expect(response.status).toBe(400);
+    const errors = JSON.parse(response.error.text);
+    expect(errors).not.toBeNull();
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.picture1).toBe('Make sure the main picture has been set to continue.');
+  });
+
+  it('when image 1 has not been set should receive 400 response', async () => {
+    const productTypes = await productOperations.getAllProductTypes();
+    const productType = productTypes[0];
+    const response = await agent.post('/admin-dashboard/product/page1/continue')
+      .field('productName', 'Product')
+      .field('productTypeId', productType.id)
+      .field('description', 'description')
+      .field('subDescription', 'subDescription')
+      .field('subDescriptionTitle', 'subDescriptionTitle')
+      .field('bulletPoints', 'Hello,Bye')
+      .attach('2Blob', path.join(__dirname, './flyer.svg'));
+
+    expect(response.status).toBe(400);
+    const errors = JSON.parse(response.error.text);
+    expect(errors).not.toBeNull();
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.picture1).toBe('Make sure the main picture has been set to continue.');
+  });
+
+  it('when all page 1 values set and new product should receive 201 response', async () => {
+    const productTypes = await productOperations.getAllProductTypes();
+    const productType = productTypes[0];
+    const newProductName = 'New Product';
+    const newDescription = 'New Description';
+    const newSubDescription = 'New Sub Description';
+    const newSubDescriptionTitle = 'New Sub Description Title';
+    const bulletPoints = ['Hello', 'Bye', 'New'];
+
+    const response = await agent.post('/admin-dashboard/product/page1/continue')
+      .field('productName', newProductName)
+      .field('productTypeId', productType.id)
+      .field('description', newDescription)
+      .field('subDescription', newSubDescription)
+      .field('subDescriptionTitle', newSubDescriptionTitle)
+      .field('bulletPoints', `${bulletPoints[0]},${bulletPoints[1]},${bulletPoints[2]}`)
+      .attach('1Blob', path.join(__dirname, './flyer.svg'));
+
+    expect(response.status).toBe(201);
+    const { id } = JSON.parse(response.text);
+    expect(id).not.toBeNull();
+    const product = await productOperations.getProductById(id);
+    expect(product).not.toBeNull();
+    expect(product.name).toBe(newProductName);
+    expect(product.productTypeFk).toBe(productType.id);
+    expect(product.description).toBe(newDescription);
+    expect(product.subDescription).toBe(newSubDescription);
+    expect(product.subDescriptionTitle).toBe(newSubDescriptionTitle);
+    expect(product.status).toBe('Incomplete');
+    expect(product.deleteFl).toBe(true);
+  });
+
+  it('when all page 1 values set and existing product should receive 200 response', async () => {
+    const product = await productTestHelper.createTestProduct();
+
+    const productTypes = await productOperations.getAllProductTypes();
+    const productType = productTypes[0];
+    const newProductName = 'New Product';
+    const newDescription = 'New Description';
+    const newSubDescription = 'New Sub Description';
+    const newSubDescriptionTitle = 'New Sub Description Title';
+    const bulletPoints = ['Hello', 'Bye', 'New'];
+
+    const response = await agent.post('/admin-dashboard/product/page1/continue')
+      .field('productName', newProductName)
+      .field('productTypeId', productType.id)
+      .field('description', newDescription)
+      .field('subDescription', newSubDescription)
+      .field('subDescriptionTitle', newSubDescriptionTitle)
+      .field('productId', product.id)
+      .field('bulletPoints', `${bulletPoints[0]},${bulletPoints[1]},${bulletPoints[2]}`)
+      .attach('1Blob', path.join(__dirname, './flyer.svg'));
+
+    expect(response.status).toBe(200);
+    const { id } = JSON.parse(response.text);
+    expect(id).not.toBeNull();
+    const updatedProduct = await productOperations.getProductById(id);
+    expect(updatedProduct).not.toBeNull();
+    expect(updatedProduct.name).toBe(newProductName);
+    expect(updatedProduct.productTypeFk).toBe(productType.id);
+    expect(updatedProduct.description).toBe(newDescription);
+    expect(updatedProduct.subDescription).toBe(newSubDescription);
+    expect(updatedProduct.subDescriptionTitle).toBe(newSubDescriptionTitle);
+    expect(updatedProduct.status).toBe('Incomplete');
+    expect(updatedProduct.deleteFl).toBe(true);
+  });
+
+  it('when all page 1 values set and existing product id incorrect should receive 400 response', async () => {
+    const productTypes = await productOperations.getAllProductTypes();
+    const productType = productTypes[0];
+    const response = await agent.post('/admin-dashboard/product/page1/continue')
+      .field('productName', 'Product')
+      .field('productTypeId', productType.id)
+      .field('description', 'description')
+      .field('subDescription', 'subDescription')
+      .field('subDescriptionTitle', 'subDescriptionTitle')
+      .field('bulletPoints', 'Hello,Bye')
+      .field('productId', 0)
+      .attach('1Blob', path.join(__dirname, './flyer.svg'));
+
+    expect(response.status).toBe(400);
+    const errors = JSON.parse(response.error.text);
+    expect(errors).not.toBeNull();
+    expect(Object.keys(errors).length).toBe(1);
+    expect(errors.error).toBe('Product no found.');
   });
 });
 

@@ -657,11 +657,11 @@ async function continuePage1(req, res) {
     subDescriptionTitle,
   };
   let s3PathMap = new Map();
-  if (files !== null) {
+  if (files !== null && files !== undefined) {
     s3PathMap = await productOperations.uploadPictures('Products/', productName, files);
   }
   // verify productName is not empty
-  if (productName === '') {
+  if (!productName || productName === '') {
     return res.status(400).json({ error: "'Product Name' must be set to save." });
   }
 
@@ -675,9 +675,9 @@ async function continuePage1(req, res) {
 
   const errors = await productOperations.validateProductInformationDetails(updatedProductDetails);
   if (!isEmpty(errors)) {
-    if (!files || !files['1Blob'] || Object.keys(errors).length !== 1 || !errors.picture1) return res.status(400).json(errors);
+    return res.status(400).json(errors);
   }
-  if (productId === 'undefined') {
+  if (productId === 'undefined' || productId === undefined) {
     // create product
     updatedProductDetails.deleteFl = true;
 

@@ -174,8 +174,8 @@ html(land="en")
                                                         
                                                         input.form-control(type='text' name='input[]' value=(product != null ? product.descriptionPoint1 : ''))
                                                     .col-sm-1
-                                                    
-                                                        button.btn.btn-primary.add-btn(type='button') +
+                                                        if(product === null || product.descriptionPoint2 === null)
+                                                            button.btn.btn-primary.add-btn(type='button') +
                                                     .col-sm-1
                                                     
                                                 if(product != null && product.descriptionPoint2)
