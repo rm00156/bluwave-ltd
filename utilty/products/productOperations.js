@@ -791,10 +791,14 @@ async function validateProductInformationDetails(productDetails) {
     name, productTypeFk, image1Path, description, subDescriptionTitle, subDescription, descriptionPoint1,
   } = productDetails;
 
-  if (name === null || name === '') errors.name = "'Product Name' must be set to continue.";
+  if (name === null || name === '' || name === undefined) errors.name = "'Product Name' must be set to continue.";
 
-  const productType = await getProductTypeById(productTypeFk);
-  if (productType === null) errors.productType = "'Product Type' must be set to continue.";
+  if (productTypeFk === null || productTypeFk === undefined) {
+    errors.productType = "'Product Type' must be set to continue.";
+  } else {
+    const productType = await getProductTypeById(productTypeFk);
+    if (productType === null) errors.productType = "'Product Type' must be set to continue.";
+  }
 
   if (image1Path === undefined || image1Path === null || image1Path === '') errors.picture1 = 'Make sure the main picture has been set to continue.';
 
