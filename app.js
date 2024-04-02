@@ -19,7 +19,8 @@ const bodyParser = require('body-parser');
 const upload = require('express-fileupload');
 const flash = require('connect-flash');
 const indexRouter = require('./routes/index');
-const companyInfo = require('./utilty/company/companyInfo');
+const companyInfo = require('./utility/company/companyInfo');
+// const { setUpTestDb } = require('./tests/helper/generalTestHelper');
 
 require('./passport_setup')(passport);
 // const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
@@ -44,7 +45,8 @@ let socket;
 function setSocket(ioSocket) {
   socket = ioSocket;
 }
-models.sequelize.sync().then(() => {
+
+models.sequelize.sync().then(async () => {
   models.notification.afterCreate((instance) => {
     if (socket) socket.emit('notification', { notification: instance });
   });

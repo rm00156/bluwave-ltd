@@ -1,7 +1,7 @@
 const request = require('supertest');
 const models = require('../../models');
 const { app /* redisClient */ } = require('../../app');
-const accountOperations = require('../../utilty/account/accountOperations');
+const accountOperations = require('../../utility/account/accountOperations');
 
 async function deleteAccountById(id) {
   await models.account.destroy({

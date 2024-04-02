@@ -1,10 +1,10 @@
 const logger = require('pino')();
 const passport = require('passport');
-const companyInfo = require('../utilty/company/companyInfo');
-const basketOperations = require('../utilty/basket/basketOperations');
-const accountOperations = require('../utilty/account/accountOperations');
-const orderOperations = require('../utilty/order/orderOperations');
-const productOperations = require('../utilty/products/productOperations');
+const companyInfo = require('../utility/company/companyInfo');
+const basketOperations = require('../utility/basket/basketOperations');
+const accountOperations = require('../utility/account/accountOperations');
+const orderOperations = require('../utility/order/orderOperations');
+const productOperations = require('../utility/products/productOperations');
 
 const isDevelopment = process.env.NODE_ENV === undefined;
 

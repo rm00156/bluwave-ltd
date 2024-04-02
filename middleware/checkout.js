@@ -1,4 +1,4 @@
-const basketOperations = require('../utilty/basket/basketOperations');
+const basketOperations = require('../utility/basket/basketOperations');
 
 async function isArtworkRequired(req, res, next) {
   const activeBaskeItemDetials = await basketOperations.getActiveBasketItemsForAccount(req.user.id);

@@ -1,17 +1,17 @@
 const logger = require('pino')();
 const stripe = require('stripe')(process.env.STRIPE_KEY);
-const companyInfo = require('../utilty/company/companyInfo');
-const productOperations = require('../utilty/products/productOperations');
-const basketOperations = require('../utilty/basket/basketOperations');
-const orderOperations = require('../utilty/order/orderOperations');
-const deliveryOperations = require('../utilty/delivery/deliveryOperations');
+const companyInfo = require('../utility/company/companyInfo');
+const productOperations = require('../utility/products/productOperations');
+const basketOperations = require('../utility/basket/basketOperations');
+const orderOperations = require('../utility/order/orderOperations');
+const deliveryOperations = require('../utility/delivery/deliveryOperations');
 
 const notProduction = process.env.NODE_ENV !== 'production';
 
 const queueOperations = !notProduction
-  ? require('../utilty/queue/queueOperations')
+  ? require('../utility/queue/queueOperations')
   : null;
-const accountOperations = require('../utilty/account/accountOperations');
+const accountOperations = require('../utility/account/accountOperations');
 const models = require('../models');
 
 const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;

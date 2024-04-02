@@ -1,0 +1,28 @@
+name: ESLint
+
+on:
+  push:
+    branches: [ master ]  # Replace with the branch(es) you want to lint on push
+  pull_request:  # Optional: Run on pull requests
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest  # Replace with your preferred runner OS
+
+    steps:
+      - uses: actions/checkout@v3  # Checkout your code from the repository
+
+      - name: Install dependencies
+        run: npm install  # Replace with your package manager command if needed
+
+      - name: Run ESLint
+        uses: sibiraj-s/action-eslint@v3 # Use the built-in `run` action for flexibility
+        with:
+          eslint-args: '--ignore-path=.gitignore --quiet'
+          ignore-path: .eslintignore
+
+      - name: Check for ESLint errors (optional)
+        run: |  # Fail the workflow if ESLint finds errors
+          if [ $? -ne 0 ]; then
+            exit 1
+          fi

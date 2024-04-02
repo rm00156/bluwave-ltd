@@ -1,5 +1,5 @@
 const passport = require('passport');
-const accountOperations = require('../utilty/account/accountOperations');
+const accountOperations = require('../utility/account/accountOperations');
 
 async function loginUsingCookie(req, next, res) {
   const cookieDetails = req.cookies.bluwave_ecommerce_user_data;

@@ -1,16 +1,16 @@
 const { isEmpty } = require('lodash');
 const logger = require('pino')();
 const passport = require('passport');
-const companyInfo = require('../utilty/company/companyInfo');
+const companyInfo = require('../utility/company/companyInfo');
 const { validateCreateUserFields } = require('../validators/signup');
-const accountOperations = require('../utilty/account/accountOperations');
-const basketOperations = require('../utilty/basket/basketOperations');
-const productOperations = require('../utilty/products/productOperations');
+const accountOperations = require('../utility/account/accountOperations');
+const basketOperations = require('../utility/basket/basketOperations');
+const productOperations = require('../utility/products/productOperations');
 
 const notProduction = process.env.NODE_ENV !== 'production';
 
 const queueOperations = !notProduction
-  ? require('../utilty/queue/queueOperations')
+  ? require('../utility/queue/queueOperations')
   : null;
 
 async function rerenderSignup(errors, req, res) {

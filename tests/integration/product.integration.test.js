@@ -1,12 +1,11 @@
 const path = require('path');
 
-const productOperations = require('../../utilty/products/productOperations');
+const productOperations = require('../../utility/products/productOperations');
 const accountTestHelper = require('../helper/accountTestHelper');
 const productTestHelper = require('../helper/productTestHelper');
-const generalTestHelper = require('../helper/generalTestHelper');
-const utilityHelper = require('../../utilty/general/utilityHelper');
-const deliveryOperations = require('../../utilty/delivery/deliveryOperations');
-
+const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
+const utilityHelper = require('../../utility/general/utilityHelper');
+const deliveryOperations = require('../../utility/delivery/deliveryOperations');
 // let productType;
 let quantities;
 // const optionTypeName = 'Size';
@@ -15,6 +14,7 @@ let quantities;
 
 let agent;
 beforeAll(async () => {
+  await setUpTestDb();
   // optionType = await productOperations.getOptionTypeByName(optionTypeName);
 
   // productType = await productOperations.getProductTypeByType(productTypeName);
@@ -23,7 +23,7 @@ beforeAll(async () => {
 
   const adminSetup = await accountTestHelper.setUpAdminAccountAndAgent();
   agent = adminSetup.agent;
-});
+}, 60000);
 
 describe('post /admin-dashboard/product/:id/save', () => {
   it('when product name is undefined or empty should receive 400 response', async () => {
@@ -615,7 +615,7 @@ describe('get /product/:id/verify-quantities', () => {
 });
 
 afterEach(async () => {
-  await generalTestHelper.truncateTables([
+  await truncateTables([
     'products',
     'quantityGroupItems',
     'quantityGroups',
@@ -635,6 +635,6 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await generalTestHelper.truncateTables(['accounts']);
+  await truncateTables(['accounts']);
   // accountTestHelper.closeRedisClientConnection();
 });

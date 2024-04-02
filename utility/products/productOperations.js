@@ -4,8 +4,8 @@ const { S3Client } = require('@aws-sdk/client-s3');
 const { Op } = require('sequelize');
 const { isEmpty } = require('lodash');
 const Sequelize = require('sequelize');
-const utilityHelper = require('../general/utilityHelper');
-const deliveryOperations = require('../delivery/deliveryOperations');
+const { getExtension, hasTheSameItems } = require('../general/utilityHelper');
+const { getProductDeliveriesForProduct } = require('../delivery/deliveryOperations');
 const models = require('../../models');
 
 const env = process.env.NODE_ENV || 'development';
@@ -26,6 +26,10 @@ async function getAttributeTypeByType(attributeType) {
       attributeType,
     },
   });
+}
+
+async function getAllAttributeTypes() {
+  return models.attributeType.findAll();
 }
 
 async function getQuantityGroupForProductId(productId) {
@@ -738,7 +742,7 @@ async function uploadPictures(folder, productName, files) {
       const value = files[key];
       const index = key.replace('Blob', '');
       const blob = value.data;
-      const extension = utilityHelper.getExtension(value.mimetype);
+      const extension = getExtension(value.mimetype);
       const fileName = `picture${index}`;
       const s3Path = `${process.env.S3_BUCKET_PATH}/${testDevelopment}${folder}${productName}/${date}_${encodeURIComponent(
         fileName,
@@ -1451,7 +1455,7 @@ async function verifyQuantities(productId, quantities) {
 
   const exisitingQuantities = await getSelectedQuantitiesForProductById(productId);
   const existingQuantityIds = exisitingQuantities.map((q) => q.id.toString());
-  const quantitiesTheSame = utilityHelper.hasTheSameItems(quantities, existingQuantityIds);
+  const quantitiesTheSame = hasTheSameItems(quantities, existingQuantityIds);
 
   if (quantitiesTheSame) {
     return { valid: false, warning: false, message: 'No changes made.' };
@@ -1826,7 +1830,7 @@ async function isProductValid(product) {
   const incompleteMatrices = finishingMatrices.filter((f) => f.status === 'Incomplete');
   if (incompleteMatrices.length > 0) return { isValid: false, page: 'page4' };
 
-  const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+  const productDeliveries = await getProductDeliveriesForProduct(product.id);
   if (productDeliveries.length === 0) return { isValid: false, page: 'page5' };
 
   // discounts
@@ -2245,4 +2249,5 @@ module.exports = {
   updateFinishingMatrixRowQuantityPricesQuantityChange,
   getFinishingMatrixById,
   getFinishingMatrixRowsForFinishingMatrix,
+  getAllAttributeTypes,
 };

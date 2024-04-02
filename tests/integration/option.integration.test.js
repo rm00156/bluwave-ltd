@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
-const productOperations = require('../../utilty/products/productOperations');
+const productOperations = require('../../utility/products/productOperations');
 const accountTestHelper = require('../helper/accountTestHelper');
-const generalTestHelper = require('../helper/generalTestHelper');
+const { truncateTables, setUpTestDb } = require('../helper/generalTestHelper');
 
 const models = require('../../models');
 
@@ -14,6 +14,7 @@ let optionType;
 
 let agent;
 beforeAll(async () => {
+  await setUpTestDb();
   optionType = await productOperations.getOptionTypeByName(optionTypeName);
 
   productType = await productOperations.getProductTypeByType(productTypeName);
@@ -23,7 +24,7 @@ beforeAll(async () => {
   const adminSetup = await accountTestHelper.setUpAdminAccountAndAgent();
   // adminAccount = adminSetup.adminAccount;
   agent = adminSetup.agent;
-});
+}, 60000);
 
 describe('post /option/:id/update', () => {
   it('option not found when invalid option id specified', async () => {
@@ -265,7 +266,7 @@ describe('post /option/:id/update', () => {
 });
 
 afterEach(async () => {
-  await generalTestHelper.truncateTables(['products', 'quantityGroupItems', 'quantityGroups', 'finishingMatrices',
+  await truncateTables(['products', 'quantityGroupItems', 'quantityGroups', 'finishingMatrices',
     'finishingMatrixRows', 'optionGroupItems', 'priceMatrixRowQuantityPrices', 'priceMatrices', 'priceMatrixRows']);
   await models.option.update(
     {
@@ -283,6 +284,6 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await generalTestHelper.truncateTables(['accounts']);
+  await truncateTables(['accounts']);
   // accountTestHelper.closeRedisClientConnection();
 });

@@ -1,7 +1,7 @@
 const logger = require('pino')();
 const Sequelize = require('sequelize');
 const models = require('../../models');
-const utiltyHelper = require('../general/utilityHelper');
+const { generateNumberCode, dateXAmountFromNow, generateHash } = require('../general/utilityHelper');
 
 async function getForgottenPasswordByToken(token) {
   const now = Date.now();
@@ -87,7 +87,7 @@ async function createCookie(accountId, expires, res) {
 }
 
 async function getNewAccountNumber() {
-  const code = utiltyHelper.generateNumberCode();
+  const code = generateNumberCode();
 
   const account = await models.account.findOne({
     where: {
@@ -114,7 +114,7 @@ async function createAccount(
     account = await models.account.create({
       email,
       phoneNumber,
-      password: utiltyHelper.generateHash(password),
+      password: generateHash(password),
       name,
       accountTypeFk,
       createdAt: Date.now(),
@@ -142,7 +142,7 @@ async function createGuestAccount(res) {
     account = await models.account.create({
       email: 'temp@temp.com',
       phoneNumber: '00000000000',
-      password: utiltyHelper.generateHash(process.env.LOGIN_PASSWORD),
+      password: generateHash(process.env.LOGIN_PASSWORD),
       name: 'temp',
       accountTypeFk: 2,
       createdAt: Date.now(),
@@ -251,7 +251,7 @@ async function updateAccount(
     {
       email,
       name,
-      password: utiltyHelper.generateHash(password),
+      password: generateHash(password),
       accountTypeFk: accountTypeId,
       createdDttm: Date.now(),
       phoneNumber,
@@ -335,7 +335,7 @@ async function updateAccountNameAndPhoneNumber(accountId, name, phoneNumber) {
 async function updatePassword(accountId, password) {
   await models.account.update(
     {
-      password: utiltyHelper.generateHash(password),
+      password: generateHash(password),
       versionNo: models.sequelize.literal('versionNo + 1'),
     },
     {
@@ -375,14 +375,14 @@ async function reactivateAccount(accountId) {
 }
 
 async function createForgottenPasswordRequest(accountId) {
-  const token = utiltyHelper.generateNumberCode();
+  const token = generateNumberCode();
 
   const forgottenPassword = await getForgottenPasswordByToken(token);
   if (forgottenPassword === null) {
     return models.forgottenPassword.create({
       accountFk: accountId,
       createdDttm: Date.now(),
-      expirationDttm: utiltyHelper.dateXAmountFromNow(60 * 60 * 1000),
+      expirationDttm: dateXAmountFromNow(60 * 60 * 1000),
       usedFl: false,
       token,
       deleteFl: false,
@@ -554,6 +554,10 @@ async function getAdminAccountType() {
   });
 }
 
+async function getAllAccountTypes() {
+  return models.accountType.findAll();
+}
+
 module.exports = {
   getAdminAccountType,
   createAccountType,
@@ -588,4 +592,5 @@ module.exports = {
   deleteAllNotificationsForAccount,
   getNotificationById,
   reactivateAccount,
+  getAllAccountTypes,
 };

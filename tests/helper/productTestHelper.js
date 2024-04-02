@@ -1,6 +1,6 @@
 const models = require('../../models');
-const deliveryOperations = require('../../utilty/delivery/deliveryOperations');
-const productOperations = require('../../utilty/products/productOperations');
+const deliveryOperations = require('../../utility/delivery/deliveryOperations');
+const productOperations = require('../../utility/products/productOperations');
 
 async function createTestProduct(complete) {
   return productOperations.createDefaultProduct('ProductName', 1, complete ? 'Complete' : 'Incomplete');

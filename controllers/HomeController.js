@@ -1,15 +1,15 @@
-const companyInfo = require('../utilty/company/companyInfo');
-const productOperations = require('../utilty/products/productOperations');
-const accountOperations = require('../utilty/account/accountOperations');
-const basketOperations = require('../utilty/basket/basketOperations');
-const homePageOperations = require('../utilty/homePage/homePageOperations');
+const companyInfo = require('../utility/company/companyInfo');
+const productOperations = require('../utility/products/productOperations');
+const accountOperations = require('../utility/account/accountOperations');
+const basketOperations = require('../utility/basket/basketOperations');
+const homePageOperations = require('../utility/homePage/homePageOperations');
 
 const notProduction = process.env.NODE_ENV !== 'production';
 
 const queueOperations = !notProduction
-  ? require('../utilty/queue/queueOperations')
+  ? require('../utility/queue/queueOperations')
   : null;
-const faqOperations = require('../utilty/faq/faqOperations');
+const faqOperations = require('../utility/faq/faqOperations');
 
 async function getHomePage(req, res) {
   const basketItems = await basketOperations.getActiveBasketItemsForAccount(

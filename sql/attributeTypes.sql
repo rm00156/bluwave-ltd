@@ -1,0 +1,1 @@
+INSERT INTO `attributeTypes` (`id`, `attributeType`, `deleteFl`, `versionNo`) VALUES (1,'Printing',0,1),(2,'Finishing',0,1)

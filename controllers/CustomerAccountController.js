@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
-const companyInfo = require('../utilty/company/companyInfo');
-const productOperations = require('../utilty/products/productOperations');
-const accountOperations = require('../utilty/account/accountOperations');
-const orderOperations = require('../utilty/order/orderOperations');
-const basketOperations = require('../utilty/basket/basketOperations');
-const refundOperations = require('../utilty/refund/refundOperations');
-const deliveryOperations = require('../utilty/delivery/deliveryOperations');
+const companyInfo = require('../utility/company/companyInfo');
+const productOperations = require('../utility/products/productOperations');
+const accountOperations = require('../utility/account/accountOperations');
+const orderOperations = require('../utility/order/orderOperations');
+const basketOperations = require('../utility/basket/basketOperations');
+const refundOperations = require('../utility/refund/refundOperations');
+const deliveryOperations = require('../utility/delivery/deliveryOperations');
 
 async function getOrdersPage(req, res) {
   const basketItems = await basketOperations.getActiveBasketItemsForAccount(

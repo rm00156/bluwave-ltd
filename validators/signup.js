@@ -1,6 +1,6 @@
 const validator = require('validator');
 const logger = require('pino')();
-const accountOperations = require('../utilty/account/accountOperations');
+const accountOperations = require('../utility/account/accountOperations');
 
 function validateCreateUserFields(req) {
   const errors = {};
