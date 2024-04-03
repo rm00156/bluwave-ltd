@@ -72,6 +72,7 @@ describe('post /option/:id/update', () => {
       productName,
       productType.id,
       'Complete',
+      false,
     );
 
     const optionName = 'option';
@@ -112,6 +113,7 @@ describe('post /option/:id/update', () => {
       productName,
       productType.id,
       'Complete',
+      false,
     );
 
     const optionName = 'option';
@@ -144,6 +146,7 @@ describe('post /option/:id/update', () => {
       productName,
       productType.id,
       'Complete',
+      false,
     );
 
     const optionName = 'option';
@@ -192,6 +195,7 @@ describe('post /option/:id/update', () => {
       productName,
       productType.id,
       'Complete',
+      false,
     );
 
     const optionName = 'option';

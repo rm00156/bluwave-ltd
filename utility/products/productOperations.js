@@ -58,7 +58,7 @@ async function getQuantityGroupItemsByQuantityGroup(quantityGroupFk) {
 }
 
 async function createQuantityGroupItem(quantityGroupId, quantityId) {
-  await models.quantityGroupItem.create({
+  return models.quantityGroupItem.create({
     quantityGroupFk: quantityGroupId,
     quantityFk: quantityId,
     deleteFl: false,
@@ -779,12 +779,12 @@ async function createProduct(productDetails, s3PathMap, bulletPoints) {
   return models.product.create(update);
 }
 
-async function createDefaultProduct(name, productTypeFk, status) {
+async function createDefaultProduct(name, productTypeFk, status, deleteFl) {
   return models.product.create({
     name,
     productTypeFk,
     status,
-    deleteFl: false,
+    deleteFl,
     versionNo: 1,
   });
 }
@@ -2250,4 +2250,5 @@ module.exports = {
   getFinishingMatrixById,
   getFinishingMatrixRowsForFinishingMatrix,
   getAllAttributeTypes,
+  getAttributeTypeByType,
 };

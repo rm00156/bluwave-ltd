@@ -61,7 +61,7 @@ describe('post /admin-dashboard/product/:id/save', () => {
   it("when 'productId' is set and is valid, should return update correctly", async () => {
     const productName = 'New Name';
 
-    const product = await productTestHelper.createTestProduct(false);
+    const product = await productTestHelper.createTestProduct(false, true);
     const response = await agent.post('/admin-dashboard/product/page1/save').send({ productName, productId: product.id });
     expect(response.status).toBe(200);
 
@@ -81,7 +81,7 @@ describe('post /product/:id/clone', () => {
   });
 
   it('when cloned product just has product details', async () => {
-    const product = await productTestHelper.createTestProduct();
+    const product = await productTestHelper.createTestProduct(false, true);
 
     const response = await agent.post(`/product/${product.id}/clone`);
     expect(response.status).toBe(200);
@@ -448,7 +448,7 @@ describe('/admin-dashboard/product/page1/continue', () => {
   });
 
   it('when all page 1 values set and existing product should receive 200 response', async () => {
-    const product = await productTestHelper.createTestProduct();
+    const product = await productTestHelper.createTestProduct(false, true);
 
     const productTypes = await productOperations.getAllProductTypes();
     const productType = productTypes[0];
@@ -516,7 +516,7 @@ describe('get /product/:id/verify-quantities', () => {
   });
 
   it('when product set and quantities not defined found should return 400 response', async () => {
-    const product = await productTestHelper.createTestProduct(false);
+    const product = await productTestHelper.createTestProduct(false, true);
     const response = await agent.get(`/product/${product.id}/verify-quantities`);
     expect(response.status).toBe(400);
     const errors = JSON.parse(response.error.text);
@@ -527,7 +527,7 @@ describe('get /product/:id/verify-quantities', () => {
 
   it('when product set and quantities is empty array found should return 400 response', async () => {
     const encodedQuantities = encodeURIComponent(JSON.stringify([]));
-    const product = await productTestHelper.createTestProduct(false);
+    const product = await productTestHelper.createTestProduct(false, true);
     const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
     expect(response.status).toBe(400);
     const errors = JSON.parse(response.error.text);
@@ -538,7 +538,7 @@ describe('get /product/:id/verify-quantities', () => {
 
   it('when product set and quantities set for first time should return 200 response', async () => {
     const encodedQuantities = encodeURIComponent(JSON.stringify([quantities[0].id.toString(), quantities[1].id.toString()]));
-    const product = await productTestHelper.createTestProduct(false);
+    const product = await productTestHelper.createTestProduct(false, true);
     const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
     expect(response.status).toBe(200);
     const responseBody = JSON.parse(response.text);
