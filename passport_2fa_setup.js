@@ -1,7 +1,7 @@
 const GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator;
 const TwoFAStrategy = require('passport-2fa-totp').Strategy;
-const utilityHelper = require('./utilty/general/utilityHelper');
-const accountOperations = require('./utilty/account/accountOperations');
+const utilityHelper = require('./utility/general/utilityHelper');
+const accountOperations = require('./utility/account/accountOperations');
 
 module.exports = function passports(passport) {
   passport.serializeUser((user, done) => {

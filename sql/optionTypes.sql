@@ -1,0 +1,1 @@
+INSERT INTO `optionTypes` (`id`, `optionType`, `deleteFl`, `versionNo`) VALUES (1,'Size',0,1),(2,'Printed Sides',0,1),(3,'Paper Type',0,1),(4,'Orientation',0,1),(5,'Number Of Pages',0,1)

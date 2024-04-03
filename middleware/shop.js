@@ -1,4 +1,4 @@
-const basketOperations = require('../utilty/basket/basketOperations');
+const basketOperations = require('../utility/basket/basketOperations');
 
 async function isValidEditSession(req, res, next) {
   const { edit } = req.query;

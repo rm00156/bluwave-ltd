@@ -1,18 +1,20 @@
 const path = require('path');
 const homePageOptionHelper = require('../helper/homePageOptionHelper');
-const utilityHelper = require('../../utilty/general/utilityHelper');
-const generalTestHelper = require('../helper/generalTestHelper');
+const utilityHelper = require('../../utility/general/utilityHelper');
+const { truncateTables, setUpTestDb } = require('../helper/generalTestHelper');
 
 const accountTestHelper = require('../helper/accountTestHelper');
-const homePageOperations = require('../../utilty/homePage/homePageOperations');
-const productOperations = require('../../utilty/products/productOperations');
+const homePageOperations = require('../../utility/homePage/homePageOperations');
+const productOperations = require('../../utility/products/productOperations');
 
 let agent;
 
 beforeAll(async () => {
+  await setUpTestDb();
+
   const adminSetup = await accountTestHelper.setUpAdminAccountAndAgent();
   agent = adminSetup.agent;
-});
+}, 60000);
 
 beforeEach(async () => {
   await homePageOptionHelper.createHomePageOptions();
@@ -162,7 +164,7 @@ describe('put /home-page-option/:id/update', () => {
 });
 
 afterAll(async () => {
-  await generalTestHelper.truncateTables(['accounts']);
+  await truncateTables(['accounts']);
   // accountTestHelper.closeRedisClientConnection();
 });
 

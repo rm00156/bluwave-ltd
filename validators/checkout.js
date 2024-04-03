@@ -1,6 +1,6 @@
 const validator = require('validator');
 const logger = require('pino')();
-const orderOperations = require('../utilty/order/orderOperations');
+const orderOperations = require('../utility/order/orderOperations');
 
 function validatePhoneNumber(req, res) {
   const { phoneNumber } = req.query;

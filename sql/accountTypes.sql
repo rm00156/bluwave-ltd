@@ -1,0 +1,1 @@
+INSERT INTO `accountTypes` (`id`, `accountType`, `deleteFl`, `versionNo`) VALUES (1,'Admin',0,1),(2,'Customer',0,1)

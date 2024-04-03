@@ -1,5 +1,5 @@
-const accountOperations = require('../utilty/account/accountOperations');
-const utilityHelper = require('../utilty/general/utilityHelper');
+const accountOperations = require('../utility/account/accountOperations');
+const utilityHelper = require('../utility/general/utilityHelper');
 
 const notProduction = process.env.NODE_ENV !== 'production';
 

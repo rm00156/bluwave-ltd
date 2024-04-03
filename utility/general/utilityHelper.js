@@ -1,9 +1,9 @@
 const logger = require('pino')();
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+
 const { Upload } = require('@aws-sdk/lib-storage');
-const {
-  S3Client, /* GetObjectCommand, */ ListObjectsV2Command, DeleteObjectsCommand,
-} = require('@aws-sdk/client-s3');
+const { S3Client, /* GetObjectCommand, */ ListObjectsV2Command, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 
 const env = process.env.NODE_ENV || 'development';
 const TEST = 'test';
@@ -30,7 +30,7 @@ function dateXAmountFromNow(amountInMs) {
   const currentDate = new Date(currentTime);
 
   // Add one hour to the current date
-  const futureDate = new Date(currentDate.getTime() + (amountInMs));
+  const futureDate = new Date(currentDate.getTime() + amountInMs);
 
   return futureDate;
 }
@@ -134,12 +134,12 @@ function isEmptyString(str) {
 
 function createNewS3Client() {
   return new S3Client({
-    region: process.env.region,
+    region: process.env.S3_REGION,
     credentials: {
-      secretAccessKey: process.env.secretAccessKey,
-      accessKeyId: process.env.accessKeyId,
+      accessKeyId: process.env.S3_ACCESS_KEY_ID,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
     },
-    endpoint: process.env.s3_endpoint,
+    endpoint: 'https://s3.eu-west-2.amazonaws.com',
   });
 }
 
@@ -209,6 +209,16 @@ async function uploadFile(folder, file) {
   return s3Path;
 }
 
+async function readSqlFile(filePath) {
+  try {
+    const data = await fs.promises.readFile(filePath, 'utf8');
+    return data;
+  } catch (error) {
+    logger.error('Error reading SQL file:', error);
+    throw error; // Re-throw the error for handling
+  }
+}
+
 module.exports = {
   checkNoDuplicateNonZeroNumbers,
   dateXAmountFromNow,
@@ -221,6 +231,7 @@ module.exports = {
   isEmptyString,
   parseCommaSeperatedText,
   pauseForTimeInSecond,
+  readSqlFile,
   validPassword,
   uploadFile,
 };

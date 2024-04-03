@@ -1,10 +1,15 @@
 const Sequelize = require('sequelize');
-const utiltyHelper = require('../../utilty/general/utilityHelper');
-const accountOperations = require('../../utilty/account/accountOperations');
+const utiltyHelper = require('../../utility/general/utilityHelper');
+const accountOperations = require('../../utility/account/accountOperations');
+const { setUpTestDb } = require('../helper/generalTestHelper');
 
 const model = require('../../models');
 
 const accountIds = [];
+
+beforeAll(async () => {
+  await setUpTestDb();
+}, 60000);
 
 describe('test creation of an account', () => {
   test('if email is not a valid error thrown', async () => {

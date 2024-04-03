@@ -1,14 +1,16 @@
-const productOperations = require('../../utilty/products/productOperations');
-const generalTestHelper = require('../helper/generalTestHelper');
+const productOperations = require('../../utility/products/productOperations');
+const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
 const productTestHelper = require('../helper/productTestHelper');
 
 let quantities;
 let options;
 
 beforeAll(async () => {
+  await setUpTestDb();
+
   quantities = await productOperations.getAllQuantities();
   options = await productOperations.getAllOptions();
-});
+}, 60000);
 
 test('create option group items for optionGroup id', async () => {
   const optionIds = options.map((o) => o.id);
@@ -324,7 +326,7 @@ test('delete finishing matrices for product', async () => {
 });
 
 afterEach(async () => {
-  await generalTestHelper.truncateTables([
+  await truncateTables([
     'optionGroupItems',
     'optionGroups',
     'priceMatrices',
