@@ -58,7 +58,7 @@ async function getQuantityGroupItemsByQuantityGroup(quantityGroupFk) {
 }
 
 async function createQuantityGroupItem(quantityGroupId, quantityId) {
-  await models.quantityGroupItem.create({
+  return models.quantityGroupItem.create({
     quantityGroupFk: quantityGroupId,
     quantityFk: quantityId,
     deleteFl: false,
@@ -779,12 +779,12 @@ async function createProduct(productDetails, s3PathMap, bulletPoints) {
   return models.product.create(update);
 }
 
-async function createDefaultProduct(name, productTypeFk, status) {
+async function createDefaultProduct(name, productTypeFk, status, deleteFl) {
   return models.product.create({
     name,
     productTypeFk,
     status,
-    deleteFl: false,
+    deleteFl,
     versionNo: 1,
   });
 }
@@ -1937,8 +1937,6 @@ async function getProductsWhichCurrentlyUseOptionId(id) {
   const productsWithFinishingOption = await getProductsWhereFinishingAttributeUsesOptionId(id);
   const productsWithPrintingOption = await getProductsWherePrintingAttributeUsesOptionId(id);
 
-  // const products = [...productsWithFinishingOption.products, ...productsWithPrintingOption.products];
-
   return {
     productsWithFinishingOption: productsWithFinishingOption.products,
     productsWithPrintingOption: productsWithPrintingOption.products,
@@ -1970,20 +1968,6 @@ async function updateOptionForFinishingMatrixRows(finishingMatrixRowIds, optionI
     {
       where: {
         id: { [Sequelize.Op.in]: finishingMatrixRowIds },
-      },
-    },
-  );
-}
-
-async function updateOptionForTemplates(templateIds, optionId) {
-  await models.template.update(
-    {
-      optionFk: optionId,
-      versionNo: models.sequelize.literal('versionNo + 1'),
-    },
-    {
-      where: {
-        id: { [Sequelize.Op.in]: templateIds },
       },
     },
   );
@@ -2127,7 +2111,6 @@ module.exports = {
   getQuantityByName,
   createQuantity,
   deleteOption,
-  updateOptionForTemplates,
   updateOptionForFinishingMatrixRows,
   updateOptionForOptionGroupItems,
   getProductsWhichCurrentlyUseOptionId,
@@ -2250,4 +2233,5 @@ module.exports = {
   getFinishingMatrixById,
   getFinishingMatrixRowsForFinishingMatrix,
   getAllAttributeTypes,
+  getAttributeTypeByType,
 };

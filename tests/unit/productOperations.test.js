@@ -186,7 +186,7 @@ describe('get product by id', () => {
   });
 
   it('when id is linked to a product should return product', async () => {
-    const product = await productTestHelper.createTestProduct();
+    const product = await productTestHelper.createTestProduct(false, true);
 
     const getProduct = await productOperations.getProductById(product.id);
     expect(getProduct.id).toBe(product.id);
@@ -323,6 +323,180 @@ test('delete finishing matrices for product', async () => {
     finishingMatrix.id,
   );
   expect(deletedFinishingMatrixRowQuantityPrices.filter((d) => d.deleteFl === 1).length).toBe(2);
+});
+
+describe('get attribute type by type', () => {
+  it('should return null if no attribute type exists with type', async () => {
+    const attributeType = await productOperations.getAttributeTypeByType('test');
+    expect(attributeType).toBeNull();
+  });
+
+  it('should return attribute type if attribute type exists with type', async () => {
+    const attributeType = await productOperations.getAttributeTypeByType('Printing');
+    expect(attributeType).not.toBeNull();
+  });
+});
+
+describe('get quantity group by id', () => {
+  it('should return null if no quantity group with id', async () => {
+    const quantityGroup = await productOperations.getQuantityGroupById(0);
+    expect(quantityGroup).toBeNull();
+  });
+
+  it('should return quantity group if id exists', async () => {
+    const { quantityGroup } = await productTestHelper.createTestProductWithQuantities([]);
+    const getQuantityGroup = await productOperations.getQuantityGroupById(quantityGroup.id);
+    expect(getQuantityGroup).not.toBeNull();
+  });
+});
+
+test('create quantity group item', async () => {
+  const { quantityGroup } = await productTestHelper.createTestProductWithQuantities([]);
+  const quantity = quantities[0];
+  const quantityGroupItem = await productOperations.createQuantityGroupItem(quantityGroup.id, quantity.id);
+
+  expect(quantityGroupItem).not.toBeNull();
+  expect(quantityGroupItem.quantityGroupFk).toBe(quantityGroup.id);
+  expect(quantityGroupItem.quantityFk).toBe(quantity.id);
+  expect(quantityGroupItem.deleteFl).toBe(false);
+  expect(quantityGroupItem.versionNo).toBe(1);
+});
+
+test('create option group items', async () => {
+  const optionGroup = await productOperations.createOptionGroup();
+  const option = options[0];
+  const optionGroupItem = await productOperations.createOptionGroupItem(optionGroup.id, option.id);
+
+  expect(optionGroupItem).not.toBeNull();
+  expect(optionGroupItem.optionGroupFk).toBe(optionGroup.id);
+  expect(optionGroupItem.optionFk).toBe(option.id);
+  expect(optionGroupItem.deleteFl).toBe(false);
+  expect(optionGroupItem.versionNo).toBe(1);
+});
+
+describe('get active product type by id', () => {
+  it('should return null if no active product type with id', async () => {
+    const productType = await productOperations.getActiveProductTypeById(0);
+    expect(productType).toBeNull();
+  });
+
+  it('should return active product type if id exists', async () => {
+    const productTypes = await productOperations.getAllProductTypes();
+    const productType = productTypes[0];
+    const getProductType = await productOperations.getActiveProductTypeById(productType.id);
+    expect(getProductType).not.toBeNull();
+  });
+});
+
+describe('get all active products', () => {
+  it('should return empty if no active products', async () => {
+    await productTestHelper.createTestProduct(false, false);
+    const products = await productOperations.getAllActiveProducts();
+    expect(products.length).toBe(0);
+  });
+
+  it('should return active products', async () => {
+    await productTestHelper.createTestProduct(false, true);
+    const products = await productOperations.getAllActiveProducts();
+    expect(products.length).toBe(1);
+  });
+});
+
+describe('get all products', () => {
+  it('should return products even when inactive', async () => {
+    await productTestHelper.createTestProduct(false, false);
+    const products = await productOperations.getAllProducts();
+    expect(products.length).toBe(1);
+  });
+
+  it('should return active products', async () => {
+    await productTestHelper.createTestProduct(false, true);
+    const products = await productOperations.getAllProducts();
+    expect(products.length).toBe(1);
+  });
+
+  it('should return empty list when no products', async () => {
+    const products = await productOperations.getAllProducts();
+    expect(products.length).toBe(0);
+  });
+});
+
+describe('create quantity', () => {
+  it('should not create quantity if already exist and return existing quantity', async () => {
+    const quantity = await productOperations.getQuantityByName('25');
+    expect(quantity).not.toBeNull();
+
+    const createdQuantity = await productOperations.createQuantity('25');
+    expect(quantity.id).toBe(createdQuantity.id);
+  });
+
+  it("should create quantity if quantity doesn't exist", async () => {
+    const quantity = await productOperations.getQuantityByName('1234');
+    expect(quantity).toBeNull();
+
+    const createdQuantity = await productOperations.createQuantity('1234');
+    expect(createdQuantity).not.toBeNull();
+
+    await productTestHelper.deleteQuantity(createdQuantity.id);
+  });
+});
+
+describe('templates', () => {
+  it('should create template successfully', async () => {
+    const option = options[0];
+    const body = {
+      bleedAreaWidth: 10,
+      bleedAreaHeight: 10,
+      trimWidth: 10,
+      trimHeight: 10,
+      safeAreaHeight: 20,
+      safeAreaWidth: 20,
+      deleteFl: false,
+      sizeOptionFk: option.id,
+      versionNo: 1,
+      pdfPath: 'pdfTemplate',
+      jpegPath: 'jpgTemplate',
+    };
+
+    const template = await productOperations.createTemplate(body);
+    expect(template).not.toBeNull();
+
+    expect(template.bleedAreaHeight).toBe(body.bleedAreaHeight);
+    expect(template.bleedAreaWidth).toBe(body.bleedAreaWidth);
+    expect(template.trimWidth).toBe(body.trimWidth);
+    expect(template.trimHeight).toBe(body.trimHeight);
+    expect(template.safeAreaHeight).toBe(body.safeAreaHeight);
+    expect(template.safeAreaWidth).toBe(body.safeAreaWidth);
+    expect(template.deleteFl).toBe(body.deleteFl);
+    expect(template.sizeOptionFk).toBe(body.sizeOptionFk);
+    expect(template.versionNo).toBe(body.versionNo);
+    expect(template.pdfPath).toBe(body.pdfPath);
+    expect(template.jpegPath).toBe(body.jpegPath);
+  });
+});
+
+describe('product activation and deactivation', () => {
+  it('should return activated product', async () => {
+    const product = await productTestHelper.createTestProduct(false, false);
+    expect(product.deleteFl).toBe(true);
+    expect(product.status).toBe('Incomplete');
+
+    await productOperations.activateProduct(product.id);
+    const activatedProduct = await productOperations.getProductById(product.id);
+
+    expect(activatedProduct.deleteFl).toBe(false);
+    expect(activatedProduct.status).toBe('Complete');
+  });
+
+  it('should return deactivated product', async () => {
+    const product = await productTestHelper.createTestProduct(false, true);
+    expect(product.deleteFl).toBe(false);
+
+    await productOperations.deactivateProduct(product.id, true);
+    const deactivatedProduct = await productOperations.getProductById(product.id);
+
+    expect(deactivatedProduct.deleteFl).toBe(true);
+  });
 });
 
 afterEach(async () => {

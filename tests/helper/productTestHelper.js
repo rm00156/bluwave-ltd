@@ -2,12 +2,12 @@ const models = require('../../models');
 const deliveryOperations = require('../../utility/delivery/deliveryOperations');
 const productOperations = require('../../utility/products/productOperations');
 
-async function createTestProduct(complete) {
-  return productOperations.createDefaultProduct('ProductName', 1, complete ? 'Complete' : 'Incomplete');
+async function createTestProduct(complete, isActive) {
+  return productOperations.createDefaultProduct('ProductName', 1, complete ? 'Complete' : 'Incomplete', !isActive);
 }
 
 async function createTestProductWithQuantities(quantityIds) {
-  const product = await createTestProduct(false);
+  const product = await createTestProduct(false, true);
   const quantityGroup = await productOperations.createQuantityGroupAndSetQuantities(product.id, quantityIds);
 
   return { product, quantityGroup };
@@ -53,7 +53,7 @@ async function createTestProductWithPriceAndPrintingMatrix(quantityIds, options,
 }
 
 async function createTestProductWithDelivery() {
-  const product = await createTestProduct(false);
+  const product = await createTestProduct(false, true);
 
   const deliveryOptions = await deliveryOperations.getAllActiveDeliveryTypes();
   const deliveryOption = deliveryOptions[0];
@@ -67,7 +67,7 @@ async function createTestProductWithDelivery() {
 }
 
 async function createPriceMatrix() {
-  const product = await createTestProduct(true);
+  const product = await createTestProduct(true, true);
   const attributeType = await productOperations.getPrintingAttributeType();
   const optionTypeGroup = await productOperations.createOptionTypeGroup(product.id, attributeType.id);
   const quantityGroup = await productOperations.createQuantityGroup(product.id);
@@ -80,6 +80,14 @@ async function truncateQuantityGroupItemsAndGroups() {
   await models.quantityGroup.destroy({ truncate: true });
 }
 
+async function deleteQuantity(id) {
+  await models.quantity.destroy({
+    where: {
+      id,
+    },
+  });
+}
+
 module.exports = {
   // createCompleteTestProduct,
   createPriceMatrix,
@@ -89,5 +97,6 @@ module.exports = {
   createTestProductWithPriceAndPrintingMatrix,
   createTestProductWithPriceMatrix,
   createTestProductWithQuantities,
+  deleteQuantity,
   truncateQuantityGroupItemsAndGroups,
 };

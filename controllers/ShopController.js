@@ -598,7 +598,7 @@ async function sessionCompleted(req, res) {
       await orderOperations.completePurchaseBasket(purchaseBasketId, now);
       await queueOperations.addSendPurchaseEmail(purchaseBasketId);
 
-      const orderDetails = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(
+      const orderDetails = await orderOperations.getSuccessfulOrderForPurchaseBasketId(
         purchaseBasketId,
       );
       const text = `${orderDetails.fullName} just made order of £${parseFloat(
