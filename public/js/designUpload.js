@@ -10,7 +10,6 @@ function removeFileGroupItem(e) {
     const fileGroupItemId = e.currentTarget.getAttribute('data-filegroupitemid');
 
     const data = {basketItemId: basketItemId, fileGroupItemId: fileGroupItemId};
-    console.log('reece')
     $.ajax({
         type: 'delete',
         url: '/remove-file-group-item',

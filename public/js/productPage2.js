@@ -6,7 +6,6 @@ function saveQuantities(e) {
 
     if (form.checkValidity()) {
         e.preventDefault();
-        // console.log('reece');
         const quantities = $('#quantities').val();
         const productId = $('#productId').val();
         

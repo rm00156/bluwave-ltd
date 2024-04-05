@@ -684,7 +684,6 @@ function editProduct(e) {
     const form = document.getElementById('form');
     if (form.checkValidity()) {
         e.preventDefault();
-        console.log('reece')
 
         // do additional check
         // files, 

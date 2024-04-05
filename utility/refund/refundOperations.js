@@ -42,7 +42,7 @@ async function createRefund(orderId, refundTypeId, refundAmount) {
   });
 }
 
-async function maxRefundPossibleForOrder(refunds, totalOrderAmount) {
+async function getMaxRefundPossibleForOrder(refunds, totalOrderAmount) {
   const fullRefund = refunds.filter((r) => r.type === 'Full Refund');
   if (fullRefund.length > 0) return 0;
 
@@ -56,10 +56,19 @@ async function maxRefundPossibleForOrder(refunds, totalOrderAmount) {
   return parseFloat(totalOrderAmount) - (totalPartialRefunds / 100);
 }
 
+async function getRefundTypeByType(type) {
+  return models.refundType.findOne({
+    where: {
+      type,
+    },
+  });
+}
+
 module.exports = {
   getRefundsForOrder,
+  getRefundTypeByType,
   isRefundPossibleForOrder,
   getRefundTypes,
   createRefund,
-  maxRefundPossibleForOrder,
+  getMaxRefundPossibleForOrder,
 };
