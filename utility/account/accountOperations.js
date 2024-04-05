@@ -554,8 +554,24 @@ async function getAdminAccountType() {
   });
 }
 
+async function getCustomerAccountType() {
+  return models.accountType.findOne({
+    where: {
+      id: 2,
+    },
+  });
+}
+
 async function getAllAccountTypes() {
   return models.accountType.findAll();
+}
+
+async function getAllCustomerAccounts() {
+  return models.account.findAll({
+    where: {
+      accountTypeFk: 2,
+    },
+  });
 }
 
 module.exports = {
@@ -593,4 +609,6 @@ module.exports = {
   getNotificationById,
   reactivateAccount,
   getAllAccountTypes,
+  getCustomerAccountType,
+  getAllCustomerAccounts,
 };

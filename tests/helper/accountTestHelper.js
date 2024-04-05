@@ -1,10 +1,12 @@
 const request = require('supertest');
-const models = require('../../models');
+const { account } = require('../../models');
 const { app /* redisClient */ } = require('../../app');
-const accountOperations = require('../../utility/account/accountOperations');
+const {
+  createAccount, getAdminAccountType, getCustomerAccountType, getAllCustomerAccounts,
+} = require('../../utility/account/accountOperations');
 
 async function deleteAccountById(id) {
-  await models.account.destroy({
+  await account.destroy({
     where: {
       id,
     },
@@ -17,8 +19,8 @@ async function setUpAdminAccountAndAgent() {
   const phoneNumber = 'phoneNumber';
   const password = 'password';
 
-  const adminAccountType = await accountOperations.getAdminAccountType();
-  const adminAccount = await accountOperations.createAccount(
+  const adminAccountType = await getAdminAccountType();
+  const adminAccount = await createAccount(
     adminAccountType.id,
     email,
     name,
@@ -35,12 +37,32 @@ async function setUpAdminAccountAndAgent() {
   return { adminAccount, agent };
 }
 
+async function createTestCustomerAccount() {
+  const allCustomerAccounts = await getAllCustomerAccounts();
+  const email = `customer_email${allCustomerAccounts.length + 1}@email.com`;
+  const name = 'name';
+  const phoneNumber = 'phoneNumber';
+  const password = 'password';
+  const customerAccountType = await getCustomerAccountType();
+
+  const customerAccount = await createAccount(
+    customerAccountType.id,
+    email,
+    name,
+    phoneNumber,
+    password,
+  );
+
+  return customerAccount;
+}
+
 // function closeRedisClientConnection() {
 //   redisClient.quit();
 // }
 
 module.exports = {
   // closeRedisClientConnection,
+  createTestCustomerAccount,
   deleteAccountById,
   setUpAdminAccountAndAgent,
 };

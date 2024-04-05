@@ -80,6 +80,14 @@ async function truncateQuantityGroupItemsAndGroups() {
   await models.quantityGroup.destroy({ truncate: true });
 }
 
+async function deleteQuantity(id) {
+  await models.quantity.destroy({
+    where: {
+      id,
+    },
+  });
+}
+
 module.exports = {
   // createCompleteTestProduct,
   createPriceMatrix,
@@ -89,5 +97,6 @@ module.exports = {
   createTestProductWithPriceAndPrintingMatrix,
   createTestProductWithPriceMatrix,
   createTestProductWithQuantities,
+  deleteQuantity,
   truncateQuantityGroupItemsAndGroups,
 };

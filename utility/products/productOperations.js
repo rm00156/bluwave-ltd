@@ -1937,8 +1937,6 @@ async function getProductsWhichCurrentlyUseOptionId(id) {
   const productsWithFinishingOption = await getProductsWhereFinishingAttributeUsesOptionId(id);
   const productsWithPrintingOption = await getProductsWherePrintingAttributeUsesOptionId(id);
 
-  // const products = [...productsWithFinishingOption.products, ...productsWithPrintingOption.products];
-
   return {
     productsWithFinishingOption: productsWithFinishingOption.products,
     productsWithPrintingOption: productsWithPrintingOption.products,
@@ -1970,20 +1968,6 @@ async function updateOptionForFinishingMatrixRows(finishingMatrixRowIds, optionI
     {
       where: {
         id: { [Sequelize.Op.in]: finishingMatrixRowIds },
-      },
-    },
-  );
-}
-
-async function updateOptionForTemplates(templateIds, optionId) {
-  await models.template.update(
-    {
-      optionFk: optionId,
-      versionNo: models.sequelize.literal('versionNo + 1'),
-    },
-    {
-      where: {
-        id: { [Sequelize.Op.in]: templateIds },
       },
     },
   );
@@ -2127,7 +2111,6 @@ module.exports = {
   getQuantityByName,
   createQuantity,
   deleteOption,
-  updateOptionForTemplates,
   updateOptionForFinishingMatrixRows,
   updateOptionForOptionGroupItems,
   getProductsWhichCurrentlyUseOptionId,

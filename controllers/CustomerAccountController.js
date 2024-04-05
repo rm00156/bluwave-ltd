@@ -32,7 +32,7 @@ async function getOrderPage(req, res) {
   const basketItems = await basketOperations.getActiveBasketItemsForAccount(
     req.user.id,
   );
-  const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(
+  const order = await orderOperations.getSuccessfulOrderForPurchaseBasketId(
     orderId,
   );
   const { shippingDetailFk } = order;

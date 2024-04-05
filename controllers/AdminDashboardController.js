@@ -1249,7 +1249,7 @@ async function getAccountOrdersPage(req, res) {
 async function getAccountOrderPage(req, res) {
   const purchaseBasketId = req.params.id;
 
-  const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId);
+  const order = await orderOperations.getSuccessfulOrderForPurchaseBasketId(purchaseBasketId);
 
   const account = await accountOperations.getAccountById(order.accountFk);
   const { shippingDetailFk } = order;
@@ -1291,7 +1291,7 @@ async function createRefund(req, res) {
   const { refundTypeId } = req.body;
 
   const purchaseBasketId = req.body.orderId;
-  const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId);
+  const order = await orderOperations.getSuccessfulOrderForPurchaseBasketId(purchaseBasketId);
   const amount = refundTypeId === 2 ? order.total : req.body.amount;
   const refundAmount = parseFloat(amount) * 100;
 
@@ -1317,7 +1317,7 @@ async function createRefund(req, res) {
 async function getOustandingAmountOfOrder(req, res) {
   const { purchaseBasketId } = req.query;
 
-  const purchaseBasket = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(purchaseBasketId);
+  const purchaseBasket = await orderOperations.getSuccessfulOrderForPurchaseBasketId(purchaseBasketId);
   const refunds = await refundOperations.getRefundsForOrder(purchaseBasketId);
   const max = await refundOperations.maxRefundPossibleForOrder(refunds, purchaseBasket.total);
 
@@ -1827,12 +1827,13 @@ async function updateOptionName(req, res) {
     await productOperations.updateOptionForFinishingMatrixRows(finishingMatrixRowIds, newOption.id);
   }
 
-  const templates = await productOperations.getTemplatesForSizeOptions([id]);
+  // TO-DO
+  // const templates = await productOperations.getTemplatesForSizeOptions([id]);
 
-  if (templates.length > 0) {
-    const templateIds = templates.map((t) => t.id);
-    await productOperations.updateOptionForTemplates(templateIds, newOption.id);
-  }
+  // if (templates.length > 0) {
+  //   const templateIds = templates.map((t) => t.id);
+  //   await productOperations.updateOptionForTemplates(templateIds, newOption.id);
+  // }
 
   await productOperations.deleteOption(id);
 

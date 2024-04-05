@@ -122,7 +122,7 @@ async function sendPurchaseEmail(purchaseBasketId) {
   const transaction = await models.sequelize.transaction();
 
   try {
-    const order = await orderOperations.getSuccessfulOrderForAccountIdAndPurchaseBasketId(
+    const order = await orderOperations.getSuccessfulOrderForPurchaseBasketId(
       purchaseBasketId,
     );
     order.total = parseFloat(order.total).toFixed(2);

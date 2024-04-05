@@ -420,6 +420,85 @@ describe('get all products', () => {
     expect(products.length).toBe(0);
   });
 });
+
+describe('create quantity', () => {
+  it('should not create quantity if already exist and return existing quantity', async () => {
+    const quantity = await productOperations.getQuantityByName('25');
+    expect(quantity).not.toBeNull();
+
+    const createdQuantity = await productOperations.createQuantity('25');
+    expect(quantity.id).toBe(createdQuantity.id);
+  });
+
+  it("should create quantity if quantity doesn't exist", async () => {
+    const quantity = await productOperations.getQuantityByName('1234');
+    expect(quantity).toBeNull();
+
+    const createdQuantity = await productOperations.createQuantity('1234');
+    expect(createdQuantity).not.toBeNull();
+
+    await productTestHelper.deleteQuantity(createdQuantity.id);
+  });
+});
+
+describe('templates', () => {
+  it('should create template successfully', async () => {
+    const option = options[0];
+    const body = {
+      bleedAreaWidth: 10,
+      bleedAreaHeight: 10,
+      trimWidth: 10,
+      trimHeight: 10,
+      safeAreaHeight: 20,
+      safeAreaWidth: 20,
+      deleteFl: false,
+      sizeOptionFk: option.id,
+      versionNo: 1,
+      pdfPath: 'pdfTemplate',
+      jpegPath: 'jpgTemplate',
+    };
+
+    const template = await productOperations.createTemplate(body);
+    expect(template).not.toBeNull();
+
+    expect(template.bleedAreaHeight).toBe(body.bleedAreaHeight);
+    expect(template.bleedAreaWidth).toBe(body.bleedAreaWidth);
+    expect(template.trimWidth).toBe(body.trimWidth);
+    expect(template.trimHeight).toBe(body.trimHeight);
+    expect(template.safeAreaHeight).toBe(body.safeAreaHeight);
+    expect(template.safeAreaWidth).toBe(body.safeAreaWidth);
+    expect(template.deleteFl).toBe(body.deleteFl);
+    expect(template.sizeOptionFk).toBe(body.sizeOptionFk);
+    expect(template.versionNo).toBe(body.versionNo);
+    expect(template.pdfPath).toBe(body.pdfPath);
+    expect(template.jpegPath).toBe(body.jpegPath);
+  });
+});
+
+describe('product activation and deactivation', () => {
+  it('should return activated product', async () => {
+    const product = await productTestHelper.createTestProduct(false, false);
+    expect(product.deleteFl).toBe(true);
+    expect(product.status).toBe('Incomplete');
+
+    await productOperations.activateProduct(product.id);
+    const activatedProduct = await productOperations.getProductById(product.id);
+
+    expect(activatedProduct.deleteFl).toBe(false);
+    expect(activatedProduct.status).toBe('Complete');
+  });
+
+  it('should return deactivated product', async () => {
+    const product = await productTestHelper.createTestProduct(false, true);
+    expect(product.deleteFl).toBe(false);
+
+    await productOperations.deactivateProduct(product.id, true);
+    const deactivatedProduct = await productOperations.getProductById(product.id);
+
+    expect(deactivatedProduct.deleteFl).toBe(true);
+  });
+});
+
 afterEach(async () => {
   await truncateTables([
     'optionGroupItems',
