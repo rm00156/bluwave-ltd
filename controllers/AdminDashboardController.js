@@ -1319,7 +1319,7 @@ async function getOustandingAmountOfOrder(req, res) {
 
   const purchaseBasket = await orderOperations.getSuccessfulOrderForPurchaseBasketId(purchaseBasketId);
   const refunds = await refundOperations.getRefundsForOrder(purchaseBasketId);
-  const max = await refundOperations.maxRefundPossibleForOrder(refunds, purchaseBasket.total);
+  const max = await refundOperations.getMaxRefundPossibleForOrder(refunds, purchaseBasket.total);
 
   res.status(200).json({ max });
 }

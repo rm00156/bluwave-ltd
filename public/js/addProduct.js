@@ -1297,7 +1297,6 @@ function isPrintingAttribuetesValidToAddNewFinishingAttributes() {
     if(options.length == 0)
         return false;
 
-    console.log('reece')
     return isValidOptionsSelected(options, true);
     
 }

@@ -51,7 +51,7 @@ models.sequelize.sync().then(async () => {
     if (socket) socket.emit('notification', { notification: instance });
   });
 }).catch((err) => {
-  logger.error(err, 'Database connection to reece has failed!');
+  logger.error(err, 'Database connection has failed!');
 });
 
 app.set('views', path.join(__dirname, 'views'));
