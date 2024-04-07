@@ -34,6 +34,21 @@ async function getProductDeliveriesForProduct(productId) {
   });
 }
 
+async function updateProductDeliveryPriceForProductIdAndDeliveryType(price, deliveryTypeFk, productFk) {
+  await models.productDelivery.update(
+    {
+      price,
+      versionNo: models.sequelize.literal('versionNo + 1'),
+    },
+    {
+      where: {
+        productFk,
+        deliveryTypeFk,
+      },
+    },
+  );
+}
+
 async function updateProductDeliveriesForProduct(productId, deliveryOptions) {
   // find all existing productDeliveries which are not part of the update
   // delete them
@@ -41,45 +56,39 @@ async function updateProductDeliveriesForProduct(productId, deliveryOptions) {
   const productDeliveries = await getProductDeliveriesForProduct(productId);
 
   const productDeliveriesToDelete = productDeliveries.filter(
-    (pd) => !deliveryOptions
-      .map((d) => d.deliveryId)
-      .includes(pd.deliveryTypeFk.toString()),
+    (pd) => !deliveryOptions.map((d) => d.deliveryId).includes(pd.deliveryTypeFk.toString()),
   );
 
-  productDeliveriesToDelete.forEach(async (productDelivery) => {
-    await productDelivery.destroy();
-  });
+  await Promise.all(
+    productDeliveriesToDelete.map(async (productDelivery) => {
+      await productDelivery.destroy();
+    }),
+  );
 
   // find productDeliveries with the same id
 
-  const deliveriesToBeUpdated = deliveryOptions.filter((d) => productDeliveries
-    .map((pd) => pd.deliveryTypeFk.toString())
+  const deliveriesToBeUpdated = deliveryOptions.filter((d) => productDeliveries.map((pd) => pd.deliveryTypeFk.toString())
     .includes(d.deliveryId));
 
-  deliveriesToBeUpdated.forEach(async (deliveryOption) => {
-    await models.productDelivery.update(
-      {
-        price: deliveryOption.price,
-        versionNo: models.sequelize.literal('versionNo + 1'),
-      },
-      {
-        where: {
-          productFk: productId,
-          deliveryTypeFk: deliveryOption.deliveryId,
-        },
-      },
-    );
-  });
-
-  const deliveriesToBeCreated = deliveryOptions.filter(
-    (d) => !productDeliveries
-      .map((pd) => pd.deliveryTypeFk.toString())
-      .includes(d.deliveryId),
+  await Promise.all(
+    deliveriesToBeUpdated.map(async (deliveryOption) => {
+      await updateProductDeliveryPriceForProductIdAndDeliveryType(
+        deliveryOption.price,
+        deliveryOption.deliveryId,
+        productId,
+      );
+    }),
   );
 
-  deliveriesToBeCreated.forEach(async (deliveryOption) => {
-    await createDeliveryOptionForProduct(productId, deliveryOption);
-  });
+  const deliveriesToBeCreated = deliveryOptions.filter(
+    (d) => !productDeliveries.map((pd) => pd.deliveryTypeFk.toString()).includes(d.deliveryId),
+  );
+
+  await Promise.all(
+    deliveriesToBeCreated.map(async (deliveryOption) => {
+      await createDeliveryOptionForProduct(productId, deliveryOption);
+    }),
+  );
 }
 
 async function getDeliveryType(id) {
@@ -108,9 +117,7 @@ async function getDeliveryOptionsForProducts(productIds) {
         productDeliveryMap.set(pd.deliveryTypeFk, pd.price);
       }
     });
-    deliveryOptions[productId] = productDeliveries.map(
-      (pd) => pd.deliveryTypeFk,
-    );
+    deliveryOptions[productId] = productDeliveries.map((pd) => pd.deliveryTypeFk);
   }
 
   let availableOptions = [];
@@ -210,4 +217,5 @@ module.exports = {
   createShippingDetail,
   getShippingDetailById,
   getAllDeliveryOptionsForProduct,
+  updateProductDeliveryPriceForProductIdAndDeliveryType,
 };
