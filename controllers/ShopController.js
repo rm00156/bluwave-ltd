@@ -361,15 +361,14 @@ async function uploadDesign(req, res) {
   const transaction = await models.sequelize.transaction();
 
   try {
-    await basketOperations.uploadDesignForBasketItem(file, basketItemId);
+    const { fileGroupItem } = await basketOperations.uploadDesignForBasketItem(file, basketItemId);
+    await transaction.commit();
+    return res.status(200).json({ id: fileGroupItem.id });
   } catch (err) {
     logger.error(err);
     await transaction.rollback();
     return res.status(400).json({});
   }
-
-  await transaction.commit();
-  return res.status(200).json({});
 }
 
 async function removeFileGroupItem(req, res) {

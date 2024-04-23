@@ -17,6 +17,7 @@ env:
   S3_ACCESS_KEY_ID: ${{ secrets.ACCESSKEYID }}
   S3_SECRET_ACCESS_KEY: ${{ secrets.SECRETACCESSKEY }}
   SECRET: ${{ secrets.SECRET }}
+  LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
 jobs:
   jest_tests:
     runs-on: ubuntu-latest
@@ -34,12 +35,12 @@ jobs:
         uses: shogo82148/actions-setup-mysql@v1
         with:
           mysql-version: "8.0"
-      
+
       - name: Create test-db
         run: mysql -uroot -e 'CREATE DATABASE IF NOT EXISTS test_db'
-      
+
       - name: Install dependencies
         run: npm install
-      
+
       - name: Run Jest tests
         run: npm run test

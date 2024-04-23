@@ -1,10 +1,9 @@
 const Sequelize = require('sequelize');
-const { Upload } = require('@aws-sdk/lib-storage');
-const { S3Client } = require('@aws-sdk/client-s3');
 const productOperations = require('../products/productOperations');
+const { uploadFile } = require('../general/utilityHelper');
 const models = require('../../models');
 
-async function getFileGroupItemByFileGroupId(id) {
+async function getFileGroupItemsByFileGroupId(id) {
   return models.fileGroupItem.findAll({
     where: {
       fileGroupFk: id,
@@ -26,7 +25,7 @@ async function createRevisedBasketItem(basketItem, revisedBasketItems) {
   const result = basketItem;
 
   if (basketItem.fileGroupFk != null) {
-    const fileGroupItems = await getFileGroupItemByFileGroupId(
+    const fileGroupItems = await getFileGroupItemsByFileGroupId(
       basketItem.fileGroupFk,
     );
     result.fileGroupItems = fileGroupItems;
@@ -145,7 +144,7 @@ async function removeBasketItem(basketItemId) {
 
   if (fileGroupId != null) {
     const fileGroup = await getFileGroupById(fileGroupId);
-    const fileGroupItems = await getFileGroupItemByFileGroupId(fileGroup.id);
+    const fileGroupItems = await getFileGroupItemsByFileGroupId(fileGroup.id);
 
     fileGroupItems.forEach(async (fileGroupItem) => {
       await fileGroupItem.destroy();
@@ -245,58 +244,40 @@ async function createFileGroupItem(fileGroupId, path, fileName) {
   });
 }
 
-async function uploadDesignForBasketItem(file, basketItemId) {
-  const s3 = new S3Client({
-    region: process.env.S3_REGION,
-    credentials: {
-      accessKeyId: process.env.S3_ACCESS_KEY_ID,
-      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+async function setFileGroupForBasketItem(id, fileGroupFk) {
+  await models.basketItem.update(
+    {
+      fileGroupFk,
+      versionNo: models.sequelize.literal('versionNo + 1'),
     },
-    endpoint: 'https://s3.eu-west-2.amazonaws.com',
-  });
-  const date = Date.now();
+    {
+      where: {
+        id,
+      },
+    },
+  );
+}
 
-  const s3Path = `${
-    process.env.S3_BUCKET_PATH
-  }/BasketItem/${date}_${encodeURIComponent(file.name)}`;
-  const params = {
-    Bucket: process.env.S3_BUCKET,
-    Body: file.data,
-    Key: `BasketItem/${date}_${file.name}`,
-    ACL: 'public-read',
-  };
-
-  const s3UploadPromise = new Upload({
-    client: s3,
-    params,
-  }).done();
-  await s3UploadPromise;
+async function uploadDesignForBasketItem(file, basketItemId) {
+  const s3Path = await uploadFile('BasketItem', file);
 
   const basketItem = await getBasketItem(basketItemId);
   let { fileGroupFk } = basketItem;
   if (fileGroupFk == null) {
     const fileGroup = await createFileGroup();
     fileGroupFk = fileGroup.id;
-    await models.basketItem.update(
-      {
-        fileGroupFk,
-        versionNo: models.sequelize.literal('versionNo + 1'),
-      },
-      {
-        where: {
-          id: basketItemId,
-        },
-      },
-    );
+    await setFileGroupForBasketItem(basketItemId, fileGroupFk);
   }
 
-  await createFileGroupItem(fileGroupFk, s3Path, file.name);
+  const fileGroupItem = await createFileGroupItem(fileGroupFk, s3Path, file.name);
+
+  return { s3Path, fileGroupItem };
 }
 
 async function getFileGroupItemsForBasketItem(basketItem) {
   const { fileGroupFk } = basketItem;
 
-  if (fileGroupFk == null) return [];
+  if (!fileGroupFk) return [];
 
   return models.fileGroupItem.findAll({
     where: {
@@ -305,34 +286,30 @@ async function getFileGroupItemsForBasketItem(basketItem) {
   });
 }
 
-async function removeFileGroupItem(fileGroupItemId, basketItemId) {
-  const fileGroupItem = await models.fileGroupItem.findOne({
+async function getFileGroupItemById(id) {
+  return models.fileGroupItem.findOne({
     where: {
-      id: fileGroupItemId,
+      id,
     },
   });
+}
+
+async function removeFileGroupItem(fileGroupItemId, basketItemId) {
+  const fileGroupItem = await getFileGroupItemById(fileGroupItemId);
 
   const fileGroupId = fileGroupItem.fileGroupFk;
   await fileGroupItem.destroy();
 
-  const fileGroupItems = await getFileGroupItemByFileGroupId(fileGroupId);
+  const fileGroupItems = await getFileGroupItemsByFileGroupId(fileGroupId);
 
   if (fileGroupItems.length === 0) {
-    await models.basketItem.update(
-      {
-        fileGroupFk: null,
-        versionNo: models.sequelize.literal('versionNo + 1'),
-      },
-      {
-        where: {
-          id: basketItemId,
-        },
-      },
-    );
+    const fileGroup = await getFileGroupById(fileGroupId);
+    await setFileGroupForBasketItem(basketItemId, null);
+    await fileGroup.destroy();
   }
 }
 
-async function updateBasketItemsToAccount(accountId, basketItemIds) {
+async function setBasketItemsAccountId(accountId, basketItemIds) {
   await models.basketItem.update(
     {
       accountFk: accountId,
@@ -413,6 +390,9 @@ async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(
 }
 
 module.exports = {
+  createFileGroup,
+  createFileGroupItem,
+  createRevisedBasketItem,
   getActiveBasketItemsForAccount,
   createBasketItem,
   removeBasketItem,
@@ -422,10 +402,14 @@ module.exports = {
   uploadDesignForBasketItem,
   getFileGroupItemsForBasketItem,
   removeFileGroupItem,
-  updateBasketItemsToAccount,
+  setBasketItemsAccountId,
   getAllBasketItemsForCheckout,
   getSubtotalFromBasketItems,
   setPurchaseBasketForBasketItem,
   getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId,
   editBasketItem,
+  getFileGroupItemsByFileGroupId,
+  getFileGroupById,
+  setFileGroupForBasketItem,
+  getFileGroupItemById,
 };
