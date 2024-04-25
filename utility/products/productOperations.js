@@ -447,14 +447,6 @@ async function getProductById(id) {
   });
 }
 
-async function getOptionGroupForProductId(productId) {
-  return models.optionGroup.findOne({
-    where: {
-      productFk: productId,
-    },
-  });
-}
-
 async function getAllProductsByProductTypeId(productTypeId) {
   return models.product.findAll({
     where: {
@@ -2185,7 +2177,6 @@ module.exports = {
   setQuantitiesForQuantityGroup,
   updateQuantitiesForQuantityGroup,
   createQuantityGroupAndSetQuantities,
-  getOptionGroupForProductId,
   getPriceMatrixForProductId,
   getOptionTypesNotUsedByFinishingMatrixForProduct,
   getFinishingOptionTypesForProduct,

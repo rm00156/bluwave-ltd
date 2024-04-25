@@ -56,6 +56,18 @@ async function createTestCustomerAccount() {
   return customerAccount;
 }
 
+async function setUpCustomerAccountAndAgent() {
+  const customerAccount = await createTestCustomerAccount();
+
+  const response = await request(app)
+    .post('/login')
+    .send({ email: customerAccount.email, password: customerAccount.password });
+  const agent = request.agent(app);
+  agent.set('Cookie', response.headers['set-cookie']);
+
+  return { customerAccount, agent };
+}
+
 // function closeRedisClientConnection() {
 //   redisClient.quit();
 // }
@@ -65,4 +77,5 @@ module.exports = {
   createTestCustomerAccount,
   deleteAccountById,
   setUpAdminAccountAndAgent,
+  setUpCustomerAccountAndAgent,
 };

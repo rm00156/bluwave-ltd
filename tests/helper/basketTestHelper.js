@@ -1,6 +1,11 @@
 const { createShippingDetail } = require('../../utility/delivery/deliveryOperations');
 const { createTestCustomerAccount } = require('./accountTestHelper');
 const { createPurchaseBasketAtDttm } = require('../../utility/order/orderOperations');
+const {
+  createFileGroup, createFileGroupItem, createBasketItem, setPurchaseBasketForBasketItem, getPurchaseBasketById,
+} = require('../../utility/basket/basketOperations');
+const { createTestProductWithPriceMatrix } = require('./productTestHelper');
+const { getAllOptions, createOptionGroup, createOptionGroupItem } = require('../../utility/products/productOperations');
 
 async function createTestShippingDetail() {
   const account = await createTestCustomerAccount();
@@ -62,9 +67,56 @@ async function createPurchaseBasketForAccount(accountId, deliveryType) {
     Date.now(),
   );
 }
+
+async function createTestFileGroupItemWithPathAndFileName(path, fileName) {
+  const fileGroup = await createFileGroup();
+  return createFileGroupItem(fileGroup.id, path, fileName);
+}
+
+async function createTestFileGroupItem() {
+  return createTestFileGroupItemWithPathAndFileName('path', 'fileName');
+}
+
+async function createTestBasketItem(quantityGroup) {
+  const account = await createTestCustomerAccount();
+  const options = await getAllOptions();
+  const option = options[0];
+  const quantityIds = quantityGroup.map((q) => q.id);
+  const optionIds = [option.id];
+  const rows = [
+    {
+      optionIdGroup: optionIds,
+      quantityGroup,
+    },
+  ];
+
+  const { product } = await createTestProductWithPriceMatrix(quantityIds, optionIds, rows);
+
+  const optionGroup = await createOptionGroup();
+  await createOptionGroupItem(optionGroup.id, optionIds[0]);
+  return createBasketItem(
+    account.id,
+    product.id,
+    optionGroup.id,
+    null,
+    quantityGroup[0].id,
+    quantityGroup[0].price,
+  );
+}
+
+async function createTestPurchaseBasketForBasketItem(accountId, deliveryType, dttm, basketItemId) {
+  const purchaseBasket = await createPurchaseBasketForAccountAtDttm(accountId, deliveryType, dttm);
+  await setPurchaseBasketForBasketItem(basketItemId, purchaseBasket.id);
+  return getPurchaseBasketById(purchaseBasket.id);
+}
+
 module.exports = {
   createPurchaseBasketForAccount,
   createPurchaseBasketForAccountAtDttm,
+  createTestBasketItem,
   createTestShippingDetail,
   createTestShippingDetailWithAccountId,
+  createTestFileGroupItem,
+  createTestFileGroupItemWithPathAndFileName,
+  createTestPurchaseBasketForBasketItem,
 };

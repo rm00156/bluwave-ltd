@@ -188,7 +188,7 @@ async function uploadFile(folder, file) {
   const blob = file.data;
   const extension = getExtension(file.mimetype);
   const fileName = `${testDevelopment}${folder}/${date}_${encodeURIComponent(
-    'home_page_display_option_picture',
+    file.name,
   )}.${extension}`;
   const s3Path = `${process.env.S3_BUCKET_PATH}/${fileName}`;
 

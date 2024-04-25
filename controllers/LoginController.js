@@ -149,7 +149,7 @@ async function checkoutLogin(req, res, next) {
       );
       const basketItemIds = basketItems.basketItems.map((b) => b.id);
 
-      await basketOperations.updateBasketItemsToAccount(
+      await basketOperations.setBasketItemsAccountId(
         account.id,
         basketItemIds,
       );
