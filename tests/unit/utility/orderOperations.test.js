@@ -1,9 +1,9 @@
-const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
-const { createTestShippingDetail, createPurchaseBasketForAccount } = require('../helper/basketTestHelper');
-const orderOperations = require('../../utility/order/orderOperations');
-const { getAllActiveDeliveryTypes } = require('../../utility/delivery/deliveryOperations');
-const { createTestCustomerAccount } = require('../helper/accountTestHelper');
-const { getPurchaseBasketById } = require('../../utility/basket/basketOperations');
+const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
+const { createTestShippingDetail, createPurchaseBasketForAccount } = require('../../helper/basketTestHelper');
+const orderOperations = require('../../../utility/order/orderOperations');
+const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
+const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
+const { getPurchaseBasketById } = require('../../../utility/basket/basketOperations');
 
 let deliveryTypes;
 

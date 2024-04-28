@@ -37,7 +37,24 @@ async function setUpAdminAccountAndAgent() {
   return { adminAccount, agent };
 }
 
-async function createTestCustomerAccount() {
+async function createTestCustomerAccountWithEmail(email) {
+  const name = 'name';
+  const phoneNumber = 'phoneNumber';
+  const password = 'password';
+  const customerAccountType = await getCustomerAccountType();
+
+  const customerAccount = await createAccount(
+    customerAccountType.id,
+    email,
+    name,
+    phoneNumber,
+    password,
+  );
+
+  return customerAccount;
+}
+
+async function createTestCustomerAccount(date, guestFl) {
   const allCustomerAccounts = await getAllCustomerAccounts();
   const email = `customer_email${allCustomerAccounts.length + 1}@email.com`;
   const name = 'name';
@@ -51,6 +68,8 @@ async function createTestCustomerAccount() {
     name,
     phoneNumber,
     password,
+    date,
+    guestFl,
   );
 
   return customerAccount;
@@ -75,6 +94,7 @@ async function setUpCustomerAccountAndAgent() {
 module.exports = {
   // closeRedisClientConnection,
   createTestCustomerAccount,
+  createTestCustomerAccountWithEmail,
   deleteAccountById,
   setUpAdminAccountAndAgent,
   setUpCustomerAccountAndAgent,

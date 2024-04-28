@@ -1,7 +1,7 @@
-const homePageOptionHelper = require('../helper/homePageOptionHelper');
-const homePageOperations = require('../../utility/homePage/homePageOperations');
-const productOperations = require('../../utility/products/productOperations');
-const { setUpTestDb } = require('../helper/generalTestHelper');
+const homePageOptionHelper = require('../../helper/homePageOptionHelper');
+const homePageOperations = require('../../../utility/homePage/homePageOperations');
+const productOperations = require('../../../utility/products/productOperations');
+const { setUpTestDb } = require('../../helper/generalTestHelper');
 
 beforeAll(async () => {
   await setUpTestDb();

@@ -1,6 +1,6 @@
-const productOperations = require('../../utility/products/productOperations');
-const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
-const productTestHelper = require('../helper/productTestHelper');
+const productOperations = require('../../../utility/products/productOperations');
+const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
+const productTestHelper = require('../../helper/productTestHelper');
 
 let quantities;
 let options;

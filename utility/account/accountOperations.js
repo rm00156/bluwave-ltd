@@ -3,6 +3,24 @@ const Sequelize = require('sequelize');
 const models = require('../../models');
 const { generateNumberCode, dateXAmountFromNow, generateHash } = require('../general/utilityHelper');
 
+async function getForgottenPasswordByAccountId(accountFk) {
+  const now = Date.now();
+
+  return models.forgottenPassword.findOne({
+    where: {
+      accountFk,
+      deleteFl: false,
+      usedFl: false,
+      expirationDttm: {
+        [Sequelize.Op.gt]: now,
+      },
+      createdDttm: {
+        [Sequelize.Op.lt]: now,
+      },
+    },
+  });
+}
+
 async function getForgottenPasswordByToken(token) {
   const now = Date.now();
 
@@ -21,12 +39,7 @@ async function getForgottenPasswordByToken(token) {
   });
 }
 
-async function updateCookieExpirationDate(
-  cookieId,
-  expirationDttm,
-  res,
-  maxAge,
-) {
+async function updateCookieExpirationDate(cookieId, expirationDttm, res, maxAge) {
   await models.cookie.update(
     {
       expirationDttm,
@@ -58,6 +71,16 @@ async function getActiveCookie(accountId) {
   });
 }
 
+async function createCookieForAccountId(accountFk, expirationDttm) {
+  return models.cookie.create({
+    accountFk,
+    createdDttm: Date.now(),
+    expirationDttm,
+    acceptedFl: false,
+    deleteFl: false,
+    versionNo: 1,
+  });
+}
 async function createCookie(accountId, expires, res) {
   const expirationDttm = new Date(Date.now() + expires);
 
@@ -68,21 +91,9 @@ async function createCookie(accountId, expires, res) {
       httpOnly: true,
       maxAge: expires,
     });
-    return models.cookie.create({
-      accountFk: accountId,
-      createdDttm: Date.now(),
-      expirationDttm,
-      acceptedFl: false,
-      deleteFl: false,
-      versionNo: 1,
-    });
+    return createCookieForAccountId(accountId, expirationDttm);
   }
-  await updateCookieExpirationDate(
-    existingActiveCookie.id,
-    expirationDttm,
-    res,
-    expires,
-  );
+  await updateCookieExpirationDate(existingActiveCookie.id, expirationDttm, res, expires);
   return getActiveCookie(accountId);
 }
 
@@ -100,29 +111,36 @@ async function getNewAccountNumber() {
   return getNewAccountNumber();
 }
 
-async function createAccount(
-  accountTypeFk,
-  email,
-  name,
-  phoneNumber,
-  password,
-) {
+async function createAccountObject(email, phoneNumber, password, name, accountTypeFk, createdAt, accountNumber, guestFl) {
+  return models.account.create({
+    email,
+    phoneNumber,
+    password: generateHash(password),
+    name,
+    accountTypeFk,
+    createdAt,
+    accountNumber,
+    guestFl,
+    deleteFl: false,
+    versionNo: 1,
+  });
+}
+
+async function createAccount(accountTypeFk, email, name, phoneNumber, password, date, guest) {
   const accountNumber = await getNewAccountNumber();
   const transaction = await models.sequelize.transaction();
   let account;
   try {
-    account = await models.account.create({
+    account = await createAccountObject(
       email,
       phoneNumber,
-      password: generateHash(password),
+      password,
       name,
       accountTypeFk,
-      createdAt: Date.now(),
+      !date ? Date.now() : date,
       accountNumber,
-      guestFl: false,
-      deleteFl: false,
-      versionNo: 1,
-    });
+      guest === undefined || guest === null ? false : guest,
+    );
     await transaction.commit();
   } catch (err) {
     logger.error(err.message);
@@ -139,19 +157,16 @@ async function createGuestAccount(res) {
   let account;
   let email;
   try {
-    account = await models.account.create({
-      email: 'temp@temp.com',
-      phoneNumber: '00000000000',
-      password: generateHash(process.env.LOGIN_PASSWORD),
-      name: 'temp',
-      accountTypeFk: 2,
-      createdAt: Date.now(),
+    account = await createAccountObject(
+      'temp@temp.com',
+      '00000000000',
+      process.env.LOGIN_PASSWORD,
+      'temp',
+      2,
+      Date.now(),
       accountNumber,
-      guestFl: true,
-      deleteFl: false,
-      versionNo: 1,
-    });
-
+      true,
+    );
     email = `temp${account.id}@temp.com`;
     await models.account.update(
       {
@@ -237,22 +252,13 @@ async function complete2FaSetupForAccountId(accountId, secret) {
   await transaction.commit();
 }
 
-async function updateAccount(
-  id,
-  email,
-  password,
-  name,
-  phoneNumber,
-  accountTypeId,
-  guestFl,
-  deleteFl,
-) {
+async function updateAccount(id, email, password, name, phoneNumber, accountTypeFk, guestFl, deleteFl) {
   await models.account.update(
     {
       email,
       name,
       password: generateHash(password),
-      accountTypeFk: accountTypeId,
+      accountTypeFk,
       createdDttm: Date.now(),
       phoneNumber,
       guestFl,
@@ -375,10 +381,9 @@ async function reactivateAccount(accountId) {
 }
 
 async function createForgottenPasswordRequest(accountId) {
-  const token = generateNumberCode();
-
-  const forgottenPassword = await getForgottenPasswordByToken(token);
+  const forgottenPassword = await getForgottenPasswordByAccountId(accountId);
   if (forgottenPassword === null) {
+    const token = generateNumberCode();
     return models.forgottenPassword.create({
       accountFk: accountId,
       createdDttm: Date.now(),
@@ -390,7 +395,7 @@ async function createForgottenPasswordRequest(accountId) {
     });
   }
 
-  return createForgottenPasswordRequest(accountId);
+  return forgottenPassword;
 }
 
 async function getForgottenPassword(accountId, token) {
@@ -463,8 +468,6 @@ async function getNewCustomersInTheLastWeek() {
     },
   );
 
-  if (result.length === 0) return 0;
-
   return result[0].count;
 }
 
@@ -506,9 +509,7 @@ async function createNotification(accountFk, link, text) {
 async function createNotificationForAdminAccounts(text, link) {
   const accounts = await getAllActiveAdminAccounts();
 
-  await Promise.all(
-    accounts.map((account) => createNotification(account.id, link, text)),
-  );
+  await Promise.all(accounts.map((account) => createNotification(account.id, link, text)));
 }
 
 async function getNotificationById(id) {
@@ -532,18 +533,7 @@ async function deleteNotificationById(id) {
 
 async function deleteAllNotificationsForAccount(accountId) {
   const notifications = await getNotificationsForAccount(accountId);
-  await Promise.all(
-    notifications.map((notification) => deleteNotification(notification)),
-  );
-}
-
-async function createAccountType(id, accountType) {
-  return models.accountType.create({
-    id,
-    accountType,
-    deleteFl: false,
-    versionNo: 1,
-  });
+  await Promise.all(notifications.map((notification) => deleteNotification(notification)));
 }
 
 async function getAdminAccountType() {
@@ -576,7 +566,6 @@ async function getAllCustomerAccounts() {
 
 module.exports = {
   getAdminAccountType,
-  createAccountType,
   updateAccount,
   complete2FaSetupForAccountId,
   findAccountById,
@@ -611,4 +600,9 @@ module.exports = {
   getAllAccountTypes,
   getCustomerAccountType,
   getAllCustomerAccounts,
+  getForgottenPasswordByToken,
+  createNotification,
+  getForgottenPasswordByAccountId,
+  createCookieForAccountId,
+  createAccountObject,
 };

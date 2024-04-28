@@ -1,6 +1,6 @@
-const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
-const { createTestFaq, createTestFaqWithQuestion, createTestFaqWithQuestionAndAnswer } = require('../helper/faqTesHelper');
-const faqOperations = require('../../utility/faq/faqOperations');
+const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
+const { createTestFaq, createTestFaqWithQuestion, createTestFaqWithQuestionAndAnswer } = require('../../helper/faqTesHelper');
+const faqOperations = require('../../../utility/faq/faqOperations');
 
 let faqTypes;
 beforeAll(async () => {
