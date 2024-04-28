@@ -1,8 +1,8 @@
-const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
-const { createTestShippingDetail } = require('../helper/basketTestHelper');
-const { createTestProduct } = require('../helper/productTestHelper');
+const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
+const { createTestShippingDetail } = require('../../helper/basketTestHelper');
+const { createTestProduct } = require('../../helper/productTestHelper');
 
-const deliveryOperations = require('../../utility/delivery/deliveryOperations');
+const deliveryOperations = require('../../../utility/delivery/deliveryOperations');
 
 beforeAll(async () => {
   await setUpTestDb();

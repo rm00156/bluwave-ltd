@@ -1,8 +1,8 @@
-const refundOperations = require('../../utility/refund/refundOperations');
-const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
-const { createPurchaseBasketForAccount } = require('../helper/basketTestHelper');
-const { createTestCustomerAccount } = require('../helper/accountTestHelper');
-const { getAllActiveDeliveryTypes } = require('../../utility/delivery/deliveryOperations');
+const refundOperations = require('../../../utility/refund/refundOperations');
+const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
+const { createPurchaseBasketForAccount } = require('../../helper/basketTestHelper');
+const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
+const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 
 let refundTypes;
 let deliveryTypes;

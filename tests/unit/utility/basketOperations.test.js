@@ -1,9 +1,9 @@
-const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
-const { createTestFileGroupItem, createTestBasketItem, createTestPurchaseBasketForBasketItem } = require('../helper/basketTestHelper');
-const { createTestCustomerAccount } = require('../helper/accountTestHelper');
-const { deleteS3Folder } = require('../../utility/general/utilityHelper');
-const { createTestProduct, createTestProductWithPriceMatrix } = require('../helper/productTestHelper');
-const { getAllActiveDeliveryTypes } = require('../../utility/delivery/deliveryOperations');
+const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
+const { createTestFileGroupItem, createTestBasketItem, createTestPurchaseBasketForBasketItem } = require('../../helper/basketTestHelper');
+const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
+const { deleteS3Folder } = require('../../../utility/general/utilityHelper');
+const { createTestProduct, createTestProductWithPriceMatrix } = require('../../helper/productTestHelper');
+const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 const {
   getOptionGroupItemsForPriceMatrix,
   getAllQuantities,
@@ -11,9 +11,9 @@ const {
   getOptionGroupItemsByOptionGroupId,
   getOptionGroupById,
 
-} = require('../../utility/products/productOperations');
-const { completePurchaseBasket } = require('../../utility/order/orderOperations');
-const basketOperations = require('../../utility/basket/basketOperations');
+} = require('../../../utility/products/productOperations');
+const { completePurchaseBasket } = require('../../../utility/order/orderOperations');
+const basketOperations = require('../../../utility/basket/basketOperations');
 
 let quantities;
 let deliveryTypes;
