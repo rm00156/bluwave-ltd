@@ -1,4 +1,5 @@
 const request = require('supertest');
+
 const { account } = require('../../models');
 const { app /* redisClient */ } = require('../../app');
 const {
@@ -13,24 +14,28 @@ async function deleteAccountById(id) {
   });
 }
 
-async function setUpAdminAccountAndAgent() {
+async function createTestAdminAccount() {
   const email = 'email@email.com';
   const name = 'name';
   const phoneNumber = 'phoneNumber';
   const password = 'password';
 
   const adminAccountType = await getAdminAccountType();
-  const adminAccount = await createAccount(
+  return createAccount(
     adminAccountType.id,
     email,
     name,
     phoneNumber,
     password,
   );
+}
+
+async function setUpAdminAccountAndAgent() {
+  const adminAccount = await createTestAdminAccount();
 
   const response = await request(app)
     .post('/admin-login')
-    .send({ email, password });
+    .send({ email: adminAccount.email, password: 'password' });
   const agent = request.agent(app);
   agent.set('Cookie', response.headers['set-cookie']);
 
@@ -93,6 +98,7 @@ async function setUpCustomerAccountAndAgent() {
 
 module.exports = {
   // closeRedisClientConnection,
+  createTestAdminAccount,
   createTestCustomerAccount,
   createTestCustomerAccountWithEmail,
   deleteAccountById,

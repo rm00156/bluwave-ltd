@@ -293,5 +293,5 @@ test('complete 2Fa setup for account id', async () => {
 });
 
 afterEach(async () => {
-  await truncateTables(['accounts', 'forgottenPasswords', 'notifications', 'cookies']);
+  await truncateTables(['accounts', 'forgottenPasswords', 'notifications', 'cookies', 'twoFactorAuths']);
 });
