@@ -1,7 +1,9 @@
 const accountOperations = require('../utility/account/accountOperations');
 const utilityHelper = require('../utility/general/utilityHelper');
 
-const notProduction = process.env.NODE_ENV !== 'production';
+function notProduction() {
+  return process.env.NODE_ENV !== 'production';
+}
 
 async function isAdmin(req, res, next) {
   const account = req.user;
@@ -18,46 +20,9 @@ async function isAdmin(req, res, next) {
   return next();
 }
 
-async function isSecuredAdmin(req, res, next) {
-  const account = req.user;
-
-  if (account === null) {
-    return res.redirect('/login');
-  }
-
-  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(
-    account.id,
-  );
-
-  if (
-    account.accountTypeFk !== 1
-    || (twoFactorAuth !== null && twoFactorAuth.authenticatedFl === true)
-  ) {
-    // redirect to page to set up 2fa
-    return res.redirect('/login');
-  }
-
-  return next();
-}
-
-async function enterPassword(req, res, next) {
-  const { password } = req.query;
-  if (!utilityHelper.validPassword(req.user, password)) {
-    res.redirect('/setup-2fa');
-  } else {
-    req.session.password = password;
-    next();
-  }
-}
-
 async function adminRequire2faSetup(req, res, next) {
-  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(
-    req.user.id,
-  );
-  if (
-    !notProduction
-    && (twoFactorAuth === null || !twoFactorAuth.authenticatedFl)
-  ) {
+  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(req.user.id);
+  if (!notProduction() && (twoFactorAuth === null || !twoFactorAuth.authenticatedFl)) {
     return res.redirect('/setup-2fa');
   }
 
@@ -70,7 +35,7 @@ async function isLoginRequire2faCode(req, res, next) {
 
   const account = await accountOperations.findAccountByEmail(email);
 
-  if (account === null) {
+  if (account === null || account.accountTypeFk !== 1) {
     // error
     return res.redirect('/admin/login?error=UserNotFound');
   }
@@ -80,10 +45,8 @@ async function isLoginRequire2faCode(req, res, next) {
   }
 
   req.session.password = password;
-  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(
-    account.id,
-  );
-  if (!notProduction && twoFactorAuth !== null && twoFactorAuth.authenticatedFl === true) {
+  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(account.id);
+  if (!notProduction() && twoFactorAuth !== null && twoFactorAuth.authenticatedFl === true) {
     req.session.email = account.email;
     req.session.twoFa = true;
     return res.redirect('/admin/login/step-two');
@@ -110,33 +73,28 @@ function twoFa(req, res, next) {
   if (req.session.twoFa === true) {
     req.body.email = req.session.email;
     req.body.password = req.session.password;
-    next();
-  } else {
-    res.redirect('/admin/login');
+    return next();
   }
+  return res.redirect('/admin/login');
 }
 
 async function setup2fa(req, res, next) {
-  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(
-    req.user.id,
-  );
+  const twoFactorAuth = await accountOperations.getTwoFactorAuthForAccountId(req.user.id);
 
   if (twoFactorAuth !== null && twoFactorAuth.authenticatedFl === true) {
     req.session.message = undefined;
-    res.redirect('/admin-dashboard');
-  } else {
-    req.body.email = req.user.email;
-    req.body.password = req.session.password;
-    next();
+    return res.redirect('/admin-dashboard');
   }
+  req.body.email = req.user.email;
+  req.body.password = req.session.password;
+  return next();
 }
 
 module.exports = {
   adminRequire2faSetup,
-  enterPassword,
   isAdmin,
   isLoginRequire2faCode,
-  isSecuredAdmin,
+  notProduction,
   setup2fa,
   twoFa,
   twoFa2,
