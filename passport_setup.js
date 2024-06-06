@@ -33,11 +33,10 @@ module.exports = function passports(passport) {
     }
     if (account.password === null || account.password === undefined) {
       req.flash('message', 'You must reset your password');
-      return done(null, false);
+      return done(new Error(), false);
     }
     if (!utilityHelper.validPassword(account, password)) {
-      req.flash('message', 'Incorrect credentials');
-      return done(null, false);
+      return done(new Error(), false);
     }
 
     return done(null, account);
@@ -51,8 +50,7 @@ module.exports = function passports(passport) {
     const account = await accountOperations.findAccountByEmail(email);
 
     if (account === null) {
-      req.flash('message', 'Incorrect Credentials');
-      return done(null, false);
+      return done(new Error(), false);
     }
 
     return done(null, account);

@@ -1,14 +1,16 @@
 const passport = require('passport');
 const accountOperations = require('../utility/account/accountOperations');
 
-async function loginUsingCookie(req, next, res) {
+async function loginUsingCookie(req, res, next) {
   const cookieDetails = req.cookies.bluwave_ecommerce_user_data;
   const account = await accountOperations.findAccountById(cookieDetails.id);
   req.body.email = account.email;
   req.body.password = process.env.LOGIN_PASSWORD;
 
   passport.authenticate('local2', (err, user) => {
-    if (err) return next(err);
+    if (err) {
+      return next(err);
+    }
 
     return req.logIn(user, async (loginErr) => {
       if (loginErr) return next(loginErr);
@@ -39,7 +41,7 @@ async function getUser(req, res, next) {
     // // first time coming to site or first time coing to site in awhile
     const cookie = req.cookies.bluwave_ecommerce_user_data;
     if (cookie) {
-      await loginUsingCookie(req, next, res);
+      await loginUsingCookie(req, res, next);
     } else {
       // no cookie
 
@@ -94,4 +96,5 @@ module.exports = {
   getUser,
   isCheckoutAsGuest,
   isGuest,
+  loginUsingCookie,
 };
