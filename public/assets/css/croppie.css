@@ -279,7 +279,7 @@ th, td {
 .sticky-col-2 {
     position: -webkit-sticky;
     position: sticky;
-    /* left: 100px; */
+    left: 100px;
     background-color: white !important;
     z-index: 2;
 }
