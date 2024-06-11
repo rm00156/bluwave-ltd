@@ -122,12 +122,12 @@ html(land="en")
                                                                 .mb-3.col-lg-12.mt-5
                                                                     .col-sm-12
                                                                         label.form-label.mb-2 Finishing Matrix
-                                                                        div(id='finishing-container' + (index + 1))
+                                                                        div.scrollable-table-container(id='finishing-container' + (index + 1))
                                                                             
                                                                             table.table.table-striped(style="font-size:9pt" id='finishingMatrixTable' + (index + 1)) 
                                                                                 thead.text-center 
                                                                                     
-                                                                                    th #{optionObject.key}
+                                                                                    th(class="sticky-col sticky-header") #{optionObject.key}
                                                                                     
                                                                                     each quantity in selectedQuantities 
                                                                                         th #{quantity.quantity}
@@ -135,7 +135,7 @@ html(land="en")
                                                                                     each row in optionObject.value.rows
                                                                                         tr 
                                                                                         
-                                                                                            td(data-optionid=row[0].optionId) #{row[0].optionName}
+                                                                                            td(class="sticky-col" data-optionid=row[0].optionId) #{row[0].optionName}
                                                                                             
                                                                                             each item in row 
                                                                                                 td

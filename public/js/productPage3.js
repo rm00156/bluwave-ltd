@@ -409,10 +409,19 @@ function createPriceMatrix() {
     table.classList.add('table-striped');
     const thead = document.createElement('thead');
     thead.classList.add('text-center')
-
-    columns.forEach(column => {
+    
+    columns.forEach((column, index) => {
 
         const th = document.createElement('th');
+        if(column.type === 'OptionType') {
+            
+            if(index === 0)
+                th.classList.add('sticky-col');
+            else
+                th.classList.add(`sticky-col-${index + 1}`);
+            
+            th.classList.add('sticky-header');
+        }
         th.append(column.columnName);
         thead.append(th);
 
@@ -467,9 +476,13 @@ function populateTable(table, combinations, quantities) {
 
         const row = document.createElement('tr');
 
-        combination.forEach(item => {
+        combination.forEach((item, index) => {
 
             const cell = document.createElement('td');
+            if(index === 0)
+                cell.classList.add('sticky-col');
+            else
+                cell.classList.add(`sticky-col-${index + 1}`);
             cell.append(item.option);
             cell.setAttribute('data-optionid', item.id);
 
