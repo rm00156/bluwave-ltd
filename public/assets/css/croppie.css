@@ -248,3 +248,46 @@ background: #ccc;
 .cr-rotate-r i:before {
 	content: '↻';
 }
+
+.scrollable-table-container {
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: center;
+    padding: 8px;
+}
+
+/* th {
+    background-color: #f2f2f2;
+} */
+
+.sticky-col {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 0;
+    background-color: white !important;
+    z-index: 2;
+}
+
+.sticky-col-2 {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 100px; /* Adjust based on the width of the first column */
+    background-color: white !important;
+    z-index: 2;
+}
+
+.sticky-header {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 3;
+}

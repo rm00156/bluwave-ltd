@@ -134,21 +134,25 @@ html(land="en")
                                             .mb-3.col-lg-12.mt-5
                                                 .col-sm-12
                                                     label.form-label.mb-2 Price Matrix
-                                                    #price-container
+                                                    #price-container.scrollable-table-container
                                                         if(selectedOptionTypes.length > 0)
                                                             table#priceMatrixTable.table.table-striped(style="font-size:9pt") 
                                                                 thead.text-center 
-                                                                    each optionType in selectedOptionTypes 
-                                                                        th #{optionType}
-                                                                    
+                                                                    each optionType, index in selectedOptionTypes 
+                                                                        if(index === 0)
+                                                                            th(class="sticky-col sticky-header") #{optionType}
+                                                                        else 
+                                                                            th(class=`sticky-col-${index + 1} sticky-header`) #{optionType}
                                                                     each quantity in selectedQuantities 
                                                                         th #{quantity.quantity}
                                                                 tbody 
                                                                     each row in matrixRows 
                                                                         tr 
-                                                                            each option in row[0].options
-                                                                                td(data-optionid=option.id) #{option.name}
-                                                                            
+                                                                            each option, index in row[0].options
+                                                                                if(index === 0)
+                                                                                    td(class="sticky-col" data-optionid=option.id) #{option.name}
+                                                                                else 
+                                                                                    td(class=`sticky-col-${index + 1}` data-optionid=option.id) #{option.name}
                                                                             each item in row 
                                                                                 td
                                                                                     input.form-control.quantity(style="width:100px" data-quantityid=item.quantityFk data-priceMatrixRowQuantityPriceId = item.priceMatrixRowQuantityPriceId data-optiongroupid=item.optionGroupFk type="text"  value=item.price)

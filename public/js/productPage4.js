@@ -148,9 +148,14 @@ function createFinishingMatrix(orderNo, selectedOptions, selectedOptionTypes) {
     const thead = document.createElement('thead');
     thead.classList.add('text-center')
 
-    columns.forEach(column => {
+    columns.forEach((column, index) => {
 
         const th = document.createElement('th');
+        if(index === 0) {
+            th.classList.add('sticky-col');
+            th.classList.add('sticky-header');
+        }
+            
         th.append(column.columnName);
         thead.append(th);
 
@@ -219,9 +224,12 @@ function populateTable(table, combinations, quantities, orderNo) {
 
         const row = document.createElement('tr');
 
-        combination.forEach(item => {
+        combination.forEach((item, index) => {
 
             const cell = document.createElement('td');
+            if(index === 0) {
+                cell.classList.add('sticky-col');
+            }
             cell.append(item.option);
             cell.setAttribute('data-optionid', item.id);
 
@@ -518,6 +526,7 @@ function handleAddSelectClick(event) {
 
     finishingMatrixLabel.append('Finishing Matrix');
     const finishingContainer = document.createElement('div');
+    finishingContainer.classList.add('scrollable-table-container')
     finishingContainer.id = `finishing-container${orderNo}`;
 
     finishingColumn.append(finishingMatrixLabel);
