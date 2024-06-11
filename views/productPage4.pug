@@ -167,24 +167,8 @@ html(land="en")
                                                         .mb-3.col-lg-12.mt-5
                                                             .col-sm-12
                                                                 label.form-label.mb-2 Finishing Matrix
-                                                                #finishing-container1
-                                                                //- if(selectedOptionTypes.length > 0)
-                                                                //-     table#finishingMatrixTable1.table.table-striped(style="font-size:9pt") 
-                                                                //-         thead.text-center 
-                                                                //-             each optionType in selectedOptionTypes 
-                                                                //-                 th #{optionType}
-                                                                            
-                                                                //-             each quantity in selectedQuantities 
-                                                                //-                 th #{quantity.quantity}
-                                                                //-         tbody 
-                                                                //-             each row in matrixRows 
-                                                                //-                 tr 
-                                                                //-                     each option in row[0].options
-                                                                //-                         td(data-optionid=option.id) #{option.name}
-                                                                                    
-                                                                //-                     each item in row 
-                                                                //-                         td
-                                                                //-                             input.form-control.quantity(data-quantityid=item.quantityFk data-matrix-orderNo=1 data-priceMatrixRowQuantityPriceId = item.priceMatrixRowQuantityPriceId data-optiongroupid=item.optionGroupFk type="text" required value=item.price)
+                                                                #finishing-container1.scrollable-table-container
+                                                                
                                         .row
                                             .col-sm-6
                                                 .d-grid
