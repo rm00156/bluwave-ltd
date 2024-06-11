@@ -279,10 +279,52 @@ th, td {
 .sticky-col-2 {
     position: -webkit-sticky;
     position: sticky;
-    left: 100px; /* Adjust based on the width of the first column */
+    /* left: 100px; */
     background-color: white !important;
     z-index: 2;
 }
+
+.sticky-col-3 {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 200px; /* Adjust based on the width of the first column */
+    background-color: white !important;
+    z-index: 2;
+}
+
+.sticky-col-4 {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 300px; /* Adjust based on the width of the first column */
+    background-color: white !important;
+    z-index: 2;
+}
+
+.sticky-col-5 {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 400px; /* Adjust based on the width of the first column */
+    background-color: white !important;
+    z-index: 2;
+}
+
+
+.sticky-col-6 {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 500px; /* Adjust based on the width of the first column */
+    background-color: white !important;
+    z-index: 2;
+}
+
+.sticky-col-7 {
+    position: -webkit-sticky;
+    position: sticky;
+    left: 600px; /* Adjust based on the width of the first column */
+    background-color: white !important;
+    z-index: 2;
+}
+
 
 .sticky-header {
     position: -webkit-sticky;
