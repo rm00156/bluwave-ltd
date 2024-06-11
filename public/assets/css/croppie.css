@@ -279,7 +279,7 @@ th, td {
 .sticky-col-2 {
     position: -webkit-sticky;
     position: sticky;
-    left: 100px;
+    left: 150px;
     background-color: white !important;
     z-index: 2;
 }
@@ -287,7 +287,7 @@ th, td {
 .sticky-col-3 {
     position: -webkit-sticky;
     position: sticky;
-    left: 200px; /* Adjust based on the width of the first column */
+    left: 300px; /* Adjust based on the width of the first column */
     background-color: white !important;
     z-index: 2;
 }
@@ -295,7 +295,7 @@ th, td {
 .sticky-col-4 {
     position: -webkit-sticky;
     position: sticky;
-    left: 300px; /* Adjust based on the width of the first column */
+    left: 450px; /* Adjust based on the width of the first column */
     background-color: white !important;
     z-index: 2;
 }
@@ -303,7 +303,7 @@ th, td {
 .sticky-col-5 {
     position: -webkit-sticky;
     position: sticky;
-    left: 400px; /* Adjust based on the width of the first column */
+    left: 600px; /* Adjust based on the width of the first column */
     background-color: white !important;
     z-index: 2;
 }
@@ -312,7 +312,7 @@ th, td {
 .sticky-col-6 {
     position: -webkit-sticky;
     position: sticky;
-    left: 500px; /* Adjust based on the width of the first column */
+    left: 750px; /* Adjust based on the width of the first column */
     background-color: white !important;
     z-index: 2;
 }
@@ -320,7 +320,7 @@ th, td {
 .sticky-col-7 {
     position: -webkit-sticky;
     position: sticky;
-    left: 600px; /* Adjust based on the width of the first column */
+    left: 900px; /* Adjust based on the width of the first column */
     background-color: white !important;
     z-index: 2;
 }

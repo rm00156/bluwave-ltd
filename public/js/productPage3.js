@@ -407,6 +407,7 @@ function createPriceMatrix() {
     table.id = 'priceMatrixTable';
     table.classList.add('table');
     table.classList.add('table-striped');
+    table.style = 'table-layout: fixed;'
     const thead = document.createElement('thead');
     thead.classList.add('text-center')
     
@@ -421,7 +422,9 @@ function createPriceMatrix() {
                 th.classList.add(`sticky-col-${index + 1}`);
             
             th.classList.add('sticky-header');
+            
         }
+        th.style="width:150px;"
         th.append(column.columnName);
         thead.append(th);
 
@@ -485,7 +488,7 @@ function populateTable(table, combinations, quantities) {
                 cell.classList.add(`sticky-col-${index + 1}`);
             cell.append(item.option);
             cell.setAttribute('data-optionid', item.id);
-
+            cell.style="width:150px;"
             row.append(cell);
         });
 
