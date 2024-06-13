@@ -9,6 +9,8 @@ const sequelize = new Sequelize(env === 'test' ? process.env.TEST_DATABASE_NAME 
   logging: env !== 'test' && env !== 'development',
   pool: {
     max: 12,
+    min: 0,
+    idle: 10000,
   },
 });
 const db = {};
