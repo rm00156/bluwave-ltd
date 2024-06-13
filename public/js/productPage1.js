@@ -549,7 +549,8 @@ function continueProductInformation() {
 $(function () {
 
     const addButton = document.querySelector('.add-btn');
-    addButton.addEventListener('click', handleAddClick);
+    if(addButton)
+        addButton.addEventListener('click', handleAddClick);
     rowCount = getRowCount();
     $('.picture').on('change', setupCropWindow);
     $('#confirmCrop').on('click', confirmCrop);
