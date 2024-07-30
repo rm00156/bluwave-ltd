@@ -290,9 +290,7 @@ function continueToPage6(e) {
                 return;
             }
             
-        
-            return window.location = `/product/${productId}/validate`;
-
+            return window.location = `/admin-dashboard/product/${productId}/page6`;
 
             // var job = data.currentTarget.response;
 

@@ -68,6 +68,20 @@ function BasketItems(sequelize, Sequelize) {
       allowNull: false,
     },
 
+    subTotal: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+
+    saleFk: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'sales',
+        key: 'id',
+      },
+    },
+
     purchaseBasketFk: {
       type: Sequelize.INTEGER,
       allowNull: true,

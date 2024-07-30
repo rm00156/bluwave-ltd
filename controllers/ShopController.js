@@ -78,6 +78,8 @@ async function getProductPage(req, res) {
     );
   }
 
+  const sale = await productOperations.getSaleForProductId(product.id);
+
   const { edit } = req.query;
   let priceMatrixOptions = null;
   let finishingMatrixOptions = null;
@@ -113,6 +115,7 @@ async function getProductPage(req, res) {
     currentQuantityId,
     finishingMatrixOptions,
     lowestPriceWithQuantity,
+    sale
   });
 }
 
@@ -131,7 +134,8 @@ async function getQuantityPriceTableDetails(req, res) {
 
   if (quantityPriceTable.length === 0) return res.status(204).json({});
 
-  return res.status(200).json(quantityPriceTable);
+  const sale = await productOperations.getSaleForProductId(productId, true);
+  return res.status(200).json({quantityPriceTable, sale});
 }
 
 async function getPricingMatrixOptionTypesAndOptionsForProduct(req, res) {
@@ -208,14 +212,30 @@ async function editBasketItem(req, res) {
   res.status(200).json({});
 }
 
+const getSubTotal = (price, sale) => {
+
+  if(sale) {
+    return parseFloat((parseFloat(price)/ 100) * (100 - sale.percentage)).toFixed(2);
+  }
+  return price;
+}
+
 async function addToBasket(req, res) {
   const { productId } = req.body;
   const selectedOptions = JSON.parse(req.body.selectedOptions);
   const selectedFinishingOptions = JSON.parse(
     req.body.selectedFinishingOptions,
   );
-  const { quantityId } = req.body;
-  const { price } = req.body;
+  const { priceMatrixRowQuantityPriceId } = req.body;
+  // const { price } = req.body;
+  const priceMatrixRowQuantityPrice = await productOperations.getPriceMatrixRowQuantityPriceById(priceMatrixRowQuantityPriceId);
+  if(priceMatrixRowQuantityPrice === null)
+    return res.status(204).json({error: 'incorrect priceMatrixRowQuantityPrice id'})
+
+  const quantityId = priceMatrixRowQuantityPrice.quantityFk;
+  const price = priceMatrixRowQuantityPrice.price;
+  const sale = await productOperations.getSaleForProductId(productId, true);
+  const subTotal = getSubTotal(price, sale);
 
   const transaction = await models.sequelize.transaction();
 
@@ -240,6 +260,8 @@ async function addToBasket(req, res) {
         finishingOptionGroup.id,
         quantityId,
         price,
+        subTotal,
+        sale ? sale.id : null
       );
     } else {
       await basketOperations.createBasketItem(
@@ -249,6 +271,8 @@ async function addToBasket(req, res) {
         null,
         quantityId,
         price,
+        subTotal,
+        sale ? sale.id : null
       );
     }
   } catch (err) {

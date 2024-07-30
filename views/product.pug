@@ -6,6 +6,7 @@ html(land="en")
     include common/footer.pug
     include common/scripts.pug
     +head()
+    link(rel="stylesheet", href="/assets/css/product.css")
     #preloader
         #status
             .bouncing-loader
@@ -37,7 +38,9 @@ html(land="en")
             section.mt-8
                 .container
                     .row.mb-5
-                        aside.col-md-5.sticky-div
+                        aside.col-md-6.sticky-div(style="position:relative")
+                            if(sale)
+                                span.sale #{sale.percentage}% off
                             .slider.slider-for
                                 div
                                     .zoom(onmousemove='zoom(event)' style='background-image: url("' + product.image1Path + '")')
@@ -87,9 +90,7 @@ html(land="en")
                             section.mt-lg-14.mt-8
                                 .container
                                     .row
-                                        .trustpilot-widget(data-locale='en-GB' data-template-id='5419b6a8b0d04a076446a9ad' data-businessunit-id='5c8eb780df266400012deb11' data-style-height='24px' data-style-width='100%' data-theme='light')
-                                            a(href='https://uk.trustpilot.com/review/thefuneralstationery.co.uk' target='_blank') Trustpilot
-
+                                        
                                         //- .col-md-12
                                             ul#myTab.nav.nav-pills.nav-lb-tab(role='tablist')
                                                 // nav item
@@ -123,12 +124,15 @@ html(land="en")
                                                             .col-12.col-lg-6
                                                                 h5 PLACEHOLDER
                                                 
-                        .col-md-7
+                        .col-md-6
                             .ps-lg-10.mt-6.mt-md-0
                                 // content
                                 //- a.mb-4.d-block(href='/shop?type=' + productType.productType) #{productType.productType}
                                 // heading
                                 h1.mb-1 #{product.name}
+                                //- .trustpilot-widget(data-locale='en-GB' data-template-id='5419b6a8b0d04a076446a9ad' data-businessunit-id='5c8eb780df266400012deb11' data-style-height='24px' data-style-width='100%' data-theme='light')
+                                //-     a(href='https://uk.trustpilot.com/review/thefuneralstationery.co.uk' target='_blank') Trustpilot
+
                                 .mb-4
                                     // rating
                                     // rating
@@ -174,6 +178,7 @@ html(land="en")
                                     input#priceMatrixOptions(type="hidden" value=priceMatrixOptions)
                                     input#finishingMatrixOptions(type="hidden" value=finishingMatrixOptions)
                                     input#currentQuantityId(type="hidden" value=currentQuantityId)
+                                    
                                     large.fw-bold.text-dark Customise your #{product.name}
                                     br
                                     br
@@ -184,7 +189,7 @@ html(land="en")
                                     large.fw-bold.text-dark Select your Quantity 
                                     .col-12
                                         #quantityPriceTableSection
-                                        
+                                            
                                 
                                 .mb-4
                                     large.fw-bold.text-dark Summary

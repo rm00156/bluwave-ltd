@@ -1,9 +1,11 @@
 var optionTypes = [];
 var finishingOptionTypes = [];
 var price;
+var priceMatrixRowQuantityPriceId;
 var quantityId;
 var productId;
 var first = true;
+var sale;
 $(function(){
     productId = $('#productId').val();
     setupOptionTypesQuantitiesAndPrices(productId);
@@ -126,7 +128,10 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
                 } else {
                     const currentQuantityId = $('#currentQuantityId').val();
                     $('#quantityPriceTableSection').empty();
-                    var tableDetails = response;
+                    var tableDetails = response.quantityPriceTable;
+                    sale = response.sale;
+                    
+
                     var html = '<table id="quantityPriceTable" style="cursor:pointer" class="table table-light mt-3 table-hover">' +
                                     '<thead>' +
                                         '<th>Quantity</th>' +
@@ -138,11 +143,25 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
                     for(var i = 0; i < tableDetails.length; i++) {
                         var defaultedSelectedRow = i == 0 ? 'class="table-active"' : '';
                         var tableDetail = tableDetails[i];
-                        html = html + '<tr data-quantity="' + tableDetail.quantity + '" data-price="' + parseFloat(tableDetail.price).toFixed(2) + '" data-priceMatrixRowQuantityRowId="' + tableDetail.priceMatrixRowQuantityRowId + '"  data-quantityId="' + tableDetail.quantityId + '"' + defaultedSelectedRow + '>' +
-                                        '<td>' + tableDetail.quantity + '</td>' +
-                                        '<td style="font-weight: 500; color:green;">£' + parseFloat(tableDetail.pricePer).toFixed(2) + '</td>' +
-                                        '<td style="font-weight: 500; color:green;">£' + parseFloat(tableDetail.price).toFixed(2) + '</td>' +
-                                      '</tr>';
+                        const originalPrice = parseFloat(tableDetail.price).toFixed(2);
+                        const originalPricePer = parseFloat(tableDetail.pricePer).toFixed(2);
+                        if(sale) {
+                            const percentage = sale.percentage;
+                            const salePrice = parseFloat((originalPrice / 100) * (100 - percentage)).toFixed(2);
+                            const salePricePer = parseFloat((originalPricePer / 100) * (100 - percentage)).toFixed(2);
+
+                            html = html + '<tr data-quantity="' + tableDetail.quantity + '" data-price="' + originalPrice + '" data-priceMatrixRowQuantityRowId="' + tableDetail.priceMatrixRowQuantityRowId + '"  data-quantityId="' + tableDetail.quantityId + '"' + defaultedSelectedRow + '>' +
+                            '<td>' + tableDetail.quantity + '</td>' +
+                            '<td><span style="font-weight: 500; padding-right:10px; color:red; text-decoration-line:line-through">£' + originalPricePer + '</span><span style="font-weight: 500; color:green;">£' + salePricePer + '</span></td>' +
+                            '<td><span style="font-weight: 500; padding-right:10px; color:red; text-decoration-line:line-through">£' + originalPrice + '</span><span style="font-weight: 500; color:green;">£' + salePrice + '</span></td>' +
+                          '</tr>';
+                        } else {
+                            html = html + '<tr data-quantity="' + tableDetail.quantity + '" data-price="' + originalPrice + '" data-priceMatrixRowQuantityRowId="' + tableDetail.priceMatrixRowQuantityRowId + '"  data-quantityId="' + tableDetail.quantityId + '"' + defaultedSelectedRow + '>' +
+                            '<td>' + tableDetail.quantity + '</td>' +
+                            '<td><span style="font-weight: 500; color:green;">£' + originalPricePer + '</span></td>' +
+                            '<td style="font-weight: 500; color:green;">£' + originalPrice + '</td>' +
+                          '</tr>';
+                        }
                         
                         if(currentQuantityId && tableDetail.quantityId === Number(currentQuantityId)){
                             quantityIndex = i + 1;
@@ -179,9 +198,12 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
         $(this).addClass('table-active');
         $('#summary').empty(); 
         quantityId = e.currentTarget.getAttribute('data-quantityid');  
-        var priceMatrixRowQuantityRowId = e.currentTarget.getAttribute('data-pricematrixrowquantityrowid');  
         var quantity = e.currentTarget.getAttribute('data-quantity'); 
         price = e.currentTarget.getAttribute('data-price'); 
+        priceMatrixRowQuantityPriceId = e.currentTarget.getAttribute('data-pricematrixrowquantityrowid'); 
+        if(sale) {
+            price = (parseFloat(price)/100) * (100 - sale.percentage)
+        }
         var summaryHtml = '<tbody>';
         for(var i = 0; i < optionTypes.length; i++) {
             var optionType = optionTypes[i];
@@ -204,7 +226,7 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
                                     '</tr>'  + 
                                     '<tr>' +
                                         '<td class="text-success" style="font-size: 20pt;font-weight:500;">Price</td>' + 
-                                        '<td class="text-success" style="font-size: 20pt;font-weight:500;">£' + price + '</td>' +
+                                        '<td class="text-success" style="font-size: 20pt;font-weight:500;">£' + price.toFixed(2) + '</td>' +
                                     '</tr>';
         summaryHtml = summaryHtml + '</tbody>'; 
         $('#summary').append(summaryHtml);   
@@ -230,7 +252,7 @@ function addToBasket() {
         selectedFinishingOptions.push({id: finishingOption.value, option: finishingOption.text});
     });
 
-    const data = {productId: productId, quantityId: quantityId, price: price, 
+    const data = {productId: productId, priceMatrixRowQuantityPriceId, 
         selectedOptions: JSON.stringify(selectedOptions),
         selectedFinishingOptions: JSON.stringify(selectedFinishingOptions)};
 

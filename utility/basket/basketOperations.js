@@ -34,7 +34,7 @@ async function createRevisedBasketItem(basketItem, revisedBasketItems) {
   result.finishingOptions = finishingOption;
   result.quantities = quantities;
   revisedBasketItems.push(result);
-  return parseFloat(basketItem.price);
+  return parseFloat(basketItem.subTotal);
 }
 
 async function getActiveBasketItemsForAccount(accountId) {
@@ -93,6 +93,8 @@ async function createBasketItem(
   finishingOptionGroupId,
   quantityId,
   price,
+  subTotal,
+  saleFk,
 ) {
   return models.basketItem.create({
     accountFk: accountId,
@@ -101,6 +103,8 @@ async function createBasketItem(
     finishingOptionGroupFk: finishingOptionGroupId,
     quantityFk: quantityId,
     price,
+    subTotal,
+    saleFk,
     deleteFl: false,
     versionNo: 1,
   });

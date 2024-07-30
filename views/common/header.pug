@@ -117,7 +117,13 @@ mixin header()
                                                                 h6.mb-0 #{basketItem.name}
                                                             small.text-muted Quantity: #{basketItem.quantity}
                                                             br
-                                                            small.text-muted £#{basketItem.price}
+                                                            if(basketItem.saleFk) 
+                                                                span(style="text-decoration: line-through; padding-right: 10px;")
+                                                                    small.text-muted £#{basketItem.price}
+                                                                span(style="font-weight:600")
+                                                                    small.text-danger £#{basketItem.subTotal}
+                                                            else 
+                                                                small.text-muted £#{basketItem.subTotal}
                                                         // price
                                                         .text-end.col-lg-2
                                                             p.text-inherit(data-basketitemid=basketItem.id aria-label='Close')
