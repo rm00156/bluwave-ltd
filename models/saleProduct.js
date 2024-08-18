@@ -1,10 +1,19 @@
-function DiscountProductGroups(sequelize, Sequelize) {
-  const DiscountProductGroup = sequelize.define('discountProductGroup', {
+function SaleProducts(sequelize, Sequelize) {
+  const SaleProduct = sequelize.define('saleProduct', {
 
     id: {
       autoIncrement: true,
       primaryKey: true,
       type: Sequelize.INTEGER,
+    },
+
+    saleFk: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'sales',
+        key: 'id',
+      },
     },
 
     productFk: {
@@ -16,32 +25,21 @@ function DiscountProductGroups(sequelize, Sequelize) {
       },
     },
 
-    quantityFk: {
-      type: Sequelize.INTEGER,
-      allowNull: true,
-      references: {
-        model: 'quantities',
-        key: 'id',
-      },
-    },
-
     deleteFl: {
       type: Sequelize.BOOLEAN,
       allowNull: false,
-      defaultValue: false,
     },
 
     versionNo: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      defaultValue: 1,
     },
 
   }, {
     timestamps: false,
   });
 
-  return DiscountProductGroup;
+  return SaleProduct;
 }
 
-module.exports = DiscountProductGroups;
+module.exports = SaleProducts;

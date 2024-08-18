@@ -75,3 +75,7 @@
   padding-top:30px;
   border-radius: 50%;
 }
+
+.dataTable thead th:first-child {
+  cursor: default;
+}

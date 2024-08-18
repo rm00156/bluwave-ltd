@@ -27,7 +27,7 @@ module.exports = {
     'global-require': 0,
     'import/no-dynamic-require': 0,
     'max-len': ['error', {
-      code: 125, // Example maximum line length
+      code: 130, // Example maximum line length
       ignoreUrls: true,
       ignoreComments: false,
       ignoreRegExpLiterals: true,

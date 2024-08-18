@@ -1,0 +1,121 @@
+doctype html
+
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    link(rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css")
+    // main
+    div
+
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                .container
+                    .row.mb-8
+                        .col-md-12
+                            // page header
+                            .d-md-flex.justify-content-between.align-items-center
+                                div
+                                    h2 Sales
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin-dashboard') Dashboard
+                                            li.breadcrumb-item.active(aria-current='page') Sales
+                                // button
+                                div
+                                    a.btn.btn-primary(href='/admin-dashboard/add-sale') Create Sale
+                    // row
+                    .row
+                        .col-xl-12.col-12.mb-5
+                            // card
+                            .card.h-100.card-lg
+                                //- .px-6.py-6
+                                    .row.justify-content-between
+                                        // form
+                                        .col-lg-4.col-md-6.col-12.mb-2.mb-lg-0
+                                            form.d-flex(role='search')
+                                                input.form-control(type='search' placeholder='Search Products' aria-label='Search')
+                                        // select option
+                                        .col-lg-2.col-md-4.col-12
+                                            select.form-select
+                                                option(selected='') Status
+                                                option(value='active') Active
+                                                option(value='deactive') Deactive
+                                // card body
+                                .card-body.p-0(style="padding: 20px !important")
+                                    // table
+                                    .table-responsive
+                                        table.table.table-centered.table-hover.text-nowrap.table-borderless.mb-0.table-with-checkbox#sales(style="cursor:pointer")
+                                            thead.bg-light
+                                                tr
+                                                    //- th
+                                                        .form-check
+                                                            input#checkAll.form-check-input(type='checkbox' value='')
+                                                            label.form-check-label(for='checkAll')
+                                                    //- th Image
+                                                    th Sale Name
+                                                    th Used Count
+                                                    th Percentage
+                                                    th FromDt
+                                                    th ToDt
+                                                    //- th Price From
+                                                    //- th
+                                            tbody
+                                                each sale in sales
+                                                    tr(data-saleId=sale.id)
+                                                        //- td
+                                                            .form-check
+                                                                input#productOne.form-check-input(type='checkbox' value='')
+                                                                label.form-check-label(for='productOne')
+                                                        //- td
+                                                            img.icon-shape.icon-md(src=product.image1Path alt='')
+                                                        td #{sale.name}
+                                                        td #{sale.usedCount}
+                                                        td #{sale.percentage}% off
+                                                        td #{sale.fromDt}
+                                                            
+                                                        td #{sale.toDt}
+                                                        //- td £#{product.price}
+                                                        
+                                                        //- td
+                                                            .dropdown
+                                                                a.text-reset(href='#' data-bs-toggle='dropdown' aria-expanded='false')
+                                                                    i.feather-icon.icon-more-vertical.fs-5
+                                                                ul.dropdown-menu
+                                                                    li
+                                                                        a.dropdown-item(href='#')
+                                                                            i.bi.bi-trash.me-3
+                                                                            | Delete
+                                                                    li
+                                                                        a.dropdown-item(href='#')
+                                                                            i.bi.bi-pencil-square.me-3
+                                                                            | Edit
+                                                
+                                //- .border-top.d-md-flex.justify-content-between.align-items-center.px-6.py-6
+                                    span Showing 1 to 8 of 12 entries
+                                    nav.mt-2.mt-md-0
+                                        ul.pagination.mb-0
+                                            li.page-item.disabled
+                                                a.page-link(href='#!') Previous
+                                            li.page-item
+                                                a.page-link.active(href='#!') 1
+                                            li.page-item
+                                                a.page-link(href='#!') 2
+                                            li.page-item
+                                                a.page-link(href='#!') 3
+                                            li.page-item
+                                                a.page-link(href='#!') Next
+
+
+
+        +adminScripts()
+        script(src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
+        script(src="/js/adminSales.js")

@@ -38,8 +38,9 @@ html(land="en")
             section.mt-8
                 .container
                     .row.mb-5
-                        aside.col-md-6.sticky-div(style="position:relative")
+                        aside.col-md-5.sticky-div
                             if(sale)
+                                
                                 span.sale #{sale.percentage}% off
                             .slider.slider-for
                                 div
@@ -90,46 +91,19 @@ html(land="en")
                             section.mt-lg-14.mt-8
                                 .container
                                     .row
+                                        .trustpilot-widget(data-locale='en-GB' data-template-id='5419b6a8b0d04a076446a9ad' data-businessunit-id='5c8eb780df266400012deb11' data-style-height='24px' data-style-width='100%' data-theme='light')
+                                            a(href='https://uk.trustpilot.com/review/thefuneralstationery.co.uk' target='_blank') Trustpilot
+
                                         
-                                        //- .col-md-12
-                                            ul#myTab.nav.nav-pills.nav-lb-tab(role='tablist')
-                                                // nav item
-                                                li.nav-item(role='presentation')
-                                                    // btn
-                                                    button#product-tab.nav-link.active(data-bs-toggle='tab' data-bs-target='#product-tab-pane' type='button' role='tab' aria-controls='product-tab-pane' aria-selected='true') Description
                                                 
-                                            // tab content
-                                            #myTabContent.tab-content
-                                                // tab pane
-                                                #product-tab-pane.tab-pane.fade.show.active(role='tabpanel' aria-labelledby='product-tab' tabindex='0')
-                                                    .my-8
-                                                        .mb-5
-                                                            // text
-                                                            //- h4.mb-1 #MAIN_DESCRIPTION_TITLE
-                                                            p.mb-0 #{product.description}
-                                                        .mb-5
-                                                            //- h5.mb-1 Storage Tips
-                                                            //- p.mb-0
-                                                            //-     | Nisi, tellus iaculis urna bibendum in lacus, integer. Id imperdiet vitae varius sed
-                                                            //-     | magnis eu
-                                                            //-     | nisi nunc sit. Vel, varius habitant ornare ac rhoncus. Consequat risus facilisis ante ipsum
-                                                            //-     | netus risus adipiscing sagittis sed.Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                                                        
-                                                // tab pane
-                                                //- #details-tab-pane.tab-pane.fade(role='tabpanel' aria-labelledby='details-tab' tabindex='0')
-                                                    .my-8
-                                                        .row
-                                                            .col-12
-                                                                h4.mb-4 Delivery Details
-                                                            .col-12.col-lg-6
-                                                                h5 PLACEHOLDER
-                                                
-                        .col-md-6
+                        .col-md-7
                             .ps-lg-10.mt-6.mt-md-0
                                 // content
                                 //- a.mb-4.d-block(href='/shop?type=' + productType.productType) #{productType.productType}
                                 // heading
-                                h1.mb-1 #{product.name}
+                                h1.mb-1(style="font-weight:800") #{product.name}
+                                if(sale)
+                                    h1.badge(style="background:#ee7572") #{sale.name} #{sale.percentage}% off
                                 //- .trustpilot-widget(data-locale='en-GB' data-template-id='5419b6a8b0d04a076446a9ad' data-businessunit-id='5c8eb780df266400012deb11' data-style-height='24px' data-style-width='100%' data-theme='light')
                                 //-     a(href='https://uk.trustpilot.com/review/thefuneralstationery.co.uk' target='_blank') Trustpilot
 
@@ -152,23 +126,28 @@ html(land="en")
                                     medium #{product.subDescription}
                                     br
                                     br
-                                    ul(style="padding-left:1rem !important")
+                                    ul(style="padding-left:0; list-style:none !important")
                                         li.text-decoration-none.text-muted
+                                            <i class="bi bi-check-square-fill text-success" style="padding-right: 5px"></i>
                                             medium #{product.descriptionPoint1}
                                         if(product.descriptionPoint2)
                                             li.text-decoration-none.text-muted
+                                                <i class="bi bi-check-square-fill text-success" style="padding-right: 5px"></i>
                                                 medium #{product.descriptionPoint2}
 
                                         if(product.descriptionPoint3)
                                             li.text-decoration-none.text-muted
+                                                <i class="bi bi-check-square-fill text-success" style="padding-right: 5px"></i>
                                                 medium #{product.descriptionPoint3}
 
                                         if(product.descriptionPoint4)
                                             li.text-decoration-none.text-muted
+                                                <i class="bi bi-check-square-fill text-success" style="padding-right: 5px"></i>
                                                 medium #{product.descriptionPoint4}
 
                                         if(product.descriptionPoint5)
                                             li.text-decoration-none.text-muted
+                                                <i class="bi bi-check-square-fill text-success" style="padding-right: 5px"></i>
                                                 medium #{product.descriptionPoint5}
                                     
 

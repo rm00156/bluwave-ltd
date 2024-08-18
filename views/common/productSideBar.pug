@@ -47,11 +47,11 @@ mixin productSideBar(type, statuses)
                                 //- i.feather-icon.icon-shopping-bag.me-2
                                 | Delivery Options
 
-                    if(priceMatrix)
-                        li.nav-item
-                            a.nav-link(aria-current='page' href=`/admin-dashboard/product/${product.id}/page6` class=(type=='page6' ? 'active' : ''))
-                                //- i.feather-icon.icon-shopping-bag.me-2
-                                | Sale
+                    //- if(priceMatrix)
+                    //-     li.nav-item
+                    //-         a.nav-link(aria-current='page' href=`/admin-dashboard/product/${product.id}/page6` class=(type=='page6' ? 'active' : ''))
+                    //-             //- i.feather-icon.icon-shopping-bag.me-2
+                    //-             | Sale
                     
                     if(product.deleteFl == false)
                         li.nav-item

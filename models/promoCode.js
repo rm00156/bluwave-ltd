@@ -1,8 +1,6 @@
-const { DataTypes } = require("sequelize");
-
 function PromoCodes(sequelize, Sequelize) {
   const PromoCode = sequelize.define(
-    "promoCode",
+    'promoCode',
     {
       id: {
         autoIncrement: true,
@@ -39,8 +37,8 @@ function PromoCodes(sequelize, Sequelize) {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "promoCodeTypes",
-          key: "id",
+          model: 'promoCodeTypes',
+          key: 'id',
         },
       },
 
@@ -48,8 +46,8 @@ function PromoCodes(sequelize, Sequelize) {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "discountProductGroups",
-          key: "id",
+          model: 'discountProductGroups',
+          key: 'id',
         },
       },
 
@@ -87,7 +85,7 @@ function PromoCodes(sequelize, Sequelize) {
     },
     {
       timestamps: false,
-    }
+    },
   );
 
   return PromoCode;

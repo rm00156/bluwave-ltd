@@ -5,16 +5,15 @@ const productOperations = require('../utility/products/productOperations');
 const basketOperations = require('../utility/basket/basketOperations');
 const orderOperations = require('../utility/order/orderOperations');
 const deliveryOperations = require('../utility/delivery/deliveryOperations');
+const { getSaleForProductId, getSubTotal, updateSalesUsedCountForOrder } = require('../utility/sales/salesOperations');
+// const notProduction = process.env.NODE_ENV !== 'production';
 
-const notProduction = process.env.NODE_ENV !== 'production';
-
-const queueOperations = !notProduction
-  ? require('../utility/queue/queueOperations')
-  : null;
+const queueOperations = process.env.NODE_ENV === 'test' ? null : require('../utility/queue/queueOperations');
 const accountOperations = require('../utility/account/accountOperations');
 const models = require('../models');
 
 const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
+
 async function getShopTypePage(req, res) {
   const { type } = req.query;
 
@@ -78,7 +77,7 @@ async function getProductPage(req, res) {
     );
   }
 
-  const sale = await productOperations.getSaleForProductId(product.id);
+  const sale = await getSaleForProductId(product.id, true);
 
   const { edit } = req.query;
   let priceMatrixOptions = null;
@@ -115,7 +114,7 @@ async function getProductPage(req, res) {
     currentQuantityId,
     finishingMatrixOptions,
     lowestPriceWithQuantity,
-    sale
+    sale,
   });
 }
 
@@ -134,8 +133,8 @@ async function getQuantityPriceTableDetails(req, res) {
 
   if (quantityPriceTable.length === 0) return res.status(204).json({});
 
-  const sale = await productOperations.getSaleForProductId(productId, true);
-  return res.status(200).json({quantityPriceTable, sale});
+  const sale = await getSaleForProductId(productId, true);
+  return res.status(200).json({ quantityPriceTable, sale });
 }
 
 async function getPricingMatrixOptionTypesAndOptionsForProduct(req, res) {
@@ -165,9 +164,16 @@ async function editBasketItem(req, res) {
   const selectedFinishingOptions = JSON.parse(
     req.body.selectedFinishingOptions,
   );
-  const { quantityId } = req.body;
-  const { price } = req.body;
-  const { basketItemId } = req.body;
+
+  const { priceMatrixRowQuantityPriceId, basketItemId, productId } = req.body;
+  const priceMatrixRowQuantityPrice = await productOperations.getPriceMatrixRowQuantityPriceById(priceMatrixRowQuantityPriceId);
+  if (priceMatrixRowQuantityPrice === null) return res.status(204).json({ error: 'incorrect priceMatrixRowQuantityPrice id' });
+
+  const quantityId = priceMatrixRowQuantityPrice.quantityFk;
+  const { price } = priceMatrixRowQuantityPrice;
+
+  const sale = await getSaleForProductId(productId, true);
+  const subTotal = getSubTotal(price, sale);
 
   const transaction = await models.sequelize.transaction();
 
@@ -191,6 +197,8 @@ async function editBasketItem(req, res) {
         finishingOptionGroup.id,
         quantityId,
         price,
+        subTotal,
+        sale ? sale.id : null,
       );
     } else {
       await basketOperations.editBasketItem(
@@ -199,42 +207,33 @@ async function editBasketItem(req, res) {
         null,
         quantityId,
         price,
+        subTotal,
+        sale ? sale.id : null,
       );
     }
   } catch (err) {
     logger.error(err);
     await transaction.rollback();
-    res.status(400).json({});
+    return res.status(400).json({});
   }
 
   await transaction.commit();
 
-  res.status(200).json({});
-}
-
-const getSubTotal = (price, sale) => {
-
-  if(sale) {
-    return parseFloat((parseFloat(price)/ 100) * (100 - sale.percentage)).toFixed(2);
-  }
-  return price;
+  return res.status(200).json({});
 }
 
 async function addToBasket(req, res) {
-  const { productId } = req.body;
+  const { productId, priceMatrixRowQuantityPriceId } = req.body;
   const selectedOptions = JSON.parse(req.body.selectedOptions);
   const selectedFinishingOptions = JSON.parse(
     req.body.selectedFinishingOptions,
   );
-  const { priceMatrixRowQuantityPriceId } = req.body;
-  // const { price } = req.body;
   const priceMatrixRowQuantityPrice = await productOperations.getPriceMatrixRowQuantityPriceById(priceMatrixRowQuantityPriceId);
-  if(priceMatrixRowQuantityPrice === null)
-    return res.status(204).json({error: 'incorrect priceMatrixRowQuantityPrice id'})
+  if (priceMatrixRowQuantityPrice === null) return res.status(204).json({ error: 'incorrect priceMatrixRowQuantityPrice id' });
 
   const quantityId = priceMatrixRowQuantityPrice.quantityFk;
-  const price = priceMatrixRowQuantityPrice.price;
-  const sale = await productOperations.getSaleForProductId(productId, true);
+  const { price } = priceMatrixRowQuantityPrice;
+  const sale = await getSaleForProductId(productId, true);
   const subTotal = getSubTotal(price, sale);
 
   const transaction = await models.sequelize.transaction();
@@ -261,7 +260,7 @@ async function addToBasket(req, res) {
         quantityId,
         price,
         subTotal,
-        sale ? sale.id : null
+        sale ? sale.id : null,
       );
     } else {
       await basketOperations.createBasketItem(
@@ -272,18 +271,18 @@ async function addToBasket(req, res) {
         quantityId,
         price,
         subTotal,
-        sale ? sale.id : null
+        sale ? sale.id : null,
       );
     }
   } catch (err) {
     logger.error(err);
     await transaction.rollback();
-    res.status(400).json({});
+    return res.status(400).json({});
   }
 
   await transaction.commit();
 
-  res.status(201).json({});
+  return res.status(201).json({});
 }
 
 async function getBasketPage(req, res) {
@@ -480,7 +479,7 @@ async function handleSetPurcharseBasketForBasketItem(
   purchaseBasketId,
 ) {
   const { quantity } = basketItem;
-  const amount = parseFloat(basketItem.price) * 100;
+  const amount = parseFloat(basketItem.subTotal) * 100;
   const lineItem = {
     name: `${basketItem.name} - (${quantity} units)`,
     amount,
@@ -512,8 +511,8 @@ async function checkout(req, res) {
   const basketItems = await basketOperations.getAllBasketItemsForCheckout(
     accountId,
   );
-  const subtotal = basketOperations.getSubtotalFromBasketItems(basketItems);
-  const total = parseFloat(subtotal) + parseFloat(deliveryPrice);
+  const { subTotal, total } = basketOperations.getTotalsFromBasketItems(basketItems);
+  const newTotal = total + parseFloat(deliveryPrice);
 
   const transaction = await models.sequelize.transaction();
   const lineItems = [];
@@ -546,8 +545,8 @@ async function checkout(req, res) {
       fullName,
       email,
       phoneNumber,
-      subtotal,
-      total,
+      subTotal,
+      newTotal,
       shippingDetail,
       deliveryTypeId,
       deliveryPrice,
@@ -619,6 +618,7 @@ async function sessionCompleted(req, res) {
 
     try {
       await orderOperations.completePurchaseBasket(purchaseBasketId, now);
+      await updateSalesUsedCountForOrder(purchaseBasketId);
       await queueOperations.addSendPurchaseEmail(purchaseBasketId);
 
       const orderDetails = await orderOperations.getSuccessfulOrderForPurchaseBasketId(

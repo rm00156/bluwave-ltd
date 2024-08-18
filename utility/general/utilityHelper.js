@@ -219,6 +219,11 @@ async function readSqlFile(filePath) {
   }
 }
 
+function midnightDate(dt) {
+  const dtString = `${dt} 23:59:59`;
+  return new Date(dtString);
+}
+
 module.exports = {
   checkNoDuplicateNonZeroNumbers,
   dateXAmountFromNow,
@@ -229,6 +234,7 @@ module.exports = {
   getTimeDifference,
   hasTheSameItems,
   isEmptyString,
+  midnightDate,
   parseCommaSeperatedText,
   pauseForTimeInSecond,
   readSqlFile,

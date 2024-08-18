@@ -131,7 +131,7 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
                     var tableDetails = response.quantityPriceTable;
                     sale = response.sale;
                     
-
+                    console.log(response)
                     var html = '<table id="quantityPriceTable" style="cursor:pointer" class="table table-light mt-3 table-hover">' +
                                     '<thead>' +
                                         '<th>Quantity</th>' +
@@ -152,8 +152,8 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
 
                             html = html + '<tr data-quantity="' + tableDetail.quantity + '" data-price="' + originalPrice + '" data-priceMatrixRowQuantityRowId="' + tableDetail.priceMatrixRowQuantityRowId + '"  data-quantityId="' + tableDetail.quantityId + '"' + defaultedSelectedRow + '>' +
                             '<td>' + tableDetail.quantity + '</td>' +
-                            '<td><span style="font-weight: 500; padding-right:10px; color:red; text-decoration-line:line-through">£' + originalPricePer + '</span><span style="font-weight: 500; color:green;">£' + salePricePer + '</span></td>' +
-                            '<td><span style="font-weight: 500; padding-right:10px; color:red; text-decoration-line:line-through">£' + originalPrice + '</span><span style="font-weight: 500; color:green;">£' + salePrice + '</span></td>' +
+                            '<td><span style="font-weight: 500; padding-right:10px; text-decoration-line:line-through" class="text-danger">£' + originalPricePer + '</span><span style="font-weight: 500;" class="text-success">£' + salePricePer + '</span></td>' +
+                            '<td><span style="font-weight: 500; padding-right:10px; text-decoration-line:line-through"  class="text-danger">£' + originalPrice + '</span><span style="font-weight: 500;" class="text-success">£' + salePrice + '</span></td>' +
                           '</tr>';
                         } else {
                             html = html + '<tr data-quantity="' + tableDetail.quantity + '" data-price="' + originalPrice + '" data-priceMatrixRowQuantityRowId="' + tableDetail.priceMatrixRowQuantityRowId + '"  data-quantityId="' + tableDetail.quantityId + '"' + defaultedSelectedRow + '>' +
@@ -226,7 +226,7 @@ function setupOptionTypesQuantitiesAndPrices(productId) {
                                     '</tr>'  + 
                                     '<tr>' +
                                         '<td class="text-success" style="font-size: 20pt;font-weight:500;">Price</td>' + 
-                                        '<td class="text-success" style="font-size: 20pt;font-weight:500;">£' + price.toFixed(2) + '</td>' +
+                                        '<td class="text-success" style="font-size: 20pt;font-weight:500;">£' + parseFloat(price).toFixed(2) + '</td>' +
                                     '</tr>';
         summaryHtml = summaryHtml + '</tbody>'; 
         $('#summary').append(summaryHtml);   
@@ -252,7 +252,7 @@ function addToBasket() {
         selectedFinishingOptions.push({id: finishingOption.value, option: finishingOption.text});
     });
 
-    const data = {productId: productId, priceMatrixRowQuantityPriceId, 
+    const data = {productId, priceMatrixRowQuantityPriceId, 
         selectedOptions: JSON.stringify(selectedOptions),
         selectedFinishingOptions: JSON.stringify(selectedFinishingOptions)};
 
@@ -291,7 +291,7 @@ function editBasket(e) {
         selectedFinishingOptions.push({id: finishingOption.value, option: finishingOption.text});
     });
 
-    const data = {quantityId: quantityId, price: price, basketItemId: basketItemId,
+    const data = { productId, priceMatrixRowQuantityPriceId, basketItemId: basketItemId,
         selectedOptions: JSON.stringify(selectedOptions),
         selectedFinishingOptions: JSON.stringify(selectedFinishingOptions)};
 

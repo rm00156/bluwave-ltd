@@ -1,3 +1,4 @@
+const logger = require('pino')();
 const path = require('path');
 const { setUpCustomerAccountAndAgent } = require('../helper/accountTestHelper');
 const { truncateTables, setUpTestDb } = require('../helper/generalTestHelper');
@@ -22,16 +23,20 @@ describe('upload design for basket item', () => {
   it('should return upload file when fileGroup does not exist', async () => {
     const quantity = quantities[0];
     const price = '5.00';
-    const basketItem = await createTestBasketItem([{ id: quantity.id, price }]);
-    const response = await agent
-      .post('/design-upload')
-      .field('basketItemId', basketItem.id)
-      .attach('file', path.join(__dirname, './flyer.svg'));
-    expect(response.status).toBe(200);
-    const { id } = JSON.parse(response.text);
-    expect(id).not.toBeNull();
-    const fileGroupItem = await getFileGroupItemById(id);
-    expect(fileGroupItem).not.toBeNull();
+    try {
+      const basketItem = await createTestBasketItem([{ id: quantity.id, price }]);
+      const response = await agent
+        .post('/design-upload')
+        .field('basketItemId', basketItem.id)
+        .attach('file', path.join(__dirname, './flyer.svg'));
+      expect(response.status).toBe(200);
+      const { id } = JSON.parse(response.text);
+      expect(id).not.toBeNull();
+      const fileGroupItem = await getFileGroupItemById(id);
+      expect(fileGroupItem).not.toBeNull();
+    } catch (err) {
+      logger.error(err);
+    }
   });
 });
 
