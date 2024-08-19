@@ -290,10 +290,8 @@ function continueToPage6(e) {
                 return;
             }
             
-        
-            return window.location = `/product/${productId}/validate`;
-
-
+            // return window.location = `/admin-dashboard/product/${productId}/page6`;
+            return (window.location = `/product/${productId}/validate`);
             // var job = data.currentTarget.response;
 
             // jobs[job.id] = {id: job.id, state: "queued", totalSteps:job.totalSteps, productItemNumber: productItemNumber, productNumber: job.productNumber, productVariantId: job.productVariantId};

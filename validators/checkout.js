@@ -6,27 +6,21 @@ function validatePhoneNumber(req, res) {
   const { phoneNumber } = req.query;
   const errors = [];
   if (
-    phoneNumber !== undefined
-    && !validator.isLength(phoneNumber, { min: 11, max: 11 })
+    phoneNumber === undefined
+    || !validator.isLength(phoneNumber, { min: 11, max: 11 })
+    || !validator.isNumeric(phoneNumber)
   ) {
     errors.push('Please enter a valid Phone Number');
     logger.info('Please use enter a valid Phone Number');
+    return res.status(400).json({ errors });
   }
 
-  if (phoneNumber !== undefined && !validator.isNumeric(phoneNumber)) {
-    errors.push('Please use enter a valid Phone Number');
-    logger.info('Please use enter a valid Phone Number');
-  }
-
-  res.status(200).json({ errors });
+  return res.status(200).json({});
 }
 
 async function isCorrectAccount(req, res, next) {
   const purchaseBasketId = req.params.id;
-  const purchaseBasket = await orderOperations.getPurchaseBasketWithIdAndAccountId(
-    purchaseBasketId,
-    req.user.id,
-  );
+  const purchaseBasket = await orderOperations.getPurchaseBasketWithIdAndAccountId(purchaseBasketId, req.user.id);
 
   if (purchaseBasket == null) {
     return res.redirect('/');

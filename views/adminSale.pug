@@ -1,0 +1,148 @@
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    
+    link(rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css")
+    link(rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/5.0.1/css/fixedColumns.dataTables.css")
+    link(rel="stylesheet" href="https://cdn.datatables.net/select/2.0.4/css/select.dataTables.css")
+    div
+        
+        +adminTopNavbar()
+        #deleteModal.modal.fade(tabindex='-1' aria-labelledby='deleteModal' aria-hidden='true')
+            .modal-dialog
+                .modal-content
+                    // modal body
+                    .modal-body.p-6
+                        .d-flex.justify-content-between.mb-5
+                            // heading
+                            div
+                                h5#deleteModalLabel.h6.mb-1 Delete Sale - #{sale.name}
+                            div
+                                // button
+                                button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                        // row
+                        .row.g-3
+                            // col
+                            .col-12
+                                p.mb-2 Are you sure you would like to delete sale - #{sale.name}?
+                                    
+                            
+                            // button
+                            .col-12.text-end
+                                button.btn.btn-outline-primary(style="margin-right:10px" type='button' data-bs-dismiss='modal') Cancel
+                                button.btn.btn-primary#delete(type='button') Delete Sale
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                input#saleId(type="hidden" value=sale.id)
+                .container
+                    // row
+                    .row.mb-8
+                        .col-md-12
+                            .d-md-flex.justify-content-between.align-items-center
+                                // page header
+                                div
+                                    h2#title Sale
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin-dashboard') Dashboard
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin-dashboard/sales') Sales
+                                            li.breadcrumb-item.active(aria-current='page') #{sale.name}
+                                // button
+                                div
+                                    a.btn.btn-light(href='/admin-dashboard/sales') Back to Sales
+                    // row
+                    .row
+                        .col-lg-12.col-12
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    .row
+                                        h3#title Sale Details
+                                        form#form
+                                            .row
+                                                p#error-noChange.small.text-danger
+                                                #sale-container
+                                                    .row.mb-3
+                                                        .col-sm-6
+                                                            label.form-label Name
+                                                            input.form-control#name(type='text' required value=sale.name) 
+                                                            p#error-name.small.text-danger
+                                                        .col-sm-6
+                                                            label.form-label Sale Percentage (%)
+                                                            input.form-control#percentage(type='number' value=sale.percentage required min=1 max=100)
+                                                            p#error-percentage.small.text-danger
+                                                    .row.mb-3
+                                                        .col-sm-6
+                                                            label.form-label From Dt
+                                                            input.form-control.date#fromDt(type='date' value=(sale.fromDt.toString()).replaceAll('T00:00:00.000Z', '') required)
+                                                            p#error-fromDt.small.text-danger
+                                                        .col-sm-6
+                                                            label.form-label To Dt
+                                                            input.form-control.date#toDt(type='date' value=(sale.toDt.toString()).replaceAll('T00:00:00.000Z', '')  required)   
+                                                            p#error-toDt.small.text-danger
+                                                    .row.mb-3 
+                                                        .col-sm-6
+                                                            label.form-label Description
+                                                            textarea.form-control#description(required rows=4) #{sale.description}
+                                                            p#error-description.small.text-danger
+                                                        if(sale)
+                                                            .col-sm-6
+                                                                label.form-label(style="color:white") Description
+                                                                br
+                                                                a.btn.btn-danger(href='#' data-bs-toggle='modal' data-bs-target='#deleteModal') Delete Sale
+                                            
+                                            .row
+                                                h3 Link Products
+                                                .table-responsive
+                                                    table.stripe.row-border.order-column.nowrap#products(style="cursor:pointer")
+                                                        thead
+                                                            tr
+                                                                th     
+                                                                th Image
+                                                                th Name
+                                                                th Product Type
+                                                                th Status
+                                                                
+                                                        
+                                                        tbody
+                                                            //- each product in products
+                                                                tr(id=product.id) 
+                                                                    td
+                                                                    td 
+                                                                        img(src=product.image1Path width="50px")
+                                                                    td #{product.name}
+                                                                    td #{product.productType}
+                                                                    td 
+                                                                        if(product.deleteFl == false)
+                                                                            span.badge.bg-light-primary.text-dark-primary Active
+                                                                        else 
+                                                                            span.span.badge.bg-light-danger.text-dark-danger Deactive
+                                                                    
+                                                            
+                                            .mb-3.col-sm-6.offset-sm-3.mt-5
+                                                .d-grid
+                                                    button.btn.btn-primary#updateSale(type='submit')
+                                                        | Update Sale
+    +adminScripts()
+    //- 
+    script(src='/assets/js/vendors/editor.js')
+    //- script(src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
+    script(src="https://cdn.datatables.net/2.1.3/js/dataTables.js")
+    script(src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/dataTables.fixedColumns.js")
+    script(src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/fixedColumns.dataTables.js")
+    script(src="https://cdn.datatables.net/select/2.0.4/js/dataTables.select.js")
+    script(src="https://cdn.datatables.net/select/2.0.4/js/select.dataTables.js")
+
+    script(src='/js/adminSale.js')
+    script(src="/js/adminDashboard.js")

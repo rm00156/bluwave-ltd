@@ -110,7 +110,12 @@ html(land="en")
                                                         .col-2.col-md-2.text-center.text-muted
                                                             span #{basketItem.quantity}
                                                         .col-3.text-lg-end.text-start.text-md-end.col-md-3
-                                                            span.fw-bold £#{basketItem.price}
+                                                            if(basketItem.saleFk)
+                                                                span.fw-bold(style="text-decoration: line-through; ") £#{basketItem.price}
+                                                                br
+                                                                span.text-danger £#{basketItem.subTotal}
+                                                            else 
+                                                                span.fw-bold £#{basketItem.price}
                                             
                                             // list group item
                                             li.list-group-item.px-4.py-3(style="font-size:9pt")

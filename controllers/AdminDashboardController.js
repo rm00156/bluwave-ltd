@@ -5,6 +5,7 @@ const stripe = require('stripe')(process.env.STRIPE_KEY);
 const GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator;
 const companyInfo = require('../utility/company/companyInfo');
 const { validateUser } = require('../validators/signup');
+const { hasSaleNotChanged, validateDate, validateSale } = require('../validators/sale');
 const accountOperations = require('../utility/account/accountOperations');
 const productOperations = require('../utility/products/productOperations');
 const deliveryOperations = require('../utility/delivery/deliveryOperations');
@@ -14,6 +15,7 @@ const homePageOperations = require('../utility/homePage/homePageOperations');
 const orderOperations = require('../utility/order/orderOperations');
 const refundOperations = require('../utility/refund/refundOperations');
 const faqOperations = require('../utility/faq/faqOperations');
+const salesOperations = require('../utility/sales/salesOperations');
 const utilityHelper = require('../utility/general/utilityHelper');
 
 const models = require('../models');
@@ -359,6 +361,38 @@ async function getProductPage5(req, res) {
   });
 }
 
+// async function getProductPage6(req, res) {
+//   const { id } = req.params;
+//   const product = await productOperations.getProductById(id);
+
+//   if (product === null) {
+//     // message
+//     return res.redirect("/admin-dashboard/products");
+//   }
+
+//   const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
+//   const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
+//   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
+//   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+//   const isValid = await productOperations.isProductValid(product);
+//   // const sale = await productOperations.getSaleForProductId(product.id);
+
+//   const { message } = req.session;
+//   req.session.message = undefined;
+//   return res.render("productPage6", {
+//     user: req.user,
+//     companyDetails: companyInfo.getCompanyDetails(),
+//     product,
+//     quantityGroup,
+//     priceMatrix,
+//     finishingMatrices,
+//     productDeliveries,
+//     isValid: isValid.isValid,
+//     // sale,
+//     message,
+//   });
+// }
+
 async function verifyQuantities(req, res) {
   const productId = req.params.id;
 
@@ -480,6 +514,116 @@ async function savePrintingAttributes(req, res) {
   const updatedProduct = await productOperations.getProductById(productId);
   const isValid = await productOperations.isProductValid(updatedProduct);
   await productOperations.setProductStatusComplete(productId, isValid.isValid);
+
+  return res.status(200).json({});
+}
+
+async function getProductWithNoActiveSalesForSale(req, res) {
+  const { id, fromDt, toDt } = req.params;
+  const errors = validateDate(fromDt, toDt);
+
+  if (!isEmpty(errors)) {
+    return res.status(400).json(errors);
+  }
+
+  const currentProducts = await salesOperations.getProductsForSaleIdWhichOverlapDates(id, fromDt, toDt);
+  const otherProducts = await salesOperations.getProductsWithNoActiveSale(fromDt, toDt);
+
+  const result = [...currentProducts, ...otherProducts];
+  return res.status(200).json(result);
+}
+
+async function getProductWithNoActiveSales(req, res) {
+  const { fromDt, toDt } = req.params;
+
+  const errors = validateDate(fromDt, toDt);
+
+  if (!isEmpty(errors)) {
+    return res.status(400).json(errors);
+  }
+
+  const products = await salesOperations.getProductsWithNoActiveSale(fromDt, toDt);
+
+  return res.status(200).json(products);
+}
+
+async function createSale(req, res) {
+  const errors = validateSale(req.body);
+
+  if (!isEmpty(errors)) {
+    return res.status(400).json(errors);
+  }
+
+  const {
+    name, fromDt, toDt, description, percentage, ids,
+  } = req.body;
+  const createdSale = await salesOperations.createSale(name, fromDt, toDt, description, percentage, ids);
+
+  return res.status(200).json({ id: createdSale.id });
+}
+
+async function getSalePage(req, res) {
+  const { id } = req.params;
+
+  const sale = await salesOperations.getSaleById(id);
+  if (!sale) {
+    return res.redirect('/admin-dashboard');
+  }
+
+  return res.render('adminSale', {
+    sale,
+    user: req.user,
+    companyDetails: companyInfo.getCompanyDetails(),
+  });
+}
+
+async function updateSale(req, res) {
+  const { id } = req.params;
+
+  const sale = await salesOperations.getSaleById(id);
+
+  if (!sale) {
+    return res.status(400).json({ error: 'No sale found' });
+  }
+
+  const errors = validateSale(req.body);
+
+  if (!isEmpty(errors)) {
+    return res.status(400).json(errors);
+  }
+
+  if (await hasSaleNotChanged(req.body, sale)) {
+    return res.status(400).json({ errors: { noChange: true } });
+  }
+
+  const {
+    name, fromDt, toDt, description, percentage, ids,
+  } = req.body;
+  const newSale = await salesOperations.updateSale(sale.id, name, fromDt, toDt, description, percentage, ids);
+
+  return res.status(200).json({ id: newSale.id });
+}
+
+async function getSaleProducts(req, res) {
+  const { id } = req.params;
+
+  const saleProducts = await salesOperations.getSaleProductsForSaleId(id);
+  const productIds = saleProducts.map((saleProduct) => saleProduct.productFk);
+  return res.status(200).json({ productIds });
+}
+
+async function deleteSale(req, res) {
+  const { id } = req.params;
+
+  const basketItems = await basketOperations.getBasketItemsWithSaleId(id);
+  if (basketItems.length === 0) {
+    await salesOperations.deleteSaleById(id);
+    return res.status(200).json({});
+  }
+
+  await basketOperations.deleteSalesFromBasketItems(id);
+
+  await salesOperations.deactivateSale(id);
 
   return res.status(200).json({});
 }
@@ -641,6 +785,15 @@ async function getProductPage(req, res) {
     productDeliveries,
     deliveryTypes,
     companyDetails: companyInfo.getCompanyDetails(),
+  });
+}
+
+async function getSalesPage(req, res) {
+  const sales = await salesOperations.getAllSales();
+  res.render('adminSales', {
+    user: req.user,
+    companyDetails: companyInfo.getCompanyDetails(),
+    sales,
   });
 }
 
@@ -1257,6 +1410,14 @@ async function getAccountOrderPage(req, res) {
   const basketItems = await basketOperations.getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchaseBasketId);
   const refunds = await refundOperations.getRefundsForOrder(purchaseBasketId);
   const isNewRefundPossible = refundOperations.isRefundPossibleForOrder(refunds, order.total);
+
+  const sales = basketItems
+    .filter((b) => b.saleFk !== null)
+    .map((item) => ({
+      name: `${item.saleName} ${item.percentage}% off`,
+      discountAmount: item.price - item.subTotal,
+    }));
+
   const { message } = req.session;
   req.session.message = undefined;
 
@@ -1270,6 +1431,7 @@ async function getAccountOrderPage(req, res) {
     refunds,
     message,
     isNewRefundPossible,
+    sales,
   });
 }
 
@@ -1421,9 +1583,19 @@ async function getOptionPage(req, res) {
   });
 }
 
-async function getAddProductTypePage(req, res) {
+function getAddProductTypePage(req, res) {
   res.render('addProductType', {
     user: req.user,
+    companyDetails: companyInfo.getCompanyDetails(),
+  });
+}
+
+async function getAddSalePage(req, res) {
+  // const products = await productOperations.getAllProducts();
+
+  res.render('addSale', {
+    user: req.user,
+    // products,
     companyDetails: companyInfo.getCompanyDetails(),
   });
 }
@@ -1857,11 +2029,9 @@ async function updateHomePageOption(req, res) {
 
   const existingHomePageOptionWithProductType = await homePageOperations.getHomePageOptionByProductTypeId(productTypeId);
   if (existingHomePageOptionWithProductType && existingHomePageOptionWithProductType.id !== homePageOption.id) {
-    return res
-      .status(400)
-      .json({
-        error: `Home Page Option at position ${existingHomePageOptionWithProductType.orderNo} is already using '${productType.productType}'`,
-      });
+    return res.status(400).json({
+      error: `Home Page Option at position ${existingHomePageOptionWithProductType.orderNo} is already using '${productType.productType}'`,
+    });
   }
 
   if (description === undefined || description === null || utilityHelper.isEmptyString(description)) return res.status(400).json({ error: "'description' must be set." });
@@ -1994,7 +2164,9 @@ async function cloneProduct(req, res) {
             rowsMap.set(orderNo, { optionId: [matrixRow.optionId], quantityGroup: [] });
           }
 
-          rowsMap.get(orderNo).quantityGroup.push({ id: matrixRow.quantityFk, price: matrixRow.price === null ? '' : matrixRow.price });
+          rowsMap
+            .get(orderNo)
+            .quantityGroup.push({ id: matrixRow.quantityFk, price: matrixRow.price === null ? '' : matrixRow.price });
         });
 
         rowsMap.forEach((value) => {
@@ -2034,10 +2206,12 @@ module.exports = {
   createAdmin,
   createProduct,
   createRefund,
+  createSale,
   deactivate,
   deactivateAccount,
   deleteNotification,
   deleteNotifications,
+  deleteSale,
   editFaq,
   editProduct,
   editProductType,
@@ -2051,6 +2225,7 @@ module.exports = {
   getActivatePage,
   getAddFaqPage,
   getAddProductTypePage,
+  getAddSalePage,
   getAddTemplatePage,
   getAdminDashboardPage,
   getBannerSectionPage,
@@ -2075,6 +2250,8 @@ module.exports = {
   getOustandingAmountOfOrder,
   getPriceMatrixRows,
   getProductDeliveries,
+  getProductWithNoActiveSalesForSale,
+  getProductWithNoActiveSales,
   getProductPage,
   getProductsPage,
   getProductPage1,
@@ -2082,10 +2259,14 @@ module.exports = {
   getProductPage3,
   getProductPage4,
   getProductPage5,
+  // getProductPage6,
   getProductTypePage,
   getProductTypesPage,
   getRefundTypes,
   getQuantities,
+  getSalePage,
+  getSalesPage,
+  getSaleProducts,
   getSetup2faPage,
   getTemplatePage,
   getTemplatesPage,
@@ -2102,6 +2283,7 @@ module.exports = {
   setup2fa2Registration,
   updateHomePageOption,
   updateOptionName,
+  updateSale,
   validate,
   verifyQuantities,
 };

@@ -447,6 +447,13 @@ async function getProductById(id) {
   });
 }
 
+async function getProductDetailById(id) {
+  const productDetails = await models.sequelize.query('select p.*, pt.productType from products p inner join productTypes pt on p.productTypeFk = pt.id '
+  + ' where p.id = :id', { replacements: { id }, type: models.sequelize.QueryTypes.SELECT });
+
+  return productDetails.length > 0 ? productDetails[0] : null;
+}
+
 async function getAllProductsByProductTypeId(productTypeId) {
   return models.product.findAll({
     where: {
@@ -455,6 +462,7 @@ async function getAllProductsByProductTypeId(productTypeId) {
     },
   });
 }
+
 async function getLowestPriceWithQuantityForProductByProductId(productId) {
   const result = await models.sequelize.query(
     'select quantity, pmrqp.price from products p '
@@ -580,12 +588,6 @@ async function getQuantityPriceTable(options, finishingOptions, productId) {
     });
 
     return updateQuantityPriceTableToIncludeFinishingMatrixTable(quantityPriceTable, finishingQuantityPriceMap);
-    // quantityPriceTable.forEach((qr) => {
-    //   const { quantityId } = qr;
-    //   const { pricePer, price } = finishingQuantityPriceMap.get(quantityId);
-    //   qr.price = (parseFloat(qr.price) + price).toFixed(2);
-    //   qr.pricePer = (parseFloat(qr.pricePer) + pricePer).toFixed(2);
-    // });
   }
 
   return quantityPriceTable;
@@ -2019,6 +2021,14 @@ async function getPriceMatrixRowQuantityPriceForRow(priceMatrixRowFk) {
   });
 }
 
+async function getPriceMatrixRowQuantityPriceById(id) {
+  return models.priceMatrixRowQuantityPrice.findOne({
+    where: {
+      id,
+    },
+  });
+}
+
 async function getPriceMatrixRowQuantityPricesForMatrix(priceMatrixFk) {
   return models.sequelize.query(
     'select pq.* from priceMatrixRowQuantityPrices pq '
@@ -2060,8 +2070,8 @@ async function getOptionGroupsForMatrix(priceMatrixId) {
 async function getOptionTypeGroupItemsForProduct(productId) {
   return models.sequelize.query(
     'select otg.* from optionTypeGroupItems otgi '
-    + ' inner join optionTypeGroups otg on otgi.optionTypeGroupFk = otg.id '
-    + ' inner join products p on otg.productFk = :productId',
+      + ' inner join optionTypeGroups otg on otgi.optionTypeGroupFk = otg.id '
+      + ' inner join products p on otg.productFk = :productId',
     { replacements: { productId }, type: models.sequelize.QueryTypes.SELECT },
   );
 }
@@ -2225,4 +2235,6 @@ module.exports = {
   getFinishingMatrixRowsForFinishingMatrix,
   getAllAttributeTypes,
   getAttributeTypeByType,
+  getPriceMatrixRowQuantityPriceById,
+  getProductDetailById,
 };

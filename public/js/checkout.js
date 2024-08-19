@@ -1,5 +1,5 @@
-// var stripe = Stripe('pk_test_5cQWxxaMq14oogwEPGeNiiCG00naQUtjyS');
-var stripe = Stripe('pk_live_aQTkfvwiROZzVl4MdtcFbrqh00Xcze97Y4');
+var stripe = Stripe('pk_test_5cQWxxaMq14oogwEPGeNiiCG00naQUtjyS');
+// var stripe = Stripe('pk_live_aQTkfvwiROZzVl4MdtcFbrqh00Xcze97Y4');
 $(function(){
 
     $('.delivery-options').on('change', getSelectedDeliveryOption);
@@ -21,7 +21,7 @@ function validatePhoneNumber() {
         success: function(response, xhr, status) {
 
             const errors = response.errors;
-            if(status.status == 200) {
+            if(status.status == 400) {
                 if(errors.length > 0) {
                     $('#phoneNumber').val('');
                     $('#phoneNumberError').text(errors[0]);

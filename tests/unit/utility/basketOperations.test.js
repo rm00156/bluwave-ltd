@@ -86,6 +86,8 @@ test('create basket item', async () => {
     null,
     quantity2.id,
     price,
+    price,
+    null,
   );
   expect(basketItem).not.toBeNull();
   expect(basketItem.accountFk).toBe(account.id);
@@ -356,8 +358,8 @@ test('should return sub total for basket item ids', async () => {
   const basketItem1 = await createTestBasketItem([{ id: quantity.id, price: price1 }]);
   const basketItem2 = await createTestBasketItem([{ id: quantity.id, price: price2 }]);
 
-  const subtotal = basketOperations.getSubtotalFromBasketItems([basketItem1, basketItem2]);
-  expect(subtotal).toBe('16.00');
+  const { subTotal } = basketOperations.getTotalsFromBasketItems([basketItem1, basketItem2]);
+  expect(subTotal).toBe('16.00');
 });
 
 describe('get active basket items for an account', () => {

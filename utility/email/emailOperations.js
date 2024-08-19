@@ -142,6 +142,13 @@ async function sendPurchaseEmail(purchaseBasketId) {
       }), // Replace 'new_value' with the desired value for field 'c'
     );
 
+    const sales = orderItems
+      .filter((o) => o.saleFk !== null)
+      .map((item) => ({
+        name: `${item.saleName} ${item.percentage}% off`,
+        discountAmount: parseFloat(item.price - item.subTotal).toFixed(2),
+      }));
+
     const data = {
       name: order.fullName,
       email: order.email,
@@ -152,16 +159,20 @@ async function sendPurchaseEmail(purchaseBasketId) {
       deliveryType: order.deliveryType,
       deliveryPrice: order.deliveryPrice,
       total: order.total,
-      addressLine1: shippingDetail.addressLine1,
-      addressLine2: shippingDetail.addressLine2,
-      city: shippingDetail.city,
-      postCode: shippingDetail.postCode,
       orderItems: revisedOrderItems,
       collect: shippingDetail == null,
       company: process.env.COMPANY_NAME,
       url: process.env.WEBSITE_URL,
       logo: process.env.COMPANY_LOGO,
+      sales,
     };
+
+    if (shippingDetail) {
+      data.addressLine1 = shippingDetail.addressLine1;
+      data.addressLine2 = shippingDetail.addressLine2;
+      data.city = shippingDetail.city;
+      data.postCode = shippingDetail.postCode;
+    }
 
     const content = await compile('purchaseEmail', data);
 

@@ -116,7 +116,7 @@ html(land="en")
                                                         th Price
                                                         th Quantity
                                                         th Files
-                                                        th Total
+                                                        th(style="text-align:right") Total
                                                 // tbody
                                                 tbody
                                                     each basketItem in basketItems
@@ -139,8 +139,7 @@ html(land="en")
                                                                     a(href=fileGroupItem.path) #{fileGroupItem.fileName}
                                                                     br
                                                             
-                                                            td £#{basketItem.price}
-
+                                                            td(style="text-align:right") £#{basketItem.price}
 
                                                     tr
                                                         td.border-bottom-0.pb-0
@@ -149,9 +148,22 @@ html(land="en")
                                                         td.fw-medium.text-dark(colspan='1')
                                                             // text
                                                             | Sub Total :
-                                                        td.fw-medium.text-dark
+                                                        td.fw-medium.text-dark(style="text-align:right")
                                                             // text
                                                             | £#{order.subTotal}
+                                                    if(sales)
+                                                        each sale in sales 
+                                                            tr 
+                                                                td.border-bottom-0.pb-0
+                                                                td.border-bottom-0.pb-0
+                                                                td.border-bottom-0.pb-0
+                                                                td.fw-medium.text-danger(colspan='1')
+                                                                    // text
+                                                                    | #{sale.name}
+                                                                td.fw-medium.text-danger(style="text-align:right")
+                                                                    // text
+                                                                    | - £#{(sale.discountAmount).toFixed(2)}
+
                                                     tr
                                                         td.border-bottom-0.pb-0
                                                         td.border-bottom-0.pb-0
@@ -159,7 +171,7 @@ html(land="en")
                                                         td.fw-medium.text-dark(colspan='1')
                                                             // text
                                                             | #{order.deliveryType}
-                                                        td.fw-medium.text-dark
+                                                        td.fw-medium.text-dark(style="text-align:right")
                                                             // text
                                                             | £#{order.deliveryPrice}
                                                     tr
@@ -169,7 +181,7 @@ html(land="en")
                                                         td.fw-semi-bold.text-dark(colspan='1')
                                                             // text
                                                             | Total
-                                                        td.fw-semi-bold.text-dark
+                                                        td.fw-semi-bold.text-dark(style="text-align:right")
                                                             // text
                                                             | £#{(parseFloat(order.total)).toFixed(2)}
                                 .card-body.p-6

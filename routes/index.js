@@ -68,6 +68,8 @@ router.get('/admin-dashboard/product/:id/page2', isAdmin, adminRequire2faSetup, 
 router.get('/admin-dashboard/product/:id/page3', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage3);
 router.get('/admin-dashboard/product/:id/page4', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage4);
 router.get('/admin-dashboard/product/:id/page5', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage5);
+// router.get("/admin-dashboard/product/:id/page6", isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage6);
+
 router.get('/admin-dashboard/product/:id/activate', isAdmin, adminRequire2faSetup, adminDashboardController.getActivatePage);
 router.get(
   '/admin-dashboard/product/:id/deactivate',
@@ -75,6 +77,7 @@ router.get(
   adminRequire2faSetup,
   adminDashboardController.getDeactivatePage,
 );
+router.get('/admin-dashboard/sales', isAdmin, adminRequire2faSetup, adminDashboardController.getSalesPage);
 
 router.post(
   '/admin-dashboard/product/:id/page3/continue',
@@ -111,6 +114,17 @@ router.post(
   adminRequire2faSetup,
   adminDashboardController.saveDeliveryOptions,
 );
+
+router.get('/products/no-active-sale/:fromDt/:toDt', isAdmin, adminRequire2faSetup, adminDashboardController.getProductWithNoActiveSales);
+router.get('/products/no-active-sale/sale/:id/:fromDt/:toDt', isAdmin, adminRequire2faSetup, adminDashboardController.getProductWithNoActiveSalesForSale);
+
+router.post('/admin-dashboard/sale/create', isAdmin, adminRequire2faSetup, adminDashboardController.createSale);
+router.get('/admin-dashboard/sale/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getSalePage);
+router.post('/admin-dashboard/sale/:id/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateSale);
+router.get('/sale/:id/products', isAdmin, adminRequire2faSetup, adminDashboardController.getSaleProducts);
+
+router.delete('/sale/:id/delete', isAdmin, adminRequire2faSetup, adminDashboardController.deleteSale);
+
 router.get(
   '/product/:id/get-finishing-matrices',
   isAdmin,
@@ -185,6 +199,13 @@ router.get(
   isAdmin,
   adminRequire2faSetup,
   adminDashboardController.getAddProductTypePage,
+);
+
+router.get(
+  '/admin-dashboard/add-sale',
+  isAdmin,
+  adminRequire2faSetup,
+  adminDashboardController.getAddSalePage,
 );
 
 router.get('/admin-dashboard/accounts', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountsPage);
@@ -263,26 +284,11 @@ router.get(
 );
 router.post('/set-navigation-bar-headers', isAdmin, adminRequire2faSetup, adminDashboardController.setNavigationBarHeaders);
 
-router.put(
-  '/home-page-option/:id/update',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.updateHomePageOption,
-);
+router.put('/home-page-option/:id/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateHomePageOption);
 
-router.put(
-  '/home-page-option/:id/remove',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.removeHomePageOption,
-);
+router.put('/home-page-option/:id/remove', isAdmin, adminRequire2faSetup, adminDashboardController.removeHomePageOption);
 
-router.get(
-  '/admin-dashboard/home-page-options',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getHomePageOptions,
-);
+router.get('/admin-dashboard/home-page-options', isAdmin, adminRequire2faSetup, adminDashboardController.getHomePageOptions);
 
 router.get(
   '/admin-dashboard/home-page-option/:id',

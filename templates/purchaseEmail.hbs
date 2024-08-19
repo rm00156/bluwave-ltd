@@ -205,6 +205,16 @@
                                                                                     style="color:#2d2d2d;padding:10px 10px 12px;vertical-align:top;font-weight:bold;border-top:1px solid #f1f1f1">
                                                                                     £{{subTotal}}</td>
                                                                             </tr>
+                                                                            {{#each sales}}
+                                                                                <tr style="background:#fff3ae">
+                                                                                <td colspan="3"
+                                                                                    style="font-size:13px;color:#db3030;padding:10px 10px 12px;border-right:1px solid #ebe0a0;border-top:1px solid #f1f1f1;text-align:right">
+                                                                                    {{name}}</td>
+                                                                                <td
+                                                                                    style="color:#db3030;padding:10px 10px 12px;vertical-align:top;font-weight:bold;border-top:1px solid #f1f1f1">
+                                                                                    - £{{discountAmount}}</td>
+                                                                            </tr>
+                                                                            {{/each}}
                                                                             <tr style="background:#fff3ae">
                                                                                 <td colspan="3"
                                                                                     style="font-size:13px;color:#000000;padding:10px 10px 12px;border-right:1px solid #ebe0a0;border-top:1px solid #f1f1f1;text-align:right">
@@ -307,8 +317,7 @@
                                                                                     style="font-size:11px;color:#000000">
                                                                                     Bluwave Ltd, Registered in England
                                                                                     and Wales (registered no. 048 400
-                                                                                    51) Registered Office: Unit 1b 1a
-                                                                                    Philip Walk SE15 3NH, United
+                                                                                    51) Registered Office: Unit 4, Gardner Industrial Est, Kent House, Lane, Beckenham, BR3 1QZ, United
                                                                                     Kingdom.</td>
                                                                             </tr>
                                                                             <tr>

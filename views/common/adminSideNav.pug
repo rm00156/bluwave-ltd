@@ -80,6 +80,22 @@ mixin adminSideNav()
                                     a.nav-link(href='/admin-dashboard/home-page-options')
                                         | Display Options 1-8
                     li.nav-item
+                        a.nav-link.collapsed(href='#' data-bs-toggle='collapse' data-bs-target='#navDiscount' aria-expanded='false' aria-controls='navDiscount')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-percent
+                                span.nav-link-text Discounts
+                        #navDiscount.collapse(data-bs-parent='#sideNavbar')
+                            ul.nav.flex-column
+                                li.nav-item
+                                    a.nav-link(href='/admin-dashboard/sales')
+                                        | Sales
+                                li.nav-item
+                                    a.nav-link(href='#')
+                                        | Promo Codes
+                                 
+                    
+                    li.nav-item
                         a.nav-link(href='/')
                             .d-flex.align-items-center
                                 span.nav-link-icon
@@ -182,6 +198,22 @@ mixin adminSideNav()
                                 //- li.nav-item
                                 //-     a.nav-link(href='/admin-dashboard/options_5_8')
                                 //-         | Set Options 5-8
+
+                    li.nav-item
+                        a.nav-link.collapsed(href='#' data-bs-toggle='collapse' data-bs-target='#navDiscount' aria-expanded='false' aria-controls='navDiscount')
+                            .d-flex.align-items-center
+                                span.nav-link-icon
+                                    i.bi.bi-percent
+                                span.nav-link-text Discounts
+                        #navDiscount.collapse(data-bs-parent='#sideNavbar')
+                            ul.nav.flex-column
+                                li.nav-item
+                                    a.nav-link(href='/admin-dashboard/sales')
+                                        | Sales
+                                li.nav-item
+                                    a.nav-link(href='#')
+                                        | Promo Codes
+                                 
 
                     li.nav-item
                         a.nav-link(href='/')

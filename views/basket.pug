@@ -96,7 +96,11 @@ html(land="en")
                                                         
                                                     // input group
                                                     .col-lg-2.col-md-2.col-xs-6.mb-2
-                                                        span.fw-bold £#{basketItem.price}
+                                                        if(basketItem.saleFk)
+                                                            span.fw-bold(style="text-decoration: line-through; padding-right: 10px") £#{basketItem.price}
+                                                            span.text-danger £#{basketItem.subTotal}
+                                                        else 
+                                                            span.fw-bold £#{basketItem.price}
                                                     .col-lg-1.col-md-1.col-xs-6.mb-1
                                                         a(href=`/shop/${basketItem.name}?edit=${basketItem.id}`)
                                                             div.edit-item(style="cursor:pointer" data-basketitemid=basketItem.id)

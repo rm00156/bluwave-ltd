@@ -77,7 +77,7 @@ async function createTestFileGroupItem() {
   return createTestFileGroupItemWithPathAndFileName('path', 'fileName');
 }
 
-async function createTestBasketItem(quantityGroup) {
+async function createTestBasketItem(quantityGroup, saleFk) {
   const account = await createTestCustomerAccount();
   const options = await getAllOptions();
   const option = options[0];
@@ -101,6 +101,8 @@ async function createTestBasketItem(quantityGroup) {
     null,
     quantityGroup[0].id,
     quantityGroup[0].price,
+    quantityGroup[0].price,
+    saleFk ?? null,
   );
 }
 
