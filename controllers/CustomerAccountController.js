@@ -39,7 +39,7 @@ async function getOrderPage(req, res) {
   const shippingDetail = shippingDetailFk == null
     ? null
     : await deliveryOperations.getShippingDetailById(shippingDetailFk);
-  const orderItems = await basketOperations.getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(
+  const orderBasketItems = await basketOperations.getBasketItemsForOrderId(
     orderId,
   );
   const refunds = await refundOperations.getRefundsForOrder(orderId);
@@ -51,7 +51,11 @@ async function getOrderPage(req, res) {
     navigationBarHeaders,
     allProductTypes,
     basketItems,
-    orderItems,
+    orderItems: orderBasketItems.basketItems,
+    sale: orderBasketItems.sale,
+    totalSaleAmount: orderBasketItems.totalSaleAmount,
+    code: orderBasketItems.code,
+    totalPromoCodeAmount: orderBasketItems.totalPromoCodeAmount,
     order,
     shippingDetail,
     refunds,

@@ -146,10 +146,21 @@ async function getOrderDetailsInLastMonth() {
   return result[0];
 }
 
+async function getAccountsWithNoOrders() {
+  return models.sequelize.query(
+    'select * from accounts where id not in ( select distinct a.id from basketItems b '
+      + ' inner join purchaseBaskets pb on b.purchaseBasketFk = pb.id '
+      + ' inner join accounts a on b.accountFk = a.id '
+      + ' where  pb.status = :status)',
+    { replacements: { status: 'Completed' }, type: models.sequelize.QueryTypes.SELECT },
+  );
+}
+
 module.exports = {
   createPurchaseBasket,
   createPurchaseBasketAtDttm,
   completePurchaseBasket,
+  getAccountsWithNoOrders,
   getPurchaseBasketWithIdAndAccountId,
   getSuccessfulOrdersForAccountId,
   getSuccessfulOrderForPurchaseBasketId,

@@ -6,7 +6,7 @@ const { createTestBasketItem } = require('../../helper/basketTestHelper');
 const { getAllQuantities } = require('../../../utility/products/productOperations');
 const { getBasketItem } = require('../../../utility/basket/basketOperations');
 
-const adminDashboardController = require('../../../controllers/AdminDashboardController');
+const saleController = require('../../../controllers/SaleController');
 const { getSaleById } = require('../../../utility/sales/salesOperations');
 
 let res;
@@ -31,7 +31,7 @@ describe('admin dashboard controller', () => {
       },
     };
 
-    adminDashboardController.getProductWithNoActiveSalesForSale(req, res);
+    saleController.getProductWithNoActiveSalesForSale(req, res);
     const errors = {
       fromDt: 'Please enter valid date',
       toDt: 'Please enter valid date',
@@ -51,7 +51,7 @@ describe('admin dashboard controller', () => {
       },
     };
 
-    await adminDashboardController.getProductWithNoActiveSalesForSale(req, res);
+    await saleController.getProductWithNoActiveSalesForSale(req, res);
     const productDetail = await getProductDetailById(product.id);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith([productDetail]);
@@ -65,7 +65,7 @@ describe('admin dashboard controller', () => {
       },
     };
 
-    adminDashboardController.getProductWithNoActiveSales(req, res);
+    saleController.getProductWithNoActiveSales(req, res);
     const errors = {
       fromDt: 'Please enter valid date',
       toDt: 'Please enter valid date',
@@ -84,7 +84,7 @@ describe('admin dashboard controller', () => {
       },
     };
 
-    await adminDashboardController.getProductWithNoActiveSales(req, res);
+    await saleController.getProductWithNoActiveSales(req, res);
     const productDetail = await getProductDetailById(product.id);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith([productDetail]);
@@ -105,7 +105,7 @@ describe('admin dashboard controller', () => {
     const errors = {
       name: 'Please enter name between 3 and 50 characters in length.',
     };
-    adminDashboardController.createSale(req, res);
+    saleController.createSale(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(errors);
   });
@@ -122,7 +122,7 @@ describe('admin dashboard controller', () => {
         ids: `["${product.id}"]`,
       },
     };
-    await adminDashboardController.createSale(req, res);
+    await saleController.createSale(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ id: expect.any(Number) });
   });
@@ -135,7 +135,7 @@ describe('admin dashboard controller', () => {
     };
 
     res.redirect = jest.fn();
-    await adminDashboardController.getSalePage(req, res);
+    await saleController.getSalePage(req, res);
     expect(res.redirect).toHaveBeenCalled();
   });
 
@@ -148,7 +148,7 @@ describe('admin dashboard controller', () => {
     };
 
     res.render = jest.fn();
-    await adminDashboardController.getSalePage(req, res);
+    await saleController.getSalePage(req, res);
     expect(res.render).toHaveBeenCalled();
   });
 
@@ -162,7 +162,7 @@ describe('admin dashboard controller', () => {
     const error = {
       error: 'No sale found',
     };
-    await adminDashboardController.updateSale(req, res);
+    await saleController.updateSale(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(error);
   });
@@ -187,7 +187,7 @@ describe('admin dashboard controller', () => {
     const error = {
       name: 'Please enter name between 3 and 50 characters in length.',
     };
-    await adminDashboardController.updateSale(req, res);
+    await saleController.updateSale(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(error);
   });
@@ -216,7 +216,7 @@ describe('admin dashboard controller', () => {
         noChange: true,
       },
     };
-    await adminDashboardController.updateSale(req, res);
+    await saleController.updateSale(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(error);
   });
@@ -240,7 +240,7 @@ describe('admin dashboard controller', () => {
       },
     };
 
-    await adminDashboardController.updateSale(req, res);
+    await saleController.updateSale(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ id: expect.any(Number) });
   });
@@ -253,7 +253,7 @@ describe('admin dashboard controller', () => {
       },
     };
 
-    await adminDashboardController.getSaleProducts(req, res);
+    await saleController.getSaleProducts(req, res);
 
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ productIds: [product.id] });
@@ -267,7 +267,7 @@ describe('admin dashboard controller', () => {
       },
     };
 
-    await adminDashboardController.deleteSale(req, res);
+    await saleController.deleteSale(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
 
@@ -287,7 +287,7 @@ describe('admin dashboard controller', () => {
     };
     const basketItem = await createTestBasketItem([{ id: quantity.id, price }], sale.id);
 
-    await adminDashboardController.deleteSale(req, res);
+    await saleController.deleteSale(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalled();
 
@@ -302,7 +302,7 @@ describe('admin dashboard controller', () => {
     const req = {};
     res.render = jest.fn();
 
-    await adminDashboardController.getSalesPage(req, res);
+    await saleController.getSalesPage(req, res);
     expect(res.render).toHaveBeenCalled();
   });
 
@@ -310,7 +310,7 @@ describe('admin dashboard controller', () => {
     const req = {};
     res.render = jest.fn();
 
-    await adminDashboardController.getAddSalePage(req, res);
+    await saleController.getAddSalePage(req, res);
     expect(res.render).toHaveBeenCalled();
   });
 });

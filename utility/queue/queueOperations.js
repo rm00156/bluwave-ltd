@@ -33,7 +33,12 @@ async function addSendPurchaseEmail(purchaseBasketId) {
   await workerQueue.add({ process: 'sendPurchaseEmail', purchaseBasketId });
 }
 
+async function addJob(process) {
+  await workerQueue.add({ process });
+}
+
 module.exports = {
+  addJob,
   addForgottenPasswordEmailJob,
   addSendSigupEmail,
   addSendPurchaseEmail,

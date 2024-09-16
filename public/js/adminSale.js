@@ -79,7 +79,7 @@ $(function () {
       start: 2,
     },
     order: [[1, "asc"]],
-    paging: true,
+    paging: false,
     scrollCollapse: true,
     scrollX: true,
     scrollY: 600,

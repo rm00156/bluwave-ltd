@@ -10,7 +10,7 @@ function PromoCodeTypes(sequelize, Sequelize) {
     },
 
     promoCodeType: {
-      type: DataTypes.ENUM('BOGO', 'Delivery', 'SpecificBundle', 'Bundle'),
+      type: DataTypes.ENUM('FirstOrder', 'FreeDelivery', 'Standard'),
       allowNull: false,
     },
 

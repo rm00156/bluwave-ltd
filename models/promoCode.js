@@ -23,11 +23,6 @@ function PromoCodes(sequelize, Sequelize) {
         allowNull: false,
       },
 
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-
       description: {
         type: Sequelize.TEXT,
         allowNull: false,
@@ -42,25 +37,6 @@ function PromoCodes(sequelize, Sequelize) {
         },
       },
 
-      discountProductGroupFk: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'discountProductGroups',
-          key: 'id',
-        },
-      },
-
-      buy: {
-        allowNull: true,
-        type: Sequelize.INTEGER,
-      },
-
-      free: {
-        allowNull: true,
-        type: Sequelize.INTEGER,
-      },
-
       percentage: {
         allowNull: true,
         type: Sequelize.INTEGER,
@@ -68,6 +44,11 @@ function PromoCodes(sequelize, Sequelize) {
 
       maxUses: {
         allowNull: true,
+        type: Sequelize.INTEGER,
+      },
+
+      usedCount: {
+        allowNull: false,
         type: Sequelize.INTEGER,
       },
 

@@ -59,7 +59,7 @@ $(function(){
             start: 2
         },
         order: [[1, 'asc']],
-        paging: true,
+        paging: false,
         scrollCollapse: true,
         scrollX: true,
         scrollY: 600,
@@ -68,50 +68,6 @@ $(function(){
             selector: 'td:first-child'
         }
     });
-
-    // $('button').on('click', function () {
-    //     var data = table
-    //     .rows( function ( idx, data, node ) {
-    //         const x = $(node).find('input[type="checkbox"]').prop('checked');
-    //         if(x) {
-    //             return $(node).find('input[type="checkbox"]')[0].parentNode.parentNode;
-    //         }
-    //     } ).map(element => {
-    //         return element.id
-    //     })
-    //     .toArray();
-        
-    //     console.log(data);
-        
-        
-    // })
-
-    // table
-    // .rows( function ( idx, data, node ) {
-    //     return $(node).find('input[type="checkbox"]').prop('checked', true);
-    // } )
-
-    // $('#products').DataTable({
-    //     columnDefs: [
-    //         {
-    //             orderable: false,
-    //             render: DataTable.render.select(),
-    //             targets: 0
-    //         }
-    //     ],
-    //     fixedColumns: {
-    //         start: 2
-    //     },
-    //     order: [[1, 'asc']],
-    //     paging: false,
-    //     scrollCollapse: true,
-    //     scrollX: true,
-    //     scrollY: 300,
-    //     select: {
-    //         style: 'os',
-    //         selector: 'td:first-child'
-    //     }
-    // });
 
     $("#form").on("submit", createSale);
     $("#delete").on("click", deleteSale);

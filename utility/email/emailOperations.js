@@ -125,29 +125,32 @@ async function sendPurchaseEmail(purchaseBasketId) {
     const order = await orderOperations.getSuccessfulOrderForPurchaseBasketId(
       purchaseBasketId,
     );
-    order.total = parseFloat(order.total).toFixed(2);
+    // order.total = parseFloat(order.total).toFixed(2);
 
     const { shippingDetailFk } = order;
 
     const shippingDetail = shippingDetailFk == null
       ? null
       : await deliveryOperations.getShippingDetailById(shippingDetailFk);
-    const orderItems = await basketOperations.getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(
+
+    const {
+      basketItems, sale, code, totalSaleAmount, totalPromoCodeAmount,
+    } = await basketOperations.getBasketItemsForOrderId(
       purchaseBasketId,
     );
-    const revisedOrderItems = orderItems.map(
-      (item) => ({
-        ...item,
-        cost: (parseFloat(item.price) / parseFloat(item.quantity)).toFixed(2),
-      }), // Replace 'new_value' with the desired value for field 'c'
-    );
+    // const revisedOrderItems = orderItems.map(
+    //   (item) => ({
+    //     ...item,
+    //     cost: (parseFloat(item.price) / parseFloat(item.quantity)).toFixed(2),
+    //   }), // Replace 'new_value' with the desired value for field 'c'
+    // );
 
-    const sales = orderItems
-      .filter((o) => o.saleFk !== null)
-      .map((item) => ({
-        name: `${item.saleName} ${item.percentage}% off`,
-        discountAmount: parseFloat(item.price - item.subTotal).toFixed(2),
-      }));
+    // const sales = orderItems
+    //   .filter((o) => o.saleFk !== null)
+    //   .map((item) => ({
+    //     name: `${item.saleName} ${item.percentage}% off`,
+    //     discountAmount: parseFloat(item.price - item.subTotal).toFixed(2),
+    //   }));
 
     const data = {
       name: order.fullName,
@@ -158,13 +161,16 @@ async function sendPurchaseEmail(purchaseBasketId) {
       subTotal: order.subTotal,
       deliveryType: order.deliveryType,
       deliveryPrice: order.deliveryPrice,
-      total: order.total,
-      orderItems: revisedOrderItems,
+      total: parseFloat(order.total).toFixed(2),
+      orderItems: basketItems,
       collect: shippingDetail == null,
       company: process.env.COMPANY_NAME,
       url: process.env.WEBSITE_URL,
       logo: process.env.COMPANY_LOGO,
-      sales,
+      sale,
+      totalSaleAmount,
+      code,
+      totalPromoCodeAmount,
     };
 
     if (shippingDetail) {

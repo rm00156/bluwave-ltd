@@ -96,7 +96,7 @@ html(land="en")
                                                         
                                                     // input group
                                                     .col-lg-2.col-md-2.col-xs-6.mb-2
-                                                        if(basketItem.saleFk)
+                                                        if(basketItem.saleFk || basketItem.promoCodeFk)
                                                             span.fw-bold(style="text-decoration: line-through; padding-right: 10px") £#{basketItem.price}
                                                             span.text-danger £#{basketItem.subTotal}
                                                         else 
@@ -123,21 +123,145 @@ html(land="en")
                             .col-12.col-lg-3.col-md-5
                                 // card
                                 .mb-5.card.mt-6
-                                    .card-body.p-6
+                                    .card.shadow-sm
                                         // heading
-                                        h2.h5.mb-4 Summary
-                                        .card.mb-2
+                                        h5.px-6.py-4.bg-transparent.mb-0 Order Summary
+                                        //- .card.mb-2
                                             // list group
-                                            ul.list-group.list-group-flush
-                                                // list group item
+                                        ul.list-group.list-group-flush
+                                            // list group item
+                                            li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                .me-auto
+                                                    .fw-bold Your Basket
+                                                span.fw-bold £#{basketItems.totalCost}
+                                            //- li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                .me-auto
+                                                    .fw-bold Subtotal
+                                                span.fw-bold £#{basketItems.subTotalCost}
+                                            if(basketItems.basketItems.filter(b => b.saleFk || b.promoCodeFk).length > 0)
                                                 li.list-group-item.d-flex.justify-content-between.align-items-start
                                                     .me-auto
-                                                        .fw-bold Subtotal
-                                                    span.fw-bold £#{basketItems.totalCost}
+                                                        div Discount
+                                                    span - £#{basketItems.totalDiscount}
+                                                li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                    .me-auto
+                                                        .fw-bold 
+                                                    span.fw-bold Discounts Applied
+                                            if(basketItems.totalSaleAmount !== '0.00')
+                                                li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                    .me-auto
+                                                        div #{basketItems.sale}
+                                                    span - £#{basketItems.totalSaleAmount}
+                                            
+                                            if(basketItems.totalPromoCodeAmount !== '0.00')
+                                                li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                    .me-auto
+                                                        div #{basketItems.code}
+                                                    span - £#{basketItems.totalPromoCodeAmount}
+                                                
+                                            li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                .me-auto
+                                                    .fw-bold Total (excluding delivery)
+                                                span.fw-bold £#{basketItems.subTotalCost}
+                                            li.list-group-item
+                                                // btn
+                                                a.form-contol.btn.btn-primary.w-100(href="/checkout")
+                                                    | Checkout
+
+                                            li.list-group-item
+                                                if(basketItems.basketItems.filter(b => b.promoCodeFk).length == 0)
+                                                    #accordionExample.accordion
+                                                        //- .accordion-item
+                                                            //- h2.accordion-header
+                                                        p.accordion-button.collapsed.fw-bold(type='button' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne')
+                                                            | Add a promo code
+                                                        #collapseOne.collapse(data-bs-parent='#accordionExample')
+                                                            //- .accordion-body
+                                                            input.form-control#promoCode
+                                                            p.text-error.text-danger#promoCodeError
+                                                            
+                                                            input#applyCode.form-control.btn.btn-success(type="button" value="Apply Code")
+                                                else 
+                                                    p#removePromoCode.fw-bold(style="cursor:pointer") Remove Promo Code  
+                                    //- .card-body.p-6
+                                    //-     // heading
+                                    //-     h2.h5.mb-4 Summary
+                                    //-     .card.mb-2
+                                    //-         // list group
+                                    //-         ul.list-group.list-group-flush
+                                    //-             // list group item
+                                    //-             li.list-group-item.d-flex.justify-content-between.align-items-start
+                                    //-                 .me-auto
+                                    //-                     .fw-bold Your Basket
+                                    //-                 span.fw-bold £#{basketItems.totalCost}
+                                    //-             //- li.list-group-item.d-flex.justify-content-between.align-items-start
+                                    //-                 .me-auto
+                                    //-                     .fw-bold Subtotal
+                                    //-                 span.fw-bold £#{basketItems.subTotalCost}
+                                    //-             if(basketItems.basketItems.filter(b => b.saleFk || b.promoCodeFk).length > 0)
+                                    //-                 li.list-group-item.d-flex.justify-content-between.align-items-start
+                                    //-                     .me-auto
+                                    //-                         div Discount
+                                    //-                     span - £#{basketItems.totalDiscount}
+                                    //-                 li.list-group-item.d-flex.justify-content-between.align-items-start
+                                    //-                     .me-auto
+                                    //-                         .fw-bold 
+                                    //-                     span.fw-bold Discounts Applied
+
+                                    //-                 each basketItem in basketItems.basketItems 
+                                    //-                     if(basketItem.promoCodeFk || basketItem.saleFk)
+                                    //-                         li.list-group-item.d-flex.justify-content-between.align-items-start
+                                    //-                             .me-auto
+                                    //-                                 if(basketItem.promoCodeFk)
+                                    //-                                     div #{basketItem.code}
+                                    //-                                 else 
+                                    //-                                     div #{basketItem.sale}    
+                                    //-                             span - £#{basketItem.discount}
+
+
+                                        
+
                                         .d-grid.mb-1.mt-4
                                             // btn
-                                            a.btn.btn-primary.btn-lg.d-flex.justify-content-between.align-items-center(href="/checkout")
+                                            a.form-contol.btn.btn-primary.btn-lg.d-flex.justify-content-between.align-items-center(href="/checkout")
                                                 | Checkout
+                                        .d-grid.mb-1.mt-4 
+                                            if(basketItems.basketItems.filter(b => b.promoCodeFk).length == 0)
+                                                #accordionExample.accordion
+                                                    //- .accordion-item
+                                                        //- h2.accordion-header
+                                                    p.accordion-button.collapsed.fw-bold(type='button' data-bs-toggle='collapse' data-bs-target='#collapseOne' aria-expanded='false' aria-controls='collapseOne')
+                                                        | Add a promo code
+                                                    #collapseOne.collapse(data-bs-parent='#accordionExample')
+                                                        //- .accordion-body
+                                                        input.form-control#promoCode
+                                                        p.text-error.text-danger#promoCodeError
+                                                        br
+                                                        input#applyCode.form-control.btn.btn-success(value="Apply Code")
+                                            else 
+                                                p#removePromoCode.fw-bold(style="cursor:pointer") Remove Promo Code            
+                                            //- ul#addPromoCodeSection.navbar-nav.flex-column.mt-3
+                                        //-     li.nav-item
+                                        //-         a.nav-link.collapsed(href='#' data-bs-toggle='collapse' data-bs-target='#addPromoCodeNav' aria-expanded='false' aria-controls='addPromoCodeNav')
+                                        //-             .d-flex.align-items-center
+                                                        
+                                        //-                 p Add a promo code
+                                        //-         #addPromoCodeNav.collapse(data-bs-parent='#addPromoCodeSection')
+                                        //-             ul.nav.flex-column
+                                        //-                 input.form-control
+                                        //-                 br
+                                        //-                 input.btn.btn-primary(value="Apply Code")
+                                        //- p.d-inline-flex.gap-1
+                                            p(style="font-weight:500" data-bs-toggle='collapse' href="#collapsePromo" role='button' aria-expanded='false' aria-controls='collapsePromo')
+                                                | Add a promo code
+
+                                                
+                                           
+                                            #collapsePromo.collapse
+                                                
+                                                input.form-control
+                                                br
+                                                input.btn.btn-primary(value="Apply Code")
                                         // text
                                         //- p
                                             small

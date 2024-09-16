@@ -1,13 +1,20 @@
+const logger = require('pino')();
+
 const path = require('path');
 const models = require('../../models');
 const { readSqlFile, pauseForTimeInSecond } = require('../../utility/general/utilityHelper');
 const { getAllAccountTypes } = require('../../utility/account/accountOperations');
 const {
-  getAllAttributeTypes, getAllOptions, getAllOptionTypes, getAllProductTypes, getAllQuantities,
+  getAllAttributeTypes,
+  getAllOptions,
+  getAllOptionTypes,
+  getAllProductTypes,
+  getAllQuantities,
 } = require('../../utility/products/productOperations');
 const { getAllActiveDeliveryTypes } = require('../../utility/delivery/deliveryOperations');
 const { getFaqTypes } = require('../../utility/faq/faqOperations');
 const { getRefundTypes } = require('../../utility/refund/refundOperations');
+const { getAllPromoCodeTypes } = require('../../utility/promoCode/promoCodeOperations');
 
 async function truncateTable(tableName, transaction) {
   await models.sequelize.query(`truncate table ${tableName}`, { transaction });
@@ -27,6 +34,7 @@ async function truncateTables(tableNames) {
 }
 
 async function setUpTestDb() {
+  await models.sequelize.sync();
   const dir = __dirname.replace('/tests/helper', '');
   const accountTypes = await readSqlFile(path.join(dir, '/sql/accountTypes.sql'));
   const attributeTypes = await readSqlFile(path.join(dir, '/sql/attributeTypes.sql'));
@@ -37,6 +45,7 @@ async function setUpTestDb() {
   const productTypes = await readSqlFile(path.join(dir, '/sql/productTypes.sql'));
   const quantities = await readSqlFile(path.join(dir, '/sql/quantities.sql'));
   const refundTypes = await readSqlFile(path.join(dir, '/sql/refundTypes.sql'));
+  const promoCodeTypes = await readSqlFile(path.join(dir, '/sql/promoCodeTypes.sql'));
 
   const existingAccountTypes = await getAllAccountTypes();
   if (existingAccountTypes.length === 0) {
@@ -89,6 +98,16 @@ async function setUpTestDb() {
   const existingRefundTypes = await getRefundTypes();
   if (existingRefundTypes.length === 0) {
     await models.sequelize.query(refundTypes, { type: models.sequelize.QueryTypes.INSERT });
+    await pauseForTimeInSecond(1);
+  }
+
+  const existingPromoCodeTypes = await getAllPromoCodeTypes();
+  if (existingPromoCodeTypes.length === 0) {
+    try {
+      await models.sequelize.query(promoCodeTypes, { type: models.sequelize.QueryTypes.INSERT });
+    } catch (err) {
+      logger.error(err);
+    }
     await pauseForTimeInSecond(1);
   }
 }
