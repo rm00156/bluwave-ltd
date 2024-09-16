@@ -7,6 +7,9 @@ const homeController = require('../controllers/HomeController');
 const signupController = require('../controllers/SignupController');
 const loginController = require('../controllers/LoginController');
 const shopController = require('../controllers/ShopController');
+const promoCodeController = require('../controllers/PromoCodeController');
+const saleController = require('../controllers/SaleController');
+
 const { isCustomer, isNotGuest } = require('../middleware/customer');
 const {
   isAdmin, isLoginRequire2faCode, adminRequire2faSetup, setup2fa, twoFa, twoFa2,
@@ -40,12 +43,7 @@ router.get(
 router.get('/get-quantity-price-table-details', getUser, shopController.getQuantityPriceTableDetails);
 
 router.get('/admin-dashboard', isAdmin, adminRequire2faSetup, adminDashboardController.getAdminDashboardPage);
-router.get(
-  '/admin-dashboard/create-admin-account',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getCreateAdminPage,
-);
+router.get('/admin-dashboard/create-admin-account', isAdmin, adminRequire2faSetup, adminDashboardController.getCreateAdminPage);
 router.post('/create-admin-account', isAdmin, adminRequire2faSetup, adminDashboardController.createAdmin);
 router.get('/setup-2fa', isAdmin, adminDashboardController.getSetup2faPage);
 router.post('/setup-2fa', isAdmin, setup2fa, adminDashboardController.setup2fa2Registration);
@@ -58,12 +56,7 @@ router.get('/admin-dashboard/products', isAdmin, adminRequire2faSetup, adminDash
 router.get('/admin-dashboard/product/:id/page1', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage1);
 router.get('/admin-dashboard/product/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage);
 router.post('/admin-dashboard/product/page1/save', isAdmin, adminRequire2faSetup, adminDashboardController.savePage1);
-router.post(
-  '/admin-dashboard/product/page1/continue',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.continuePage1,
-);
+router.post('/admin-dashboard/product/page1/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage1);
 router.get('/admin-dashboard/product/:id/page2', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage2);
 router.get('/admin-dashboard/product/:id/page3', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage3);
 router.get('/admin-dashboard/product/:id/page4', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage4);
@@ -71,26 +64,17 @@ router.get('/admin-dashboard/product/:id/page5', isAdmin, adminRequire2faSetup, 
 // router.get("/admin-dashboard/product/:id/page6", isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage6);
 
 router.get('/admin-dashboard/product/:id/activate', isAdmin, adminRequire2faSetup, adminDashboardController.getActivatePage);
-router.get(
-  '/admin-dashboard/product/:id/deactivate',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getDeactivatePage,
-);
-router.get('/admin-dashboard/sales', isAdmin, adminRequire2faSetup, adminDashboardController.getSalesPage);
+router.get('/admin-dashboard/product/:id/deactivate', isAdmin, adminRequire2faSetup, adminDashboardController.getDeactivatePage);
+router.get('/admin-dashboard/sales', isAdmin, adminRequire2faSetup, saleController.getSalesPage);
+router.get('/admin-dashboard/promo-codes', isAdmin, adminRequire2faSetup, promoCodeController.getPromoCodesPage);
+router.get('/admin-dashboard/promo-code/create', isAdmin, adminRequire2faSetup, promoCodeController.getCreatePromoCodePage);
+router.post('/admin-dashboard/promo-code/create', isAdmin, adminRequire2faSetup, promoCodeController.createPromoCode);
 
-router.post(
-  '/admin-dashboard/product/:id/page3/continue',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.continuePage3,
-);
-router.post(
-  '/admin-dashboard/product/:id/page4/continue',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.continuePage4,
-);
+router.get('/admin-dashboard/promo-code/:id', isAdmin, adminRequire2faSetup, promoCodeController.getPromoCodePage);
+
+router.get('/promo-codes', isAdmin, adminRequire2faSetup, promoCodeController.getPromoCodeTypes);
+router.post('/admin-dashboard/product/:id/page3/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage3);
+router.post('/admin-dashboard/product/:id/page4/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage4);
 
 router.get('/product/:id/verify-quantities', isAdmin, adminRequire2faSetup, adminDashboardController.verifyQuantities);
 router.post('/product/:id/save-quantities', isAdmin, adminRequire2faSetup, adminDashboardController.saveQuantities);
@@ -108,35 +92,45 @@ router.post(
   adminRequire2faSetup,
   adminDashboardController.saveFinishingAttributes,
 );
-router.post(
-  '/product/:id/save-delivery-options',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.saveDeliveryOptions,
-);
-
-router.get('/products/no-active-sale/:fromDt/:toDt', isAdmin, adminRequire2faSetup, adminDashboardController.getProductWithNoActiveSales);
-router.get('/products/no-active-sale/sale/:id/:fromDt/:toDt', isAdmin, adminRequire2faSetup, adminDashboardController.getProductWithNoActiveSalesForSale);
-
-router.post('/admin-dashboard/sale/create', isAdmin, adminRequire2faSetup, adminDashboardController.createSale);
-router.get('/admin-dashboard/sale/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getSalePage);
-router.post('/admin-dashboard/sale/:id/update', isAdmin, adminRequire2faSetup, adminDashboardController.updateSale);
-router.get('/sale/:id/products', isAdmin, adminRequire2faSetup, adminDashboardController.getSaleProducts);
-
-router.delete('/sale/:id/delete', isAdmin, adminRequire2faSetup, adminDashboardController.deleteSale);
+router.post('/product/:id/save-delivery-options', isAdmin, adminRequire2faSetup, adminDashboardController.saveDeliveryOptions);
 
 router.get(
-  '/product/:id/get-finishing-matrices',
+  '/products/no-active-promo-code/:fromDt/:toDt',
   isAdmin,
   adminRequire2faSetup,
-  adminDashboardController.getFinishingMatrices,
+  promoCodeController.getProductWithNoActivePromoCodes,
 );
 router.get(
-  '/product/:id/get-product-deliveries',
+  '/products/no-active-promo-code/promo-code/:id/:fromDt/:toDt',
   isAdmin,
   adminRequire2faSetup,
-  adminDashboardController.getProductDeliveries,
+  promoCodeController.getProductWithNoActivePromoCodesForPromoCode,
 );
+router.get('/promo-code/:id/products', isAdmin, adminRequire2faSetup, promoCodeController.getPromoCodeProducts);
+router.post('/admin-dashboard/promo-code/:id/update', isAdmin, adminRequire2faSetup, promoCodeController.updatePromoCode);
+
+router.get(
+  '/products/no-active-sale/:fromDt/:toDt',
+  isAdmin,
+  adminRequire2faSetup,
+  saleController.getProductWithNoActiveSales,
+);
+router.get(
+  '/products/no-active-sale/sale/:id/:fromDt/:toDt',
+  isAdmin,
+  adminRequire2faSetup,
+  saleController.getProductWithNoActiveSalesForSale,
+);
+
+router.post('/admin-dashboard/sale/create', isAdmin, adminRequire2faSetup, saleController.createSale);
+router.get('/admin-dashboard/sale/:id', isAdmin, adminRequire2faSetup, saleController.getSalePage);
+router.post('/admin-dashboard/sale/:id/update', isAdmin, adminRequire2faSetup, saleController.updateSale);
+router.get('/sale/:id/products', isAdmin, adminRequire2faSetup, saleController.getSaleProducts);
+
+router.delete('/sale/:id/delete', isAdmin, adminRequire2faSetup, saleController.deleteSale);
+
+router.get('/product/:id/get-finishing-matrices', isAdmin, adminRequire2faSetup, adminDashboardController.getFinishingMatrices);
+router.get('/product/:id/get-product-deliveries', isAdmin, adminRequire2faSetup, adminDashboardController.getProductDeliveries);
 router.get('/product/:id/validate', isAdmin, adminRequire2faSetup, adminDashboardController.validate);
 router.post('/product/:id/activate', isAdmin, adminRequire2faSetup, adminDashboardController.activate);
 router.post('/product/:id/deactivate', isAdmin, adminRequire2faSetup, adminDashboardController.deactivate);
@@ -180,6 +174,8 @@ router.post('/login', getUser, isCustomer, loginController.login);
 router.get('/forgot-password', getUser, isCustomer, homeController.getForgotPasswordPage);
 router.post('/forgotten-password', getUser, homeController.requestForgottenPasswordEmail);
 
+router.post('/basket/apply-promo-code', isCustomer, promoCodeController.applyPromoCode);
+router.post('/basket/remove-promo-code', isCustomer, promoCodeController.removePromoCode);
 router.post('/add-to-basket', getUser, isCustomer, shopController.addToBasket);
 router.post('/edit-basket-item', getUser, isCustomer, isValidEdit, shopController.editBasketItem);
 router.get('/basket', getUser, isCustomer, shopController.getBasketPage);
@@ -194,40 +190,15 @@ router.get('/checkout-login', getUser, isCustomer, isGuest, shopController.check
 router.post('/checkout-login', getUser, isCustomer, isGuest, loginController.checkoutLogin);
 router.post('/checkout-as-guest', getUser, isCustomer, isGuest, shopController.checkoutAsGuest);
 router.post('/admin-dashboard/product-type/add', isAdmin, adminRequire2faSetup, adminDashboardController.addProductType);
-router.get(
-  '/admin-dashboard/add-product-type',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getAddProductTypePage,
-);
+router.get('/admin-dashboard/add-product-type', isAdmin, adminRequire2faSetup, adminDashboardController.getAddProductTypePage);
 
-router.get(
-  '/admin-dashboard/add-sale',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getAddSalePage,
-);
+router.get('/admin-dashboard/add-sale', isAdmin, adminRequire2faSetup, saleController.getAddSalePage);
 
 router.get('/admin-dashboard/accounts', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountsPage);
 router.get('/admin-dashboard/account/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountPage);
-router.get(
-  '/admin-dashboard/account/:id/delete',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getAccountDeletePage,
-);
-router.get(
-  '/admin-dashboard/account/:id/orders',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getAccountOrdersPage,
-);
-router.get(
-  '/admin-dashboard/account/:id/emails',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getAccountEmailsPage,
-);
+router.get('/admin-dashboard/account/:id/delete', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountDeletePage);
+router.get('/admin-dashboard/account/:id/orders', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountOrdersPage);
+router.get('/admin-dashboard/account/:id/emails', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountEmailsPage);
 
 router.get('/admin-dashboard/order/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getAccountOrderPage);
 router.get('/admin-dashboard/orders', isAdmin, adminRequire2faSetup, adminDashboardController.getOrdersPage);
@@ -262,12 +233,7 @@ router.delete('/delete-account', getUser, isCustomer, isNotGuest, customerAccoun
 router.delete('/account/:id/deactivate', isAdmin, adminRequire2faSetup, adminDashboardController.deactivateAccount);
 router.put('/account/:id/reactivate', isAdmin, adminRequire2faSetup, adminDashboardController.reactivateAccount);
 
-router.get(
-  '/reset-password/account/:accountId/forgottenPassword/:token',
-  getUser,
-  isCustomer,
-  homeController.resetPasswordPage,
-);
+router.get('/reset-password/account/:accountId/forgottenPassword/:token', getUser, isCustomer, homeController.resetPasswordPage);
 router.post('/reset-password', getUser, isCustomer, homeController.resetPassword);
 router.get('/password-reset', getUser, isCustomer, homeController.passwordResetPage);
 router.get('/forgotten-password-email-sent', getUser, isCustomer, homeController.passwordEmailSentPage);
@@ -290,19 +256,9 @@ router.put('/home-page-option/:id/remove', isAdmin, adminRequire2faSetup, adminD
 
 router.get('/admin-dashboard/home-page-options', isAdmin, adminRequire2faSetup, adminDashboardController.getHomePageOptions);
 
-router.get(
-  '/admin-dashboard/home-page-option/:id',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.getHomePageOption,
-);
+router.get('/admin-dashboard/home-page-option/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getHomePageOption);
 
-router.post(
-  '/admin-dashboard/home-page-banner/set',
-  isAdmin,
-  adminRequire2faSetup,
-  adminDashboardController.setHomePageBanner,
-);
+router.post('/admin-dashboard/home-page-banner/set', isAdmin, adminRequire2faSetup, adminDashboardController.setHomePageBanner);
 router.post(
   '/admin-dashboard/home-page-main-banner/set',
   isAdmin,

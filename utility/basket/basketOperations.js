@@ -12,36 +12,51 @@ async function getFileGroupItemsByFileGroupId(id) {
 }
 
 async function createRevisedBasketItem(basketItem, revisedBasketItems) {
-  const option = await productOperations.getOptionGroupItemsForOptionGroup(
-    basketItem.optionGroupFk,
-  );
-  const finishingOption = await productOperations.getOptionGroupItemsForOptionGroup(
-    basketItem.finishingOptionGroupFk,
-  );
-  const quantities = await productOperations.getQuantitiesForProduct(
-    basketItem.productFk,
-  );
+  const option = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.optionGroupFk);
+  const finishingOption = await productOperations.getOptionGroupItemsForOptionGroup(basketItem.finishingOptionGroupFk);
+  const quantities = await productOperations.getQuantitiesForProduct(basketItem.productFk);
 
   const result = basketItem;
 
   if (basketItem.fileGroupFk != null) {
-    const fileGroupItems = await getFileGroupItemsByFileGroupId(
-      basketItem.fileGroupFk,
-    );
+    const fileGroupItems = await getFileGroupItemsByFileGroupId(basketItem.fileGroupFk);
     result.fileGroupItems = fileGroupItems;
   }
+  result.cost = (parseFloat(basketItem.price) / parseFloat(basketItem.quantity)).toFixed(2);
   result.options = option;
   result.finishingOptions = finishingOption;
   result.quantities = quantities;
+  result.saleAmount = result.saleFk !== null ? (parseFloat(result.price) * (result.salePercentage / 100)).toFixed(2) : 0;
+  result.discount = (parseFloat(basketItem.price) - parseFloat(basketItem.subTotal)).toFixed(2);
+  if (result.promoCodeFk !== null) {
+    if (result.saleFk !== null) {
+      result.promoCodeAmount = (parseFloat(result.discount) - result.saleAmount).toFixed(2);
+    } else {
+      result.promoCodeAmount = (parseFloat(result.price) * (result.promoCodePercentage / 100)).toFixed(2);
+    }
+  } else {
+    result.promoCodeAmount = 0;
+  }
+  result.discount = (parseFloat(basketItem.price) - parseFloat(basketItem.subTotal)).toFixed(2);
   revisedBasketItems.push(result);
-  return parseFloat(basketItem.subTotal);
+  return {
+    total: parseFloat(basketItem.price),
+    subTotal: parseFloat(basketItem.subTotal),
+    discount: parseFloat(result.discount),
+    saleAmount: parseFloat(result.saleAmount),
+    promoCodeAmount: parseFloat(result.promoCodeAmount),
+    sale: result.sale,
+    code: result.code,
+  };
 }
 
 async function getActiveBasketItemsForAccount(accountId) {
   const basketItems = await models.sequelize.query(
-    ' select b.*, b.price, p.name, p.image1Path, q.quantity from basketItems b '
+    ' select b.*, b.price, p.name, p.image1Path, q.quantity, s.name as sale, pc.code, s.percentage as salePercentage, pc.percentage as promoCodePercentage from basketItems b '
       + ' inner join products p on b.productFk = p.id '
       + ' inner join quantities q on b.quantityFk = q.id '
+      + ' left join sales s on b.saleFk = s.id '
+      + ' left join promoCodes pc on b.promoCodeFk = pc.id '
       + ' where b.accountFk = :accountId '
       + ' and (b.purchaseBasketFk is null or b.purchaseBasketFk = (select id from purchaseBaskets where id = b.purchaseBasketFk and status != :completed )) '
       + ' and b.deleteFl = false '
@@ -53,25 +68,41 @@ async function getActiveBasketItemsForAccount(accountId) {
   );
 
   const revisedBasketItems = [];
-  const totalCosts = await Promise.all(
-    basketItems.map((basketItem) => createRevisedBasketItem(basketItem, revisedBasketItems)),
-  );
+  const totalCosts = await Promise.all(basketItems.map((basketItem) => createRevisedBasketItem(basketItem, revisedBasketItems)));
   let totalCost = 0;
+  let subTotalCost = 0;
+  let totalDiscount = 0;
+  let totalSaleAmount = 0;
+  let totalPromoCodeAmount = 0;
+  let sale = null;
+  let code = null;
   totalCosts.forEach((t) => {
-    totalCost += t;
+    totalCost += t.total;
+    subTotalCost += t.subTotal;
+    totalDiscount += t.discount;
+    totalSaleAmount += t.saleAmount;
+    totalPromoCodeAmount += t.promoCodeAmount;
+    if (t.code) {
+      code = t.code;
+    }
+
+    if (t.sale) {
+      sale = t.sale;
+    }
   });
-  return { basketItems: revisedBasketItems, totalCost: totalCost.toFixed(2) };
+  return {
+    basketItems: revisedBasketItems,
+    subTotalCost: subTotalCost.toFixed(2),
+    totalCost: totalCost.toFixed(2),
+    totalDiscount: totalDiscount.toFixed(2),
+    totalSaleAmount: totalSaleAmount.toFixed(2),
+    totalPromoCodeAmount: totalPromoCodeAmount.toFixed(2),
+    code,
+    sale,
+  };
 }
 
-async function editBasketItem(
-  basketItemId,
-  optionGroupId,
-  finishingOptionGroupId,
-  quantityId,
-  price,
-  subTotal,
-  sale,
-) {
+async function editBasketItem(basketItemId, optionGroupId, finishingOptionGroupId, quantityId, price, subTotal, sale) {
   await models.basketItem.update(
     {
       optionGroupFk: optionGroupId,
@@ -99,6 +130,7 @@ async function createBasketItem(
   price,
   subTotal,
   saleFk,
+  promoCodeFk,
 ) {
   return models.basketItem.create({
     accountFk: accountId,
@@ -109,6 +141,7 @@ async function createBasketItem(
     price,
     subTotal,
     saleFk,
+    promoCodeFk,
     deleteFl: false,
     versionNo: 1,
   });
@@ -146,29 +179,33 @@ async function removeBasketItem(basketItemId) {
 
   await basketItem.destroy();
   if (purchaseBasketId != null) {
-    const purchaseBasket = await getPurchaseBasketById(purchaseBasketId);
-    await purchaseBasket.destroy();
+    await models.sequelize.query('delete from purchaseBaskets where id = :id', {
+      replacements: { id: purchaseBasketId },
+      type: models.sequelize.QueryTypes.DELETE,
+    });
   }
 
   if (fileGroupId != null) {
-    const fileGroup = await getFileGroupById(fileGroupId);
-    const fileGroupItems = await getFileGroupItemsByFileGroupId(fileGroup.id);
-
-    fileGroupItems.forEach(async (fileGroupItem) => {
-      await fileGroupItem.destroy();
+    await models.sequelize.query('delete from fileGroupItems where fileGroupFk = :fileGroupFk', {
+      replacements: { fileGroupFk: fileGroupId },
+      type: models.sequelize.QueryTypes.DELETE,
     });
 
-    await fileGroup.destroy();
+    await models.sequelize.query('delete from fileGroups where id = :id', {
+      replacements: { id: fileGroupId },
+      type: models.sequelize.QueryTypes.DELETE,
+    });
   }
 
-  const optionGroup = await productOperations.getOptionGroupById(optionGroupId);
-  const optionGroupItems = await productOperations.getOptionGroupItemsByOptionGroupId(optionGroupId);
-
-  optionGroupItems.forEach(async (optionGroupItem) => {
-    await optionGroupItem.destroy();
+  await models.sequelize.query('delete from optionGroupItems where optionGroupFk = :id', {
+    replacements: { id: optionGroupId },
+    type: models.sequelize.QueryTypes.DELETE,
   });
 
-  await optionGroup.destroy();
+  await models.sequelize.query('delete from optionGroups where id = :id', {
+    replacements: { id: optionGroupId },
+    type: models.sequelize.QueryTypes.DELETE,
+  });
 }
 
 async function updateQuantityPriceForBasketItem(basketItemId, quantityId) {
@@ -331,16 +368,16 @@ async function setBasketItemsAccountId(accountId, basketItemIds) {
 }
 
 async function getAllBasketItemsForCheckout(accountId) {
-  const getActiveBasketItemsDetails = await getActiveBasketItemsForAccount(
-    accountId,
-  );
-  const { basketItems } = getActiveBasketItemsDetails;
+  const getActiveBasketItemsDetails = await getActiveBasketItemsForAccount(accountId);
+  const { basketItems, subTotalCost, totalCost } = getActiveBasketItemsDetails;
 
-  const basketItemsForCheckout = basketItems.filter(
-    (b) => b.fileGroupFk != null,
-  );
+  const basketItemsForCheckout = basketItems.filter((b) => b.fileGroupFk != null);
 
-  return basketItemsForCheckout;
+  return {
+    basketItems: basketItemsForCheckout,
+    subTotalCost,
+    totalCost,
+  };
 }
 
 function getTotalsFromBasketItems(basketItems) {
@@ -368,10 +405,8 @@ async function setPurchaseBasketForBasketItem(basketItemId, purchaseBasketId) {
   );
 }
 
-async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(
-  purchaseBasketId,
-) {
-  const withSales = await models.sequelize.query(
+async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchaseBasketId) {
+  const result = await models.sequelize.query(
     'select b.*, p.name as productName, q.quantity, ot.optionType, o.name as optionName, s.name as saleName, s.percentage from basketItems b '
       + ' inner join purchaseBaskets pb on b.purchaseBasketFk = pb.id '
       + ' inner join products p on b.productFk = p.id '
@@ -379,7 +414,7 @@ async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(
       + ' inner join options o on ogi.optionFk = o.id '
       + ' inner join optionTypes ot on o.optionTypeFk = ot.id '
       + ' inner join quantities q on b.quantityFk = q.id '
-      + ' inner join sales s on b.saleFk = s.id '
+      + ' left join sales s on b.saleFk = s.id '
       + ' where pb.id = :purchaseBasketId ',
     {
       replacements: { purchaseBasketId },
@@ -387,32 +422,65 @@ async function getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(
     },
   );
 
-  const withoutSales = await models.sequelize.query(
-    'select b.*, p.name as productName, q.quantity, ot.optionType, o.name as optionName from basketItems b '
-      + ' inner join purchaseBaskets pb on b.purchaseBasketFk = pb.id '
+  const basketItems = [];
+  await Promise.all(result.map((basketItem) => createRevisedBasketItem(basketItem, basketItems)));
+
+  const revisedBasketItems = basketItems.filter((item, index, self) => self.findIndex((i) => i.id === item.id) === index);
+
+  return revisedBasketItems;
+}
+
+async function getBasketItemsForOrderId(purchaseBasketFk) {
+  const basketItems = await models.sequelize.query(
+    ' select b.*, b.price, p.name, p.image1Path, q.quantity, s.name as sale, pc.code, s.percentage as salePercentage, pc.percentage as promoCodePercentage from basketItems b '
       + ' inner join products p on b.productFk = p.id '
-      + ' inner join optionGroupItems ogi on ogi.optionGroupFk = b.optionGroupFk '
-      + ' inner join options o on ogi.optionFk = o.id '
-      + ' inner join optionTypes ot on o.optionTypeFk = ot.id '
       + ' inner join quantities q on b.quantityFk = q.id '
-      + ' where pb.id = :purchaseBasketId and b.saleFk is null',
+      + ' left join sales s on b.saleFk = s.id '
+      + ' left join promoCodes pc on b.promoCodeFk = pc.id '
+      + ' inner join purchaseBaskets pb on b.purchaseBasketFk = pb.id '
+      + ' where b.purchaseBasketFk = :purchaseBasketFk '
+      + ' and pb.status = :completed '
+      + ' and b.deleteFl = false '
+      + ' and p.deleteFl = false',
     {
-      replacements: { purchaseBasketId },
+      replacements: { purchaseBasketFk, completed: 'Completed' },
       type: models.sequelize.QueryTypes.SELECT,
     },
   );
 
-  const result = withSales.concat(withoutSales);
-  const basketItems = [];
-  await Promise.all(
-    result.map((basketItem) => createRevisedBasketItem(basketItem, basketItems)),
-  );
+  const revisedBasketItems = [];
+  const totalCosts = await Promise.all(basketItems.map((basketItem) => createRevisedBasketItem(basketItem, revisedBasketItems)));
+  let totalCost = 0;
+  let subTotalCost = 0;
+  let totalDiscount = 0;
+  let totalSaleAmount = 0;
+  let totalPromoCodeAmount = 0;
+  let sale = null;
+  let code = null;
+  totalCosts.forEach((t) => {
+    totalCost += t.total;
+    subTotalCost += t.subTotal;
+    totalDiscount += t.discount;
+    totalSaleAmount += t.saleAmount;
+    totalPromoCodeAmount += t.promoCodeAmount;
+    if (t.code) {
+      code = t.code;
+    }
 
-  const revisedBasketItems = basketItems.filter(
-    (item, index, self) => self.findIndex((i) => i.id === item.id) === index,
-  );
-
-  return revisedBasketItems;
+    if (t.sale) {
+      sale = t.sale;
+    }
+  });
+  return {
+    basketItems: revisedBasketItems,
+    subTotalCost: subTotalCost.toFixed(2),
+    totalCost: totalCost.toFixed(2),
+    totalDiscount: totalDiscount.toFixed(2),
+    totalSaleAmount: totalSaleAmount.toFixed(2),
+    totalPromoCodeAmount: totalPromoCodeAmount.toFixed(2),
+    code,
+    sale,
+  };
 }
 
 async function getBasketItemsWithSaleId(saleFk) {
@@ -429,10 +497,39 @@ async function deleteSalesFromBasketItems(saleId) {
     { replacements: { id: saleId }, type: models.sequelize.QueryTypes.UPDATE },
   );
 
-  await models.sequelize.query('UPDATE basketItems b '
-  + ' INNER JOIN purchaseBaskets pb ON b.purchaseBasketFk = pb.id '
-  + ' SET b.saleFk = NULL, b.subTotal = b.price '
-  + ' WHERE b.saleFk = 1 AND pb.status != :status ', { replacements: { id: saleId, status: 'Completed' }, type: models.sequelize.QueryTypes.UPDATE });
+  await models.sequelize.query(
+    'UPDATE basketItems b '
+      + ' INNER JOIN purchaseBaskets pb ON b.purchaseBasketFk = pb.id '
+      + ' SET b.saleFk = NULL, b.subTotal = b.price '
+      + ' WHERE b.saleFk = 1 AND pb.status != :status ',
+    { replacements: { id: saleId, status: 'Completed' }, type: models.sequelize.QueryTypes.UPDATE },
+  );
+}
+
+async function removeExpiredPromoCodesAndSalesFromBasketItems() {
+  await models.sequelize.query(
+    'update basketItems b '
+      + ' inner join promoCodes pc on b.promoCodeFk = pc.id '
+      + ' left join purchaseBaskets pb on b.purchaseBasketFk = pb.id '
+      + ' left join sales s on b.saleFk = s.id '
+      + ' set b.promoCodeFk = null, b.versionNo = b.versionNo + 1, '
+      + ' b.subTotal = b.price * coalesce((1 - s.percentage /100), 1) '
+      + ' where pc.deleteFl = false and pc.toDt < curDate() '
+      + ' and (pb.status != :status or b.purchaseBasketFk is null)',
+    { replacements: { status: 'Completed' }, type: models.sequelize.QueryTypes.UPDATE },
+  );
+
+  await models.sequelize.query(
+    ' update basketItems b '
+      + ' inner join sales s on b.saleFk = s.id '
+      + ' left join purchaseBaskets pb on b.purchaseBasketFk = pb.id '
+      + ' left join promoCodes pc on b.promoCodeFk = pc.id '
+      + ' set b.saleFk = null, b.versionNo = b.versionNo + 1, '
+      + ' b.subTotal = b.price * coalesce((1 - pc.percentage /100), 1) '
+      + ' where s.deleteFl = false and s.toDt < curDate() '
+      + ' and (pb.status != :status or b.purchaseBasketFk is null)',
+    { replacements: { status: 'Completed' }, type: models.sequelize.QueryTypes.UPDATE },
+  );
 }
 
 module.exports = {
@@ -440,6 +537,7 @@ module.exports = {
   createFileGroupItem,
   createRevisedBasketItem,
   getActiveBasketItemsForAccount,
+  getBasketItemsForOrderId,
   createBasketItem,
   removeBasketItem,
   getPurchaseBasketById,
@@ -460,4 +558,5 @@ module.exports = {
   getFileGroupItemById,
   getBasketItemsWithSaleId,
   deleteSalesFromBasketItems,
+  removeExpiredPromoCodesAndSalesFromBasketItems,
 };

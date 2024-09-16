@@ -1,16 +1,23 @@
 const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
-const { createTestFileGroupItem, createTestBasketItem, createTestPurchaseBasketForBasketItem } = require('../../helper/basketTestHelper');
+const {
+  createTestFileGroupItem,
+  createTestBasketItem,
+  createTestPurchaseBasketForBasketItem,
+} = require('../../helper/basketTestHelper');
 const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
+const { createTestSale } = require('../../helper/saleTestHelper');
+const { createTestPromoCode } = require('../../helper/promoCodeTestHelper');
+
 const { deleteS3Folder } = require('../../../utility/general/utilityHelper');
 const { createTestProduct, createTestProductWithPriceMatrix } = require('../../helper/productTestHelper');
 const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 const {
+  createOptionGroup,
   getOptionGroupItemsForPriceMatrix,
   getAllQuantities,
   getAllOptions,
   getOptionGroupItemsByOptionGroupId,
   getOptionGroupById,
-
 } = require('../../../utility/products/productOperations');
 const { completePurchaseBasket } = require('../../../utility/order/orderOperations');
 const basketOperations = require('../../../utility/basket/basketOperations');
@@ -320,8 +327,27 @@ describe('create revised basket item', () => {
     const basketItem = await basketOperations.getBasketItem(createdBasketItem.id);
 
     const revisedBasketItems = [];
-    const parsedPrice = await basketOperations.createRevisedBasketItem(basketItem, revisedBasketItems);
-    expect(parsedPrice).toBe(parseFloat(price));
+    const { total } = await basketOperations.createRevisedBasketItem(basketItem, revisedBasketItems);
+    expect(total).toBe(parseFloat(price));
+    expect(revisedBasketItems.length).toBe(1);
+    const revisedBasketItem = revisedBasketItems[0];
+    expect(revisedBasketItem.finishingOptions.length).toBe(0);
+    expect(revisedBasketItem.options.length).toBe(1);
+    expect(revisedBasketItem.quantities.length).toBe(1);
+    expect(revisedBasketItem.fileGroupItems).toBe(undefined);
+  });
+
+  it('should return basket item price and update revised basket items list when basket item has promo code but no sale', async () => {
+    const quantity = quantities[0];
+    const price = '5.00';
+    const { promoCode } = await createTestPromoCode();
+    const createdBasketItem = await createTestBasketItem([{ id: quantity.id, price }], null, promoCode.id);
+    const basketItem = await basketOperations.getBasketItem(createdBasketItem.id);
+
+    const revisedBasketItems = [];
+    const { total, subTotal } = await basketOperations.createRevisedBasketItem(basketItem, revisedBasketItems);
+    expect(total).toBe(parseFloat(price));
+    expect(subTotal).toBe(4.5);
     expect(revisedBasketItems.length).toBe(1);
     const revisedBasketItem = revisedBasketItems[0];
     expect(revisedBasketItem.finishingOptions.length).toBe(0);
@@ -333,15 +359,18 @@ describe('create revised basket item', () => {
   it('should return basket item price and update revised basket items list including file group items', async () => {
     const quantity = quantities[0];
     const price = '5.00';
-    const createdBasketItem = await createTestBasketItem([{ id: quantity.id, price }]);
+    const { sale } = await createTestSale();
+    const { promoCode } = await createTestPromoCode();
+    const createdBasketItem = await createTestBasketItem([{ id: quantity.id, price }], sale.id, promoCode.id);
     const fileGroup = await basketOperations.createFileGroup();
     await basketOperations.createFileGroupItem(fileGroup.id, 'Path', 'FileName');
     await basketOperations.setFileGroupForBasketItem(createdBasketItem.id, fileGroup.id);
     const basketItem = await basketOperations.getBasketItem(createdBasketItem.id);
 
     const revisedBasketItems = [];
-    const parsedPrice = await basketOperations.createRevisedBasketItem(basketItem, revisedBasketItems);
-    expect(parsedPrice).toBe(parseFloat(price));
+    const { total, subTotal } = await basketOperations.createRevisedBasketItem(basketItem, revisedBasketItems);
+    expect(total).toBe(parseFloat(price));
+    expect(subTotal).toBe(4.05);
     expect(revisedBasketItems.length).toBe(1);
     const revisedBasketItem = revisedBasketItems[0];
     expect(revisedBasketItem.finishingOptions.length).toBe(0);
@@ -380,7 +409,9 @@ describe('get active basket items for an account', () => {
   it('should return items when item is not part of a purchase', async () => {
     const quantity = quantities[0];
     const price = '5.00';
-    const basketItem = await createTestBasketItem([{ id: quantity.id, price }]);
+    const { sale } = await createTestSale();
+    const { promoCode } = await createTestPromoCode();
+    const basketItem = await createTestBasketItem([{ id: quantity.id, price }], sale.id, promoCode.id);
     const accountId = basketItem.accountFk;
 
     const activeBasketItemsForAccount = await basketOperations.getActiveBasketItemsForAccount(accountId);
@@ -399,9 +430,9 @@ describe('get all basket items for checkout', () => {
     await basketOperations.createFileGroupItem(fileGroup.id, 'Path', 'FileName');
     await basketOperations.setFileGroupForBasketItem(basketItem.id, fileGroup.id);
 
-    const checkoutBasketItems = await basketOperations.getAllBasketItemsForCheckout(basketItem.accountFk);
-    expect(checkoutBasketItems.length).toBe(1);
-    const checkoutBasketItem = checkoutBasketItems[0];
+    const { basketItems } = await basketOperations.getAllBasketItemsForCheckout(basketItem.accountFk);
+    expect(basketItems.length).toBe(1);
+    const checkoutBasketItem = basketItems[0];
     expect(checkoutBasketItem.id).toBe(basketItem.id);
   });
 
@@ -409,8 +440,8 @@ describe('get all basket items for checkout', () => {
     const quantity = quantities[0];
     const price = '10.00';
     const basketItem = await createTestBasketItem([{ id: quantity.id, price }]);
-    const checkoutBasketItems = await basketOperations.getAllBasketItemsForCheckout(basketItem.accountFk);
-    expect(checkoutBasketItems.length).toBe(0);
+    const { basketItems } = await basketOperations.getAllBasketItemsForCheckout(basketItem.accountFk);
+    expect(basketItems.length).toBe(0);
   });
 });
 
@@ -424,8 +455,7 @@ test('get basket item details for successful order by purchase basket id', async
   const purchaseBasket = await createTestPurchaseBasketForBasketItem(accountId, deliveryType, Date.now(), basketItem.id);
   await completePurchaseBasket(purchaseBasket.id, Date.now());
 
-  const basketItemDetails = await basketOperations
-    .getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchaseBasket.id);
+  const basketItemDetails = await basketOperations.getBasketItemDetailsForSuccessfulOrderByPurchaseBasketId(purchaseBasket.id);
   expect(basketItemDetails.length).toBe(1);
   const basketItemDetail = basketItemDetails[0];
   expect(basketItemDetail.finishingOptions.length).toBe(0);
@@ -438,13 +468,95 @@ test('update quantity price for basket item', async () => {
   const quantity = quantities[0];
   const newQuantity = quantities[1];
   const price = '5.00';
-  const createdBasketItem = await createTestBasketItem([{ id: quantity.id, price }, { id: newQuantity.id, price }]);
+  const createdBasketItem = await createTestBasketItem([
+    { id: quantity.id, price },
+    { id: newQuantity.id, price },
+  ]);
   const basketItem = await basketOperations.getBasketItem(createdBasketItem.id);
 
   await basketOperations.updateQuantityPriceForBasketItem(basketItem.id, newQuantity.id);
   const updatedBasketItem = await basketOperations.getBasketItem(createdBasketItem.id);
   expect(updatedBasketItem.quantityFk).toBe(newQuantity.id);
   expect(updatedBasketItem.price).toBe(price);
+});
+
+test('should get basket items for orderId with sales and promo codes', async () => {
+  const quantity = quantities[0];
+  const price = '10.00';
+  const { sale } = await createTestSale();
+  const { promoCode } = await createTestPromoCode();
+  const basketItem = await createTestBasketItem([{ id: quantity.id, price }], sale.id, promoCode.id);
+
+  const optionGroupId = basketItem.optionGroupFk;
+  expect(optionGroupId).not.toBeNull();
+
+  const deliveryType = deliveryTypes[0];
+  const purchaseBasket = await createTestPurchaseBasketForBasketItem(
+    basketItem.accountFk,
+    deliveryType,
+    Date.now(),
+    basketItem.id,
+  );
+  await completePurchaseBasket(purchaseBasket.id, Date.now());
+
+  const basketItems = await basketOperations.getBasketItemsForOrderId(purchaseBasket.id);
+  expect(basketItems.basketItems.length).toBe(1);
+});
+
+test('should get basket items for orderId with no sales and promo codes', async () => {
+  const quantity = quantities[0];
+  const price = '10.00';
+  const basketItem = await createTestBasketItem([{ id: quantity.id, price }]);
+
+  const optionGroupId = basketItem.optionGroupFk;
+  expect(optionGroupId).not.toBeNull();
+
+  const deliveryType = deliveryTypes[0];
+  const purchaseBasket = await createTestPurchaseBasketForBasketItem(
+    basketItem.accountFk,
+    deliveryType,
+    Date.now(),
+    basketItem.id,
+  );
+  await completePurchaseBasket(purchaseBasket.id, Date.now());
+
+  const basketItems = await basketOperations.getBasketItemsForOrderId(purchaseBasket.id);
+  expect(basketItems.basketItems.length).toBe(1);
+});
+
+test('should update basketItems where sale or promoCodes have expired', async () => {
+  const fromDt = '2022-01-01';
+  const toDt = '2023-01-01';
+
+  const { sale, product } = await createTestSale(fromDt, toDt);
+  const { promoCode } = await createTestPromoCode(fromDt, toDt, 10, product.id);
+
+  const price = '10.00';
+  const subTotal = (parseFloat(price) * (1 - promoCode.percentage / 100) * (1 - sale.percentage / 100)).toFixed(2);
+  const quantity = quantities[0];
+
+  const account = await createTestCustomerAccount();
+
+  const optionGroup = await createOptionGroup();
+  const basketItem = await basketOperations.createBasketItem(
+    account.id,
+    product.id,
+    optionGroup.id,
+    null,
+    quantity.id,
+    price,
+    subTotal,
+    sale.id,
+    promoCode.id,
+  );
+
+  await basketOperations.removeExpiredPromoCodesAndSalesFromBasketItems();
+
+  const updatedBasketItem = await basketOperations.getBasketItem(basketItem.id);
+  expect(updatedBasketItem.saleFk).toBe(null);
+  expect(updatedBasketItem.promoCodeFk).toBe(null);
+  expect(updatedBasketItem.price).toBe(price);
+  expect(updatedBasketItem.subTotal).toBe(price);
 });
 
 afterEach(async () => {
@@ -460,7 +572,12 @@ afterEach(async () => {
     'priceMatrixRows',
     'priceMatrixRowQuantityPrices',
     'products',
+    'promoCodes',
+    'promoCodeProducts',
+    'purchaseBaskets',
     'quantityGroups',
     'quantityGroupItems',
+    'sales',
+    'saleProducts',
   ]);
 });

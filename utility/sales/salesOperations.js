@@ -1,5 +1,5 @@
 const models = require('../../models');
-const { midnightDate } = require('../general/utilityHelper');
+const { midnightDate, startOfDay } = require('../general/utilityHelper');
 
 async function getProductsWithNoActiveSale(fromDtString, toDtString) {
   const fromDt = new Date(fromDtString);
@@ -38,15 +38,13 @@ async function setSaleForBasketItems(currentSaleFk, saleFk, productIds, percenta
 
   if (removedIds.length > 0) {
     await models.sequelize.query(
-      'update basketItems set subTotal = price, saleFk = null, versionNo = versionNo + 1 where productFk in (:removedIds) and purchaseBasketFk is null and deleteFl = false',
-      { replacements: { removedIds }, type: models.sequelize.QueryTypes.UPDATE },
-    );
-
-    await models.sequelize.query(
-      'UPDATE basketItems b '
-        + ' INNER JOIN purchaseBaskets pb ON b.purchaseBasketFk = pb.id '
-        + ' set b.subTotal = b.price, b.saleFk = null, b.versionNo = b.versionNo + 1 '
-        + ' WHERE pb.status != :status and b.deleteFl = false and b.productFk in (:removedIds)',
+      ' update basketItems bi '
+        + ' LEFT JOIN sales s on bi.saleFk = s.id '
+        + ' LEFT JOIN promoCodes pc on bi.promoCodeFk = pc.id '
+        + ' LEFT JOIN purchaseBaskets pb on bi.purchaseBasketFk = pb.id '
+        + ' set bi.subTotal = bi.price * coalesce((1 - pc.percentage /100), 1), '
+        + ' bi.saleFk = null, bi.versionNo = bi.versionNo + 1 where bi.productFk in (:removedIds) '
+        + ' and (bi.purchaseBasketFk is null or pb.status != :status) and bi.deleteFl = false ',
       { replacements: { removedIds, status: 'Completed' }, type: models.sequelize.QueryTypes.UPDATE },
     );
   }
@@ -54,20 +52,19 @@ async function setSaleForBasketItems(currentSaleFk, saleFk, productIds, percenta
   if (ids.length === 0) return false;
 
   await models.sequelize.query(
-    'update basketItems set subTotal = ((100 - :percentage)/100 * price), saleFk = :saleFk, versionNo = versionNo + 1 where productFk in (:ids) and purchaseBasketFk is null and deleteFl = false',
-    { replacements: { percentage, saleFk, ids }, type: models.sequelize.QueryTypes.UPDATE },
-  );
-
-  await models.sequelize.query(
-    'UPDATE basketItems b '
-      + ' INNER JOIN purchaseBaskets pb ON b.purchaseBasketFk = pb.id '
-      + ' set b.subTotal = ((100 - :percentage)/100 * b.price), b.saleFk = :saleFk, b.versionNo = b.versionNo + 1 '
-      + ' WHERE pb.status != :status and b.deleteFl = false and b.productFk in (:ids)',
+    ' update basketItems bi '
+      + ' LEFT JOIN sales s on bi.saleFk = s.id'
+      + ' LEFT JOIN promoCodes pc on bi.promoCodeFk = pc.id '
+      + ' LEFT JOIN purchaseBaskets pb on bi.purchaseBasketFk = pb.id '
+      + ' set bi.subTotal = bi.price * coalesce((1 - :percentage /100), 1) * coalesce((1 - pc.percentage /100), 1), '
+      + ' bi.saleFk = :saleFk, '
+      + ' bi.versionNo = bi.versionNo + 1 where bi.productFk in (:ids) '
+      + ' and (bi.purchaseBasketFk is null or pb.status != :status) and bi.deleteFl = false ',
     {
       replacements: {
+        percentage,
         saleFk,
         ids,
-        percentage,
         status: 'Completed',
       },
       type: models.sequelize.QueryTypes.UPDATE,
@@ -92,10 +89,11 @@ async function createSaleProducts(saleFk, ids) {
 }
 
 async function createSale(name, fromDt, toDt, description, percentage, ids) {
+  const fromDttm = startOfDay(fromDt);
   const toDttm = midnightDate(toDt);
   const sale = await models.sale.create({
     name,
-    fromDt,
+    fromDt: fromDttm,
     toDt: toDttm,
     description,
     percentage,
@@ -220,7 +218,8 @@ async function getSaleForProductId(productFk, isActive) {
     query += ' and fromDt < :now and toDt > :now ';
   }
   const sales = await models.sequelize.query(query, {
-    replacements: { productFk, now: new Date() }, type: models.sequelize.QueryTypes.SELECT,
+    replacements: { productFk, now: new Date() },
+    type: models.sequelize.QueryTypes.SELECT,
   });
 
   if (sales.length === 0) return null;
@@ -228,9 +227,13 @@ async function getSaleForProductId(productFk, isActive) {
   return sales[0];
 }
 
-const getSubTotal = (price, sale) => {
-  if (sale) {
-    return parseFloat((parseFloat(price) / 100) * (100 - sale.percentage)).toFixed(2);
+const getSubTotal = (price, sale, promoCode) => {
+  if (sale || promoCode) {
+    const floatPrice = parseFloat(price);
+    const saleDiscount = sale ? (100 - sale.percentage) / 100 : 1;
+    const promoCodeDiscount = promoCode ? (100 - promoCode.percentage) / 100 : 1;
+
+    return (floatPrice * saleDiscount * promoCodeDiscount).toFixed(2);
   }
   return price;
 };

@@ -4,6 +4,8 @@ const { createTestProduct } = require('../../helper/productTestHelper');
 const { getAllQuantities } = require('../../../utility/products/productOperations');
 const { createTestBasketItem, createTestPurchaseBasketForBasketItem } = require('../../helper/basketTestHelper');
 const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
+const { convertDateToString } = require('../../../utility/general/utilityHelper');
+const { createTestPromoCode } = require('../../helper/promoCodeTestHelper');
 
 const saleOperations = require('../../../utility/sales/salesOperations');
 
@@ -159,11 +161,8 @@ describe('sale operation', () => {
 
   it('should return active sale when for product', async () => {
     const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
 
-    const dateString = `${year}-${month}-${day}`;
+    const dateString = convertDateToString(date);
     const { sale, product } = await createTestSale(dateString, dateString);
 
     const saleFromProduct = await saleOperations.getSaleForProductId(product.id, true);
@@ -172,7 +171,7 @@ describe('sale operation', () => {
 
   it('should return price if no sale found', () => {
     const price = 5;
-    const subTotal = saleOperations.getSubTotal(price, null);
+    const subTotal = saleOperations.getSubTotal(price);
 
     expect(subTotal).toBe(price);
   });
@@ -182,6 +181,15 @@ describe('sale operation', () => {
     const { sale } = await createTestSale();
 
     const subTotal = saleOperations.getSubTotal(price, sale);
+
+    expect(subTotal).toBe('4.50');
+  });
+
+  it('should return promo code percentage of price if promo code only found', async () => {
+    const price = 5;
+    const { promoCode } = await createTestPromoCode();
+
+    const subTotal = saleOperations.getSubTotal(price, null, promoCode);
 
     expect(subTotal).toBe('4.50');
   });

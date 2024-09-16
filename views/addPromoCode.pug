@@ -1,0 +1,129 @@
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    
+    link(rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css")
+    link(rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/5.0.1/css/fixedColumns.dataTables.css")
+    link(rel="stylesheet" href="https://cdn.datatables.net/select/2.0.4/css/select.dataTables.css")
+    div
+        
+        +adminTopNavbar()
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                .container
+                    // row
+                    .row.mb-8
+                        .col-md-12
+                            .d-md-flex.justify-content-between.align-items-center
+                                // page header
+                                div
+                                    h2 Sale
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin-dashboard') Dashboard
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin-dashboard/promo-codes') Promo Codes
+                                            li.breadcrumb-item.active(aria-current='page') Add Promo Code
+                                // button
+                                div
+                                    a.btn.btn-light(href='/admin-dashboard/promo-codes') Back to Promo Code
+                    // row
+                    .row
+                        .col-lg-12.col-12
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    .row
+                                        h3 Promo Code Details
+                                        form#form
+                                            .row
+                                                
+                                                #promo-code-container
+                                                    .row.mb-3
+                                                        .col-sm-6
+                                                            label.form-label Promo Code
+                                                            input.form-control#promoCode(required type='text')   
+                                                            p#error-promo-code.small.text-danger
+                                                        
+                                                        .col-sm-6
+                                                            label.form-label Maximum Uses Per Customer
+                                                            input.form-control#maxUses(type='number' min=1)   
+                                                            p#error-max-uses.small.text-danger
+                                                        
+
+                                                    .row.mb-3 
+                                                        .col-sm-6#promoCodeTypeSection
+                                                            label.form-label Promo Code Type
+                                                            
+                                                        .col-sm-6#promoCodeOptionSection       
+                                                    
+                                                    .row.mb-3
+                                                        .col-sm-6
+                                                            label.form-label From Dt
+                                                            input.form-control.date#fromDt(type='date' value=((promoCode && promoCode.fromDt) ? (promoCode.fromDt.toString()).replaceAll('T00:00:00.000Z', '') : '' ) required)
+                                                            p#error-fromDt.small.text-danger
+                                                        .col-sm-6
+                                                            label.form-label To Dt
+                                                            input.form-control.date#toDt(type='date' value=((promoCode && promoCode.toDt) ? (promoCode.toDt.toString()).replaceAll('T00:00:00.000Z', '') : '' )  required)   
+                                                            p#error-toDt.small.text-danger
+                                                    
+                                                        
+                                                    .row.mb-3 
+                                                        .col-sm-6
+                                                            label.form-label Description
+                                                            textarea.form-control#description(required rows=4) #{((promoCode && promoCode.description) ? promoCode.description : '' ) }
+                                                            p#error-description.small.text-danger
+                                                        
+                                            .row
+                                                h3 Link Products
+                                                .table-responsive
+                                                    table.stripe.row-border.order-column.nowrap#products(style="cursor:pointer")
+                                                        thead
+                                                            tr
+                                                                th     
+                                                                th Image
+                                                                th Name
+                                                                th Product Type
+                                                                th Status
+                                                                
+                                                        
+                                                        tbody
+                                                            //- each product in products
+                                                                tr(id=product.id) 
+                                                                    td
+                                                                    td 
+                                                                        img(src=product.image1Path width="50px")
+                                                                    td #{product.name}
+                                                                    td #{product.productType}
+                                                                    td 
+                                                                        if(product.deleteFl == false)
+                                                                            span.badge.bg-light-primary.text-dark-primary Active
+                                                                        else 
+                                                                            span.span.badge.bg-light-danger.text-dark-danger Deactive
+                                                                    
+                                                            
+                                            .mb-3.col-sm-6.offset-sm-3.mt-5
+                                                .d-grid
+                                                    button.btn.btn-primary#createPromoCode(type='submit')
+                                                        | Add Promo Code
+    +adminScripts()
+    
+    script(src='/assets/js/vendors/editor.js')
+    script(src="https://cdn.datatables.net/2.1.3/js/dataTables.js")
+    script(src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/dataTables.fixedColumns.js")
+    script(src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/fixedColumns.dataTables.js")
+    script(src="https://cdn.datatables.net/select/2.0.4/js/dataTables.select.js")
+    script(src="https://cdn.datatables.net/select/2.0.4/js/select.dataTables.js")
+
+    script(src='/js/addPromoCode.js')
+    script(src="/js/adminDashboard.js")

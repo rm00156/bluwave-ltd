@@ -8,6 +8,7 @@ if (isDevelopment) {
 }
 const Queue = require('bull');
 const emailOperations = require('./utility/email/emailOperations');
+const { removeExpiredPromoCodesAndSalesFromBasketItems } = require('./utility/basket/basketOperations');
 // Connect to a local redis intance locally, and the Heroku-provided URL in production
 const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
 
@@ -48,6 +49,8 @@ function start() {
       await emailOperations.sendSigupEmail(job.data.accountId);
     } else if (job.data.process === 'sendPurchaseEmail') {
       await emailOperations.sendPurchaseEmail(job.data.purchaseBasketId);
+    } else if (job.data.process === 'salePromoCodeExpiry') {
+      await removeExpiredPromoCodesAndSalesFromBasketItems();
     }
   }).catch((err) => {
     logger.error(err);

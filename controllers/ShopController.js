@@ -6,6 +6,7 @@ const basketOperations = require('../utility/basket/basketOperations');
 const orderOperations = require('../utility/order/orderOperations');
 const deliveryOperations = require('../utility/delivery/deliveryOperations');
 const { getSaleForProductId, getSubTotal, updateSalesUsedCountForOrder } = require('../utility/sales/salesOperations');
+const { getActivePromoCodeForBasketAndProduct } = require('../utility/promoCode/promoCodeOperations');
 // const notProduction = process.env.NODE_ENV !== 'production';
 
 const queueOperations = process.env.NODE_ENV === 'test' ? null : require('../utility/queue/queueOperations');
@@ -234,7 +235,9 @@ async function addToBasket(req, res) {
   const quantityId = priceMatrixRowQuantityPrice.quantityFk;
   const { price } = priceMatrixRowQuantityPrice;
   const sale = await getSaleForProductId(productId, true);
-  const subTotal = getSubTotal(price, sale);
+  // get promo code from basket
+  const promoCode = await getActivePromoCodeForBasketAndProduct(req.user.id, productId);
+  const subTotal = getSubTotal(price, sale, promoCode);
 
   const transaction = await models.sequelize.transaction();
 
@@ -261,6 +264,7 @@ async function addToBasket(req, res) {
         price,
         subTotal,
         sale ? sale.id : null,
+        promoCode ? promoCode.id : null,
       );
     } else {
       await basketOperations.createBasketItem(
@@ -272,6 +276,7 @@ async function addToBasket(req, res) {
         price,
         subTotal,
         sale ? sale.id : null,
+        promoCode ? promoCode.id : null,
       );
     }
   } catch (err) {
@@ -508,11 +513,11 @@ async function checkout(req, res) {
   const deliveryType = await deliveryOperations.getDeliveryType(deliveryTypeId);
   let shippingDetail = null;
 
-  const basketItems = await basketOperations.getAllBasketItemsForCheckout(
+  const { basketItems, subTotalCost, totalCost } = await basketOperations.getAllBasketItemsForCheckout(
     accountId,
   );
-  const { subTotal, total } = basketOperations.getTotalsFromBasketItems(basketItems);
-  const newTotal = total + parseFloat(deliveryPrice);
+  // const { subTotal, total } = basketOperations.getTotalsFromBasketItems(basketItems);
+  const newTotal = parseFloat(subTotalCost) + parseFloat(deliveryPrice);
 
   const transaction = await models.sequelize.transaction();
   const lineItems = [];
@@ -545,7 +550,7 @@ async function checkout(req, res) {
       fullName,
       email,
       phoneNumber,
-      subTotal,
+      totalCost,
       newTotal,
       shippingDetail,
       deliveryTypeId,

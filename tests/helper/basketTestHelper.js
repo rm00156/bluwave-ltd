@@ -6,6 +6,8 @@ const {
 } = require('../../utility/basket/basketOperations');
 const { createTestProductWithPriceMatrix } = require('./productTestHelper');
 const { getAllOptions, createOptionGroup, createOptionGroupItem } = require('../../utility/products/productOperations');
+const { getSaleById } = require('../../utility/sales/salesOperations');
+const { getPromoCodeById } = require('../../utility/promoCode/promoCodeOperations');
 
 async function createTestShippingDetail() {
   const account = await createTestCustomerAccount();
@@ -77,7 +79,7 @@ async function createTestFileGroupItem() {
   return createTestFileGroupItemWithPathAndFileName('path', 'fileName');
 }
 
-async function createTestBasketItem(quantityGroup, saleFk) {
+async function createTestBasketItem(quantityGroup, saleFk, promoCodeFk) {
   const account = await createTestCustomerAccount();
   const options = await getAllOptions();
   const option = options[0];
@@ -94,6 +96,11 @@ async function createTestBasketItem(quantityGroup, saleFk) {
 
   const optionGroup = await createOptionGroup();
   await createOptionGroupItem(optionGroup.id, optionIds[0]);
+
+  const sale = saleFk ? await getSaleById(saleFk) : null;
+  const promoCode = promoCodeFk ? await getPromoCodeById(promoCodeFk) : null;
+  const { price } = quantityGroup[0];
+  const subtotal = price * (sale ? (1 - sale.percentage / 100) : 1) * (promoCode ? (1 - promoCode.percentage / 100) : 1);
   return createBasketItem(
     account.id,
     product.id,
@@ -101,8 +108,9 @@ async function createTestBasketItem(quantityGroup, saleFk) {
     null,
     quantityGroup[0].id,
     quantityGroup[0].price,
-    quantityGroup[0].price,
+    subtotal,
     saleFk ?? null,
+    promoCodeFk ?? null,
   );
 }
 

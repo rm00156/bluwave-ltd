@@ -12,6 +12,10 @@ const sequelize = new Sequelize(env === 'test' ? process.env.TEST_DATABASE_NAME 
     min: 0,
     idle: 10000,
   },
+  timezone: 'Europe/London', // Set the connection timezone to UK time
+  dialectOptions: {
+    timezone: 'local', // This ensures MySQL operates in the local (system) timezone, but Sequelize will handle timezone conversion.
+  },
 });
 const db = {};
 

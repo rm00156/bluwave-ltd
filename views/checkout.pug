@@ -89,55 +89,96 @@ html(land="en")
                             .col-12.col-md-12.offset-lg-1.col-lg-4
                                 .mt-4.mt-lg-0
                                     .card.shadow-sm
-                                        h5.px-6.py-4.bg-transparent.mb-0 Order Details
+                                        // heading
+                                        h5.px-6.py-4.bg-transparent.mb-0 Order Summary
+                                        //- .card.mb-2
+                                            // list group
                                         ul.list-group.list-group-flush
                                             // list group item
-                                            each basketItem in basketItems.basketItems
-                                                li.list-group-item.px-4.py-3
-                                                    .row.align-items-center
-                                                        .col-2.col-md-2
-                                                            img.img-fluid(src=basketItem.image1Path alt='Ecommerce')
-                                                        .col-5.col-md-5
-                                                            h6.mb-0 #{basketItem.name}
-                                                            each option in basketItem.options
-                                                                span
-                                                                    small #{option.optionType}: #{option.name}
+                                            li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                .me-auto
+                                                    .fw-bold Your Basket
+                                                span.fw-bold £#{basketItems.totalCost}
+                                            //- li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                .me-auto
+                                                    .fw-bold Subtotal
+                                                span.fw-bold £#{basketItems.subTotalCost}
+                                            li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                #deliverySubTotalSection(style="width:100%")
+                                                    div
+                                            if(basketItems.basketItems.filter(b => b.saleFk || b.promoCodeFk).length > 0)
+                                                li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                    .me-auto
+                                                        div Discount
+                                                    span - £#{basketItems.totalDiscount}
+                                                li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                    .me-auto
+                                                        .fw-bold 
+                                                    span.fw-bold Discounts Applied
+
+                                                if(basketItems.totalSaleAmount !== '0.00')
+                                                    li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                        .me-auto
+                                                            div #{basketItems.sale}
+                                                        span - £#{basketItems.totalSaleAmount}
+                                                
+                                                if(basketItems.totalPromoCodeAmount !== '0.00')
+                                                    li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                        .me-auto
+                                                            div #{basketItems.code}
+                                                        span - £#{basketItems.totalPromoCodeAmount}  
+                                            
+                                            li.list-group-item.d-flex.justify-content-between.align-items-start
+                                                .me-auto
+                                                    .fw-bold#subTotal(data-subtotal=basketItems.subTotalCost) Total (including delivery)
+                                                span.fw-bold 
+                                                    div#total
+                                    a(href='/basket')
+                                        .card.shadow-sm.mt-5
+                                            h5.px-6.py-4.bg-transparent.mb-0 Your Basket
+                                            ul.list-group.list-group-flush
+                                                // list group item
+                                                each basketItem in basketItems.basketItems
+                                                    li.list-group-item.px-4.py-3
+                                                        .row.align-items-center
+                                                            .col-2.col-md-2
+                                                                img.img-fluid(src=basketItem.image1Path alt='Ecommerce')
+                                                            .col-5.col-md-5
+                                                                h6.mb-0 #{basketItem.name}
+                                                                each option in basketItem.options
+                                                                    span
+                                                                        small #{option.optionType}: #{option.name}
+                                                                        br
+                                                                each finishingOption in basketItem.finishingOptions
+                                                                    span
+                                                                        small #{finishingOption.optionType}: #{finishingOption.name}
+                                                                        br
+                                                            .col-2.col-md-2.text-center.text-muted
+                                                                span #{basketItem.quantity}
+                                                            .col-3.text-lg-end.text-start.text-md-end.col-md-3
+                                                                if(basketItem.saleFk || basketItem.promoCodeFk)
+                                                                    span.fw-bold(style="text-decoration: line-through; ") £#{basketItem.price}
                                                                     br
-                                                            each finishingOption in basketItem.finishingOptions
-                                                                span
-                                                                    small #{finishingOption.optionType}: #{finishingOption.name}
-                                                                    br
-                                                        .col-2.col-md-2.text-center.text-muted
-                                                            span #{basketItem.quantity}
-                                                        .col-3.text-lg-end.text-start.text-md-end.col-md-3
-                                                            if(basketItem.saleFk)
-                                                                span.fw-bold(style="text-decoration: line-through; ") £#{basketItem.price}
-                                                                br
-                                                                span.text-danger £#{basketItem.subTotal}
-                                                            else 
-                                                                span.fw-bold £#{basketItem.price}
+                                                                    span.text-danger £#{basketItem.subTotal}
+                                                                else 
+                                                                    span.fw-bold £#{basketItem.price}
                                             
                                             // list group item
-                                            li.list-group-item.px-4.py-3(style="font-size:9pt")
-                                                .row
-                                                    .d-flex.align-items-center.justify-content-between.mb-2
-                                                        .col-sm-9
-                                                            | Subtotal
-                                                        .col-sm-3.fw-bold.text-lg-end#subTotal(data-subtotal=basketItems.totalCost)
-                                                            | £#{basketItems.totalCost}
-                                                .row
-                                                    .d-flex.align-items-center.justify-content-between
-                                                        #deliverySubTotalSection(style="width:100%")
-                                                            div
+                                            //- li.list-group-item.px-4.py-3(style="font-size:9pt")
+                                                
+                                            //-     .row
+                                            //-         .d-flex.align-items-center.justify-content-between
+                                            //-             #deliverySubTotalSection(style="width:100%")
+                                            //-                 div
 
      
-                                            // list group item
-                                            li.list-group-item.px-4.py-3
-                                                .d-flex.align-items-center.justify-content-between.fw-bold
-                                                    div
-                                                        | Total
-                                                    div#total
-                                                        | 
+                                            //- // list group item
+                                            //- li.list-group-item.px-4.py-3
+                                            //-     .d-flex.align-items-center.justify-content-between.fw-bold
+                                            //-         div
+                                            //-             | Total
+                                            //-         div#total
+                                            //-             | 
 
                                     button.btn.btn-primary.ms-2.mt-4#submit(type="submit" style="width:95%") Place Order
 

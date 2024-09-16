@@ -20,6 +20,7 @@ const upload = require('express-fileupload');
 const flash = require('connect-flash');
 const indexRouter = require('./routes/index');
 const companyInfo = require('./utility/company/companyInfo');
+const recurringTaskOperations = process.env.NODE_ENV === 'test' ? null : require('./utility/recurringTask/recurringTaskOperations');
 // const { setUpTestDb } = require('./tests/helper/generalTestHelper');
 
 require('./passport_setup')(passport);
@@ -46,42 +47,50 @@ function setSocket(ioSocket) {
   socket = ioSocket;
 }
 
-models.sequelize.sync().then(async () => {
-  models.notification.afterCreate((instance) => {
-    if (socket) socket.emit('notification', { notification: instance });
+models.sequelize
+  .sync()
+  .then(async () => {
+    models.notification.afterCreate((instance) => {
+      if (socket) socket.emit('notification', { notification: instance });
+    });
+    if (process.env.NODE_ENV !== 'test') {
+      await recurringTaskOperations.setUpRecurringTasks();
+    }
+  })
+  .catch((err) => {
+    logger.error(err, 'Database connection has failed!');
   });
-}).catch((err) => {
-  logger.error(err, 'Database connection has failed!');
-});
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 app.use(morgan('dev'));
 app.use(upload());
-app.use(bodyParser.json({
-  verify(req, res, buf) {
-    const url = req.originalUrl;
-    if (url.startsWith('/stripe')) {
-      req.rawBody = buf.toString();
-    }
-  },
-}));
+app.use(
+  bodyParser.json({
+    verify(req, res, buf) {
+      const url = req.originalUrl;
+      if (url.startsWith('/stripe')) {
+        req.rawBody = buf.toString();
+      }
+    },
+  }),
+);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // this order is important
-app.use(session(
-  {
+app.use(
+  session({
     secret: process.env.SECRET,
     saveUninitialized: false,
     resave: false,
     // store: new RedisStore({ client: redisClient }),
     store: new MemoryStore({ checkPeriod: 86400000 }),
-  },
-));
+  }),
+);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());

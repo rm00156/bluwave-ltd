@@ -82,6 +82,15 @@ function BasketItems(sequelize, Sequelize) {
       },
     },
 
+    promoCodeFk: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'promoCodes',
+        key: 'id',
+      },
+    },
+
     purchaseBasketFk: {
       type: Sequelize.INTEGER,
       allowNull: true,

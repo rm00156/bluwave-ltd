@@ -151,18 +151,30 @@ html(land="en")
                                                         td.fw-medium.text-dark(style="text-align:right")
                                                             // text
                                                             | £#{order.subTotal}
-                                                    if(sales)
-                                                        each sale in sales 
-                                                            tr 
-                                                                td.border-bottom-0.pb-0
-                                                                td.border-bottom-0.pb-0
-                                                                td.border-bottom-0.pb-0
-                                                                td.fw-medium.text-danger(colspan='1')
-                                                                    // text
-                                                                    | #{sale.name}
-                                                                td.fw-medium.text-danger(style="text-align:right")
-                                                                    // text
-                                                                    | - £#{(sale.discountAmount).toFixed(2)}
+                                                    if(sale)
+                                                        
+                                                        tr 
+                                                            td.border-bottom-0.pb-0
+                                                            td.border-bottom-0.pb-0
+                                                            td.border-bottom-0.pb-0
+                                                            td.fw-medium.text-danger(colspan='1')
+                                                                // text
+                                                                | #{sale}
+                                                            td.fw-medium.text-danger(style="text-align:right")
+                                                                // text
+                                                                | - £#{(totalSaleAmount)}
+                                                    
+                                                    if(code)
+                                                        tr 
+                                                            td.border-bottom-0.pb-0
+                                                            td.border-bottom-0.pb-0
+                                                            td.border-bottom-0.pb-0
+                                                            td.fw-medium.text-danger(colspan='1')
+                                                                // text
+                                                                | #{code}
+                                                            td.fw-medium.text-danger(style="text-align:right")
+                                                                // text
+                                                                | - £#{(totalPromoCodeAmount)}
 
                                                     tr
                                                         td.border-bottom-0.pb-0
