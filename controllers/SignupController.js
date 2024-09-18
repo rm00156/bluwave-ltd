@@ -7,9 +7,9 @@ const accountOperations = require('../utility/account/accountOperations');
 const basketOperations = require('../utility/basket/basketOperations');
 const productOperations = require('../utility/products/productOperations');
 
-const notProduction = process.env.NODE_ENV !== 'production';
+const isTest = process.env.NODE_ENV === 'test';
 
-const queueOperations = !notProduction
+const queueOperations = !isTest
   ? require('../utility/queue/queueOperations')
   : null;
 
