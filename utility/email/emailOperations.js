@@ -98,7 +98,7 @@ async function sendSigupEmail(accountId) {
     const subject = 'Bluwave - Registration';
     const mailOptions = {
       from: process.env.MAILSERVER_EMAIL,
-      to: account.email,
+      to: process.env.NODE_ENV === 'production' ? account.email : process.env.LOGIN_USERNAME,
       subject,
       html: content,
     };

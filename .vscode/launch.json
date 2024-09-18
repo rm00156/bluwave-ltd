@@ -28,6 +28,12 @@
             ],
             "cwd": "${workspaceFolder}",
             "internalConsoleOptions": "openOnSessionStart"
-          }
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Worker",
+            "program": "${workspaceFolder}/worker.js"
+        },
     ]
 }

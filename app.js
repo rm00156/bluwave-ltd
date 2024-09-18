@@ -6,13 +6,14 @@ const notProduction = process.env.NODE_ENV !== 'production';
 if (notProduction) {
   require('dotenv').config(); // Load variables from .env file
 }
+const { createClient } = require('redis');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const logger = require('pino')();
 const passport = require('passport');
 const session = require('express-session');
-// const RedisStore = require('connect-redis').default;
+const RedisStore = require('connect-redis').default;
 const MemoryStore = require('memorystore')(session);
 // const redis = require('redis');
 const bodyParser = require('body-parser');
@@ -27,18 +28,20 @@ require('./passport_setup')(passport);
 // const REDIS_URL = process.env.REDIS_URL /* process.env.STACKHERO_REDIS_URL_TLS */ || 'redis://127.0.0.1:6379';
 const app = express();
 
-// const redisClient = redis.createClient({
-//   url: REDIS_URL,
-//   socket: {
-//     tls: {
-//       rejectUnauthorized: false,
-//     },
-//   },
-// });
+const client = createClient({
+  password: process.env.CLOUD_REDIS_PASSWORD,
+  socket: {
+    host: process.env.CLOUD_REDIS_HOST,
+    port: process.env.CLOUD_REDIS_PORT,
+  },
+});
 
-// redisClient.connect().catch((err) => {
-//   logger.error(err);
-// });
+if (process.env.NODE_ENV !== 'test') {
+  client.connect().catch((err) => {
+    logger.error(err);
+  });
+}
+
 const models = require('./models');
 
 let socket;
@@ -87,8 +90,8 @@ app.use(
     secret: process.env.SECRET,
     saveUninitialized: false,
     resave: false,
-    // store: new RedisStore({ client: redisClient }),
-    store: new MemoryStore({ checkPeriod: 86400000 }),
+    store: process.env.NODE_ENV === 'test' ? new MemoryStore({ checkPeriod: 86400000 }) : new RedisStore({ client }),
+    // store: new MemoryStore({ checkPeriod: 86400000 }),
   }),
 );
 app.use(passport.initialize());
