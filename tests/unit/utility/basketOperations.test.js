@@ -10,7 +10,6 @@ const { createTestPromoCode } = require('../../helper/promoCodeTestHelper');
 
 const { deleteS3Folder } = require('../../../utility/general/utilityHelper');
 const { createTestProduct, createTestProductWithPriceMatrix } = require('../../helper/productTestHelper');
-const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 const {
   createOptionGroup,
   getOptionGroupItemsForPriceMatrix,
@@ -23,11 +22,9 @@ const { completePurchaseBasket } = require('../../../utility/order/orderOperatio
 const basketOperations = require('../../../utility/basket/basketOperations');
 
 let quantities;
-let deliveryTypes;
 beforeAll(async () => {
   await setUpTestDb();
   quantities = await getAllQuantities();
-  deliveryTypes = await getAllActiveDeliveryTypes();
 }, 60000);
 
 test('create file group', async () => {
@@ -183,7 +180,7 @@ describe('remove basket Item', () => {
     expect(optionGroupId).not.toBeNull();
 
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createTestPurchaseBasketForBasketItem(account.id, deliveryType, Date.now(), basketItem.id);
 
     await basketOperations.removeBasketItem(basketItem.id);
@@ -397,7 +394,7 @@ describe('get active basket items for an account', () => {
     const price = '5.00';
     const basketItem = await createTestBasketItem([{ id: quantity.id, price }]);
     const accountId = basketItem.accountFk;
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createTestPurchaseBasketForBasketItem(accountId, deliveryType, Date.now(), basketItem.id);
     await completePurchaseBasket(purchaseBasket.id, Date.now());
 
@@ -451,7 +448,7 @@ test('get basket item details for successful order by purchase basket id', async
   const createdBasketItem = await createTestBasketItem([{ id: quantity.id, price }]);
   const basketItem = await basketOperations.getBasketItem(createdBasketItem.id);
   const accountId = basketItem.accountFk;
-  const deliveryType = deliveryTypes[0];
+  const deliveryType = 'Collection';
   const purchaseBasket = await createTestPurchaseBasketForBasketItem(accountId, deliveryType, Date.now(), basketItem.id);
   await completePurchaseBasket(purchaseBasket.id, Date.now());
 
@@ -490,7 +487,7 @@ test('should get basket items for orderId with sales and promo codes', async () 
   const optionGroupId = basketItem.optionGroupFk;
   expect(optionGroupId).not.toBeNull();
 
-  const deliveryType = deliveryTypes[0];
+  const deliveryType = 'Collection';
   const purchaseBasket = await createTestPurchaseBasketForBasketItem(
     basketItem.accountFk,
     deliveryType,
@@ -511,7 +508,7 @@ test('should get basket items for orderId with no sales and promo codes', async 
   const optionGroupId = basketItem.optionGroupFk;
   expect(optionGroupId).not.toBeNull();
 
-  const deliveryType = deliveryTypes[0];
+  const deliveryType = 'Collection';
   const purchaseBasket = await createTestPurchaseBasketForBasketItem(
     basketItem.accountFk,
     deliveryType,

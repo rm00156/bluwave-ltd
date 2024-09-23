@@ -77,13 +77,9 @@ function PurchaseBaskets(sequelize, Sequelize) {
       },
     },
 
-    deliveryTypeFk: {
-      type: Sequelize.INTEGER,
+    deliveryType: {
+      type: DataTypes.ENUM('Collection', 'Express', 'Standard'),
       allowNull: false,
-      references: {
-        model: 'deliveryTypes',
-        key: 'id',
-      },
     },
 
     deliveryPrice: {

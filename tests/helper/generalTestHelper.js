@@ -11,7 +11,6 @@ const {
   getAllProductTypes,
   getAllQuantities,
 } = require('../../utility/products/productOperations');
-const { getAllActiveDeliveryTypes } = require('../../utility/delivery/deliveryOperations');
 const { getFaqTypes } = require('../../utility/faq/faqOperations');
 const { getRefundTypes } = require('../../utility/refund/refundOperations');
 const { getAllPromoCodeTypes } = require('../../utility/promoCode/promoCodeOperations');
@@ -38,7 +37,7 @@ async function setUpTestDb() {
   const dir = __dirname.replace('/tests/helper', '');
   const accountTypes = await readSqlFile(path.join(dir, '/sql/accountTypes.sql'));
   const attributeTypes = await readSqlFile(path.join(dir, '/sql/attributeTypes.sql'));
-  const deliveryTypes = await readSqlFile(path.join(dir, '/sql/deliveryTypes.sql'));
+  // const deliveryTypes = await readSqlFile(path.join(dir, '/sql/deliveryTypes.sql'));
   const faqTypes = await readSqlFile(path.join(dir, '/sql/faqTypes.sql'));
   const optionTypes = await readSqlFile(path.join(dir, '/sql/optionTypes.sql'));
   const options = await readSqlFile(path.join(dir, '/sql/options.sql'));
@@ -59,11 +58,11 @@ async function setUpTestDb() {
     await pauseForTimeInSecond(1);
   }
 
-  const existingDeliveryTypes = await getAllActiveDeliveryTypes();
-  if (existingDeliveryTypes.length === 0) {
-    await models.sequelize.query(deliveryTypes, { type: models.sequelize.QueryTypes.INSERT });
-    await pauseForTimeInSecond(1);
-  }
+  // const existingDeliveryTypes = await getAllActiveDeliveryTypes();
+  // if (existingDeliveryTypes.length === 0) {
+  //   await models.sequelize.query(deliveryTypes, { type: models.sequelize.QueryTypes.INSERT });
+  //   await pauseForTimeInSecond(1);
+  // }
 
   const existingFaqTypes = await getFaqTypes();
   if (existingFaqTypes.length === 0) {

@@ -425,13 +425,16 @@ async function checkoutPage(req, res) {
   const basketItems = await basketOperations.getActiveBasketItemsForAccount(
     req.user.id,
   );
-  const deliveryOptions = await deliveryOperations.getDeliveryOptionsForProducts(
+  const deliveryOptions = await deliveryOperations.getDeliveryOptionsForProductIds(
     basketItems.basketItems.map((b) => b.productFk),
   );
+
+  if (deliveryOptions === null) return res.redirect('/basket');
+
   const { displayCookieMessage } = req.body;
   const { guestEmail } = req.session;
 
-  res.render('checkout', {
+  return res.render('checkout', {
     user: req.user,
     companyDetails: companyInfo.getCompanyDetails(),
     navigationBarHeaders,
@@ -506,16 +509,33 @@ async function checkout(req, res) {
   const { fullName } = req.body;
   const { email } = req.body;
   const { phoneNumber } = req.body;
-  const { deliveryPrice } = req.body;
+  const { deliveryName } = req.body;
 
-  const { deliveryTypeId } = req.body;
+  if (deliveryName !== 'Standard' && deliveryName !== 'Collection' && deliveryName !== 'Express') {
+    const message = `Delivery name ${deliveryName} is not valid.`;
+    logger.error(message);
+    return res.status(400).json(message);
+  }
+  // const { deliveryTypeId } = req.body;
 
-  const deliveryType = await deliveryOperations.getDeliveryType(deliveryTypeId);
+  // const deliveryType = await deliveryOperations.getDeliveryType(deliveryTypeId);
   let shippingDetail = null;
 
   const { basketItems, subTotalCost, totalCost } = await basketOperations.getAllBasketItemsForCheckout(
     accountId,
   );
+
+  const deliveryOptions = await deliveryOperations.getDeliveryOptionsForProductIds(basketItems.map((b) => b.productFk));
+  let deliveryPrice;
+
+  if (deliveryName === 'Standard') {
+    deliveryPrice = deliveryOptions.standardPrice;
+  } else if (deliveryName === 'Express') {
+    deliveryPrice = deliveryOptions.expressPrice;
+  } else {
+    deliveryPrice = '0.00';
+  }
+
   // const { subTotal, total } = basketOperations.getTotalsFromBasketItems(basketItems);
   const newTotal = parseFloat(subTotalCost) + parseFloat(deliveryPrice);
 
@@ -523,7 +543,7 @@ async function checkout(req, res) {
   const lineItems = [];
   let purchaseBasket;
   try {
-    if (deliveryType.collectFl === false) {
+    if (deliveryName !== 'Collection') {
       // createShippingDetail
 
       const { addressLine1 } = req.body;
@@ -553,7 +573,7 @@ async function checkout(req, res) {
       totalCost,
       newTotal,
       shippingDetail,
-      deliveryTypeId,
+      deliveryName,
       deliveryPrice,
     );
 
@@ -567,7 +587,7 @@ async function checkout(req, res) {
 
     const amount = parseInt(parseFloat(deliveryPrice) * 100, 10);
     const lineItem = {
-      name: deliveryType.name,
+      name: deliveryName,
       amount,
       currency: 'gbp',
       quantity: 1,

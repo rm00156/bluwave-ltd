@@ -52,8 +52,6 @@ function checkout(e) {
             city: $('#city').val(),
             postCode: $('#postCode').val(),
             deliveryName: deliveryName,
-            deliveryPrice: deliveryPrice,
-            deliveryTypeId: deliveryTypeId,
             url: url
     };
     

@@ -2,7 +2,6 @@ const checkoutValidator = require('../../../validators/checkout');
 const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
 const { createPurchaseBasketForAccount } = require('../../helper/basketTestHelper');
 const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
-const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 
 beforeAll(async () => {
   await setUpTestDb();
@@ -101,8 +100,7 @@ describe('validate checkout', () => {
 
   it('should call next if purchase basket found with id for account', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryTypes = await getAllActiveDeliveryTypes();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
 
     const req = {

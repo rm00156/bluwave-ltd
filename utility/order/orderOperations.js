@@ -8,7 +8,7 @@ async function createPurchaseBasketAtDttm(
   subtotal,
   total,
   shippingDetail,
-  deliveryTypeId,
+  deliveryType,
   deliveryPrice,
   dttm,
 ) {
@@ -22,7 +22,7 @@ async function createPurchaseBasketAtDttm(
     subTotal: subtotal,
     total,
     shippingDetailFk: shippingDetail === null ? null : shippingDetail.id,
-    deliveryTypeFk: deliveryTypeId,
+    deliveryType,
     deliveryPrice,
     orderId: null,
     orderNumber: null,
@@ -38,7 +38,7 @@ async function createPurchaseBasket(
   subtotal,
   total,
   shippingDetail,
-  deliveryTypeId,
+  deliveryType,
   deliveryPrice,
 ) {
   return createPurchaseBasketAtDttm(
@@ -49,7 +49,7 @@ async function createPurchaseBasket(
     subtotal,
     total,
     shippingDetail,
-    deliveryTypeId,
+    deliveryType,
     deliveryPrice,
     Date.now(),
   );
@@ -81,8 +81,7 @@ async function getPurchaseBasketWithIdAndAccountId(id, accountId) {
 
 async function getSuccessfulOrdersForAccountId(accountId) {
   return models.sequelize.query(
-    'select pb.*, dt.name as deliveryType, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb '
-      + ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id '
+    'select pb.*, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb '
       + ' where pb.status = :completed '
       + ' and pb.accountFk = :accountId '
       + ' and pb.deleteFl = false ',
@@ -95,8 +94,7 @@ async function getSuccessfulOrdersForAccountId(accountId) {
 
 async function getSuccessfulOrderForPurchaseBasketId(purchaseBasketId) {
   const result = await models.sequelize.query(
-    'select pb.*, dt.name as deliveryType, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb '
-      + ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id '
+    'select pb.*, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt from purchaseBaskets pb '
       + ' where pb.status = :completed '
       + ' and pb.id = :purchaseBasketId '
       + ' and pb.deleteFl = false ',
@@ -111,8 +109,7 @@ async function getSuccessfulOrderForPurchaseBasketId(purchaseBasketId) {
 
 async function getAllCompletedOrders() {
   return models.sequelize.query(
-    'select pb.*, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt, dt.name as deliveryType, a.guestFl from purchaseBaskets pb '
-      + ' inner join deliveryTypes dt on pb.deliveryTypeFk = dt.id '
+    'select pb.*, DATE_FORMAT(pb.purchaseDttm, "%Y-%m-%d %H:%i:%s") as purchaseDt, a.guestFl from purchaseBaskets pb '
       + ' inner join accounts a on pb.accountFk = a.id '
       + ' where pb.deleteFl = false '
       + ' and pb.status = :completed ',

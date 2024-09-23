@@ -9,6 +9,7 @@ const loginController = require('../controllers/LoginController');
 const shopController = require('../controllers/ShopController');
 const promoCodeController = require('../controllers/PromoCodeController');
 const saleController = require('../controllers/SaleController');
+const productController = require('../controllers/ProductController');
 
 const { isCustomer, isNotGuest } = require('../middleware/customer');
 const {
@@ -54,13 +55,13 @@ router.get('/admin/login/step-two', twoFa, twoFa2, loginController.adminLoginSte
 router.post('/admin/login/step-two', twoFa, loginController.adminLogin);
 router.get('/admin-dashboard/products', isAdmin, adminRequire2faSetup, adminDashboardController.getProductsPage);
 router.get('/admin-dashboard/product/:id/page1', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage1);
-router.get('/admin-dashboard/product/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage);
+// router.get('/admin-dashboard/product/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage);
 router.post('/admin-dashboard/product/page1/save', isAdmin, adminRequire2faSetup, adminDashboardController.savePage1);
 router.post('/admin-dashboard/product/page1/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage1);
 router.get('/admin-dashboard/product/:id/page2', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage2);
 router.get('/admin-dashboard/product/:id/page3', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage3);
 router.get('/admin-dashboard/product/:id/page4', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage4);
-router.get('/admin-dashboard/product/:id/page5', isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage5);
+router.get('/admin-dashboard/product/:id/page5', isAdmin, adminRequire2faSetup, productController.getProductPage5);
 // router.get("/admin-dashboard/product/:id/page6", isAdmin, adminRequire2faSetup, adminDashboardController.getProductPage6);
 
 router.get('/admin-dashboard/product/:id/activate', isAdmin, adminRequire2faSetup, adminDashboardController.getActivatePage);
@@ -205,7 +206,6 @@ router.get('/admin-dashboard/orders', isAdmin, adminRequire2faSetup, adminDashbo
 router.get('/admin-dashboard/option-types', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypesPage);
 router.get('/admin-dashboard/option-type/:id', isAdmin, adminRequire2faSetup, adminDashboardController.getOptionTypePage);
 
-router.get('/get-delivery-types', isAdmin, adminRequire2faSetup, adminDashboardController.getDeliveryTypes);
 router.get('/get-delivery-type', isAdmin, adminRequire2faSetup, adminDashboardController.getDeliveryType);
 router.get('/validate-phone-number', validatePhoneNumber);
 router.post('/stripe_webhooks/checkout.session.completed', shopController.sessionCompleted);
