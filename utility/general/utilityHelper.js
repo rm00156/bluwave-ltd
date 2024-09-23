@@ -245,6 +245,42 @@ function convertDateTimeToString(date) {
   return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
+async function getBusinessDay(date, x) {
+  const getPublicHolidays = await fetch('https://www.gov.uk/bank-holidays.json');
+  const result = await getPublicHolidays.json();
+
+  const publicHolidays = result['england-and-wales'].events.map((e) => e.date);
+  let daysToAdd = x;
+
+  const formatDate = (d) => d.toISOString().split('T')[0];
+
+  while (daysToAdd > 0) {
+    date.setDate(date.getDate() + 1);
+    const dayOfWeek = date.getDay();
+    const formattedDate = formatDate(date);
+
+    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !publicHolidays.includes(formattedDate)) {
+      daysToAdd -= 1;
+    }
+  }
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+  const day = date.getDate();
+  const month = months[date.getMonth()];
+
+  const ordinalSuffix = (days) => {
+    if (days > 3 && days < 21) return 'th';
+    switch (days % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+
+  return `${day}${ordinalSuffix(day)} ${month}`;
+}
+
 module.exports = {
   checkNoDuplicateNonZeroNumbers,
   convertDateTimeToString,
@@ -253,6 +289,7 @@ module.exports = {
   deleteS3Folder,
   generateHash,
   generateNumberCode,
+  getBusinessDay,
   getExtension,
   getTimeDifference,
   hasTheSameItems,

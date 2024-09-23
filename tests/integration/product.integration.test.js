@@ -5,7 +5,6 @@ const accountTestHelper = require('../helper/accountTestHelper');
 const productTestHelper = require('../helper/productTestHelper');
 const { setUpTestDb, truncateTables } = require('../helper/generalTestHelper');
 const utilityHelper = require('../../utility/general/utilityHelper');
-const deliveryOperations = require('../../utility/delivery/deliveryOperations');
 // let productType;
 let quantities;
 // const optionTypeName = 'Size';
@@ -346,12 +345,14 @@ describe('post /product/:id/clone', () => {
     expect(clonedProduct.status).toBe('Incomplete');
     expect(clonedProduct.deleteFl).toBe(true);
 
-    const clonedProductDeliveries = await deliveryOperations.getAllDeliveryOptionsForProduct(clonedProduct.id);
-    const productDeliveries = await deliveryOperations.getAllDeliveryOptionsForProduct(product.id);
+    const clonedProductDelivery = await productOperations.getProductDeliveryByProductId(clonedProduct.id);
+    const productDelivery = await productOperations.getProductDeliveryByProductId(product.id);
 
-    expect(clonedProductDeliveries.map((d) => ({ price: d.price, deliveryTypeFk: d.deliveryTypeFk }))).toEqual(
-      productDeliveries.map((d) => ({ price: d.price, deliveryTypeFk: d.deliveryTypeFk })),
-    );
+    expect(clonedProductDelivery.collectionWorkingDays).toBe(productDelivery.collectionWorkingDays);
+    expect(clonedProductDelivery.standardWorkingDays).toBe(productDelivery.standardWorkingDays);
+    expect(clonedProductDelivery.standardPrice).toBe(productDelivery.standardPrice);
+    expect(clonedProductDelivery.expressWorkingDays).toBe(productDelivery.expressWorkingDays);
+    expect(clonedProductDelivery.expressPrice).toBe(productDelivery.expressPrice);
   });
 });
 
@@ -598,11 +599,7 @@ describe('get /product/:id/verify-quantities', () => {
     ];
     const quantityIds = [quantity.id.toString(), quantity2.id.toString()];
     const encodedQuantities = encodeURIComponent(JSON.stringify([...quantityIds, quantities[2].id.toString()]));
-    const { product } = await productTestHelper.createTestProductWithPriceMatrix(
-      quantityIds,
-      productOptionIds,
-      priceMatrixRows,
-    );
+    const { product } = await productTestHelper.createTestProductWithPriceMatrix(quantityIds, productOptionIds, priceMatrixRows);
     const response = await agent.get(`/product/${product.id}/verify-quantities?quantities=${encodedQuantities}`);
     expect(response.status).toBe(200);
     const responseBody = JSON.parse(response.text);

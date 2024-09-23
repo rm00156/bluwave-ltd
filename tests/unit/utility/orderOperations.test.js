@@ -1,16 +1,11 @@
 const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
 const { createTestShippingDetail, createPurchaseBasketForAccount } = require('../../helper/basketTestHelper');
 const orderOperations = require('../../../utility/order/orderOperations');
-const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
 const { getPurchaseBasketById } = require('../../../utility/basket/basketOperations');
 
-let deliveryTypes;
-
 beforeAll(async () => {
   await setUpTestDb();
-
-  deliveryTypes = await getAllActiveDeliveryTypes();
 }, 60000);
 
 test('should return created purchase basket', async () => {
@@ -23,7 +18,7 @@ test('should return created purchase basket', async () => {
   const subTotal = '24';
   const total = '25';
   const deliveryPrice = '23';
-  const deliveryType = deliveryTypes[0];
+  const deliveryType = 'Collection';
   const purchaseBasket = await orderOperations.createPurchaseBasket(
     accountId,
     fullName,
@@ -32,7 +27,7 @@ test('should return created purchase basket', async () => {
     subTotal,
     total,
     shippingDetail,
-    deliveryType.id,
+    deliveryType,
     deliveryPrice,
   );
 
@@ -52,7 +47,7 @@ test('should return created purchase basket', async () => {
 
 test('purchase basket status should be updated to complete', async () => {
   const account = await createTestCustomerAccount();
-  const deliveryType = deliveryTypes[0];
+  const deliveryType = 'Collection';
   const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
 
   expect(purchaseBasket.status).toBe('Pending');
@@ -68,7 +63,7 @@ test('purchase basket status should be updated to complete', async () => {
 describe('get purchase basket with id and account id', () => {
   it("should return null if id and accountId don't match", async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     expect(purchaseBasket).not.toBeNull();
 
@@ -78,7 +73,7 @@ describe('get purchase basket with id and account id', () => {
 
   it("should return purchaseBasket if id and accountId don't match", async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     expect(purchaseBasket).not.toBeNull();
 
@@ -89,7 +84,8 @@ describe('get purchase basket with id and account id', () => {
 
 describe('get successful orders for account id', () => {
   it('should return successful orders for account only', async () => {
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
+
     const account = await createTestCustomerAccount();
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const dttm = new Date();
@@ -100,7 +96,8 @@ describe('get successful orders for account id', () => {
   });
 
   it('should return no successful orders for account', async () => {
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
+
     const account = await createTestCustomerAccount();
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const dttm = new Date();
@@ -114,7 +111,8 @@ describe('get successful orders for account id', () => {
 
 describe('get successful order for purchase basket id', () => {
   it('should return successful order for purchase basket', async () => {
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
+
     const account = await createTestCustomerAccount();
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const dttm = new Date();
@@ -137,7 +135,8 @@ describe('get successful order for purchase basket id', () => {
   });
 
   it('should return null as purchase basket is not complete', async () => {
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
+
     const account = await createTestCustomerAccount();
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
 
@@ -153,7 +152,8 @@ describe('get successful order for purchase basket id', () => {
 
 describe('get all successful orders', () => {
   it('should return all successful orders', async () => {
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
+
     const account = await createTestCustomerAccount();
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const dttm = new Date();
@@ -175,7 +175,8 @@ describe('get all successful orders', () => {
 });
 
 test('update purchase basket with orderId', async () => {
-  const deliveryType = deliveryTypes[0];
+  const deliveryType = 'Collection';
+
   const account = await createTestCustomerAccount();
   const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
   expect(purchaseBasket.orderId).toBeNull();
@@ -197,7 +198,8 @@ describe('get order details for orders in the last month', () => {
 
   it('should return no orders if no orders made in the last month', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
+
     const currentDate = new Date();
 
     // Subtract 45 days from the current date
@@ -213,7 +215,7 @@ describe('get order details for orders in the last month', () => {
 
   it('should return orders if made in the last month', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
 
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     await orderOperations.completePurchaseBasket(purchaseBasket.id, Date.now());

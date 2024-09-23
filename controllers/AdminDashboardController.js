@@ -5,6 +5,7 @@ const stripe = require('stripe')(process.env.STRIPE_KEY);
 const GoogleAuthenticator = require('passport-2fa-totp').GoogeAuthenticator;
 const companyInfo = require('../utility/company/companyInfo');
 const { validateUser } = require('../validators/signup');
+const { validateDeliveryOptions } = require('../validators/delivery');
 
 const accountOperations = require('../utility/account/accountOperations');
 const productOperations = require('../utility/products/productOperations');
@@ -184,7 +185,7 @@ async function getProductPage1(req, res) {
 
   const priceMatrix = product ? await productOperations.getPriceMatrixForProductId(product.id) : null;
   const finishingMatrices = product ? await productOperations.getFinishingMatricesForProductId(product.id) : [];
-  const productDeliveries = product ? await deliveryOperations.getProductDeliveriesForProduct(product.id) : [];
+  const productDelivery = product ? await productOperations.getProductDeliveryByProductId(product.id) : [];
   const isValid = product ? await productOperations.isProductValid(product) : { isValid: false };
   const { message } = req.session;
   req.session.message = undefined;
@@ -196,7 +197,7 @@ async function getProductPage1(req, res) {
     quantityGroup,
     priceMatrix,
     finishingMatrices,
-    productDeliveries,
+    productDelivery,
     isValid: isValid.isValid,
     message,
   });
@@ -322,39 +323,6 @@ async function getProductPage4(req, res) {
     priceMatrix,
     finishingMatrices,
     productDeliveries,
-    isValid: isValid.isValid,
-    message,
-  });
-}
-
-async function getProductPage5(req, res) {
-  const { id } = req.params;
-  const product = await productOperations.getProductById(id);
-
-  if (product === null) {
-    // message
-    return res.redirect('/admin-dashboard/products');
-  }
-
-  const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
-
-  const priceMatrix = await productOperations.getPriceMatrixForProductId(product.id);
-  const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
-  const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
-  const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
-  const isValid = await productOperations.isProductValid(product);
-
-  const { message } = req.session;
-  req.session.message = undefined;
-  return res.render('productPage5', {
-    user: req.user,
-    companyDetails: companyInfo.getCompanyDetails(),
-    product,
-    quantityGroup,
-    priceMatrix,
-    finishingMatrices,
-    productDeliveries,
-    deliveryTypes,
     isValid: isValid.isValid,
     message,
   });
@@ -526,20 +494,34 @@ async function saveDeliveryOptions(req, res) {
     return res.status(400).json({ error: 'Product no found.' });
   }
 
-  const deliveryOptions = JSON.parse(req.body.deliveryOptions);
+  const errors = validateDeliveryOptions(req.body);
 
-  const invalidOptions = deliveryOptions.filter((d) => d.price === '');
-
-  if (invalidOptions.length > 0) {
-    return res.status(400).json({ error: 'All delivery option prices must be set to continue.' });
+  if (!isEmpty(errors)) {
+    return res.status(400).json(errors);
   }
 
-  const existingDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
-
-  if (existingDeliveries.length > 0) {
-    await deliveryOperations.updateProductDeliveriesForProduct(productId, deliveryOptions);
+  const productDelivery = await productOperations.getProductDeliveryByProductId(productId);
+  if (productDelivery) {
+    // udpate
+    await productOperations.updateProductDelivery(
+      productId,
+      req.body.collectionWorkingDays,
+      req.body.standardPrice,
+      req.body.standardWorkingDays,
+      req.body.expressPrice,
+      req.body.expressWorkingDays,
+    );
   } else {
-    await deliveryOperations.createDeliveryOptionsForProduct(productId, deliveryOptions);
+    // create product delivery
+
+    await productOperations.createProductDelivery(
+      productId,
+      req.body.collectionWorkingDays,
+      req.body.standardPrice,
+      req.body.standardWorkingDays,
+      req.body.expressPrice,
+      req.body.expressWorkingDays,
+    );
   }
 
   const updatedProduct = await productOperations.getProductById(productId);
@@ -637,45 +619,45 @@ async function getOptionsForOptionType(req, res) {
   return res.status(200).json(options);
 }
 
-async function getProductPage(req, res) {
-  const productId = req.params.id;
-  // need to get all the details for product
-  const productTypes = await productOperations.getAllActiveProductTypes();
-  const optionTypes = await productOperations.getAllOptionTypes();
-  const quantities = await productOperations.getAllQuantities();
-  const product = await productOperations.getProductById(productId);
-  const { message } = req.session;
-  req.session.message = undefined;
-  // TODO
-  if (product === null) return res.redirect('/admin-dashboard');
+// async function getProductPage(req, res) {
+//   const productId = req.params.id;
+//   // need to get all the details for product
+//   const productTypes = await productOperations.getAllActiveProductTypes();
+//   const optionTypes = await productOperations.getAllOptionTypes();
+//   const quantities = await productOperations.getAllQuantities();
+//   const product = await productOperations.getProductById(productId);
+//   const { message } = req.session;
+//   req.session.message = undefined;
+//   // TODO
+//   if (product === null) return res.redirect('/admin-dashboard');
 
-  const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
-  const optionTypeAndOptionsWithAllOptions = await productOperations.addAllOptionTypesToOptionTypesAndOptionJson(
-    optionTypesAndOptions,
-  );
-  const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(productId);
+//   const optionTypesAndOptions = await productOperations.getPricingMatrixOptionTypesAndOptionsForProduct(productId);
+//   const optionTypeAndOptionsWithAllOptions = await productOperations.addAllOptionTypesToOptionTypesAndOptionJson(
+//     optionTypesAndOptions,
+//   );
+//   const selectedQuantities = await productOperations.getSelectedQuantitiesForProductById(productId);
 
-  const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(productId);
-  const selectedOptionTypes = matrixRows[0][0].options.map((o) => o.optionType);
+//   const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(productId);
+//   const selectedOptionTypes = matrixRows[0][0].options.map((o) => o.optionType);
 
-  const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
-  const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(productId);
-  return res.render('adminProduct', {
-    user: req.user,
-    product,
-    productTypes,
-    quantities,
-    optionTypes,
-    optionTypesAndOptions: optionTypeAndOptionsWithAllOptions,
-    selectedQuantities,
-    matrixRows,
-    message,
-    selectedOptionTypes,
-    productDeliveries,
-    deliveryTypes,
-    companyDetails: companyInfo.getCompanyDetails(),
-  });
-}
+//   const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
+//   const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(productId);
+//   return res.render('adminProduct', {
+//     user: req.user,
+//     product,
+//     productTypes,
+//     quantities,
+//     optionTypes,
+//     optionTypesAndOptions: optionTypeAndOptionsWithAllOptions,
+//     selectedQuantities,
+//     matrixRows,
+//     message,
+//     selectedOptionTypes,
+//     productDeliveries,
+//     deliveryTypes,
+//     companyDetails: companyInfo.getCompanyDetails(),
+//   });
+// }
 
 async function continuePage1(req, res) {
   const { productName } = req.body;
@@ -1037,7 +1019,6 @@ async function createProduct(req, res) {
   const options = utilityHelper.parseCommaSeperatedText(req.body.options);
   const quantities = utilityHelper.parseCommaSeperatedText(req.body.quantities);
   const deleteFl = JSON.parse(req.body.deleteFl);
-  const deliveryOptions = JSON.parse(req.body.deliveryOptions);
 
   const productDetails = {
     name: productName,
@@ -1058,7 +1039,7 @@ async function createProduct(req, res) {
     // create priceMatrix object
     const priceMatrix = await productOperations.createPriceMatrix(product.id, options, quantities);
     await productOperations.createPriceMatrixRowsAndQuantityPrices(priceMatrix.id, rows);
-    await deliveryOperations.createDeliveryOptionsForProduct(product.id, deliveryOptions);
+
     req.session.message = `Product ${product.name} has been successfully created`;
   } catch (err) {
     logger.error(err);
@@ -1196,11 +1177,6 @@ async function editProductType(req, res) {
 
   await transaction.commit();
   return res.status(200).json({});
-}
-
-async function getDeliveryTypes(req, res) {
-  const deliveryTypes = await deliveryOperations.getAllActiveDeliveryTypes();
-  res.status(200).json({ deliveryTypes });
 }
 
 async function getDeliveryType(req, res) {
@@ -2056,11 +2032,17 @@ async function cloneProduct(req, res) {
     }
   }
 
-  const deliveryOptionsForProduct = await deliveryOperations.getAllDeliveryOptionsForProduct(product.id);
+  const productDelivery = await productOperations.getProductDeliveryByProductId(product.id);
 
-  if (deliveryOptionsForProduct.length > 0) {
-    const deliveryOptions = deliveryOptionsForProduct.map((d) => ({ price: d.price, deliveryId: d.deliveryTypeFk }));
-    await deliveryOperations.createDeliveryOptionsForProduct(clonedProduct.id, deliveryOptions);
+  if (productDelivery !== null) {
+    await productOperations.createProductDelivery(
+      clonedProduct.id,
+      productDelivery.collectionWorkingDays,
+      productDelivery.standardPrice,
+      productDelivery.standardWorkingDays,
+      productDelivery.expressPrice,
+      productDelivery.expressWorkingDays,
+    );
   }
 
   req.session.message = 'Clone Successful';
@@ -2105,7 +2087,6 @@ module.exports = {
   getCreateAdminPage,
   getDeactivatePage,
   getDeliveryType,
-  getDeliveryTypes,
   getFaqPage,
   getFaqsPage,
   getFinishingMatrices,
@@ -2123,13 +2104,12 @@ module.exports = {
   getOustandingAmountOfOrder,
   getPriceMatrixRows,
   getProductDeliveries,
-  getProductPage,
+  // getProductPage,
   getProductsPage,
   getProductPage1,
   getProductPage2,
   getProductPage3,
   getProductPage4,
-  getProductPage5,
   getProductTypePage,
   getProductTypesPage,
   getRefundTypes,

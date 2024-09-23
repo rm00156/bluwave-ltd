@@ -1,173 +1,56 @@
 const Sequelize = require('sequelize');
 const models = require('../../models');
+const { getBusinessDay } = require('../general/utilityHelper');
 
-async function getAllActiveDeliveryTypes() {
-  return models.deliveryType.findAll({
+async function getDeliveryOptionsForProductIds(ids) {
+  const productDeliveries = await models.productDelivery.findAll({
     where: {
-      deleteFl: false,
-    },
-  });
-}
-
-async function createDeliveryOptionForProduct(productId, deliveryOption) {
-  return models.productDelivery.create({
-    productFk: productId,
-    deliveryTypeFk: deliveryOption.deliveryId,
-    price: deliveryOption.price,
-    deleteFl: false,
-    versionNo: 1,
-  });
-}
-
-async function createDeliveryOptionsForProduct(productId, deliveryOptions) {
-  deliveryOptions.forEach(async (deliveryOption) => {
-    await createDeliveryOptionForProduct(productId, deliveryOption);
-  });
-}
-
-async function getProductDeliveriesForProduct(productId) {
-  return models.productDelivery.findAll({
-    where: {
-      deleteFl: false,
-      productFk: productId,
-    },
-  });
-}
-
-async function updateProductDeliveryPriceForProductIdAndDeliveryType(price, deliveryTypeFk, productFk) {
-  await models.productDelivery.update(
-    {
-      price,
-      versionNo: models.sequelize.literal('versionNo + 1'),
-    },
-    {
-      where: {
-        productFk,
-        deliveryTypeFk,
+      productFk: {
+        [Sequelize.Op.in]: ids,
       },
     },
-  );
-}
-
-async function updateProductDeliveriesForProduct(productId, deliveryOptions) {
-  // find all existing productDeliveries which are not part of the update
-  // delete them
-
-  const productDeliveries = await getProductDeliveriesForProduct(productId);
-
-  const productDeliveriesToDelete = productDeliveries.filter(
-    (pd) => !deliveryOptions.map((d) => d.deliveryId).includes(pd.deliveryTypeFk.toString()),
-  );
-
-  await Promise.all(
-    productDeliveriesToDelete.map(async (productDelivery) => {
-      await productDelivery.destroy();
-    }),
-  );
-
-  // find productDeliveries with the same id
-
-  const deliveriesToBeUpdated = deliveryOptions.filter((d) => productDeliveries.map((pd) => pd.deliveryTypeFk.toString())
-    .includes(d.deliveryId));
-
-  await Promise.all(
-    deliveriesToBeUpdated.map(async (deliveryOption) => {
-      await updateProductDeliveryPriceForProductIdAndDeliveryType(
-        deliveryOption.price,
-        deliveryOption.deliveryId,
-        productId,
-      );
-    }),
-  );
-
-  const deliveriesToBeCreated = deliveryOptions.filter(
-    (d) => !productDeliveries.map((pd) => pd.deliveryTypeFk.toString()).includes(d.deliveryId),
-  );
-
-  await Promise.all(
-    deliveriesToBeCreated.map(async (deliveryOption) => {
-      await createDeliveryOptionForProduct(productId, deliveryOption);
-    }),
-  );
-}
-
-async function getDeliveryType(id) {
-  return models.deliveryType.findOne({
-    where: {
-      id,
-    },
   });
-}
-// TODO - needs relook - not convinced logic is right
-async function getDeliveryOptionsForProducts(productIds) {
-  const deliveryOptions = {};
-  const productDeliveryMap = new Map();
-  let productDeliveries;
 
-  for (let i = 0; i < productIds.length; i += 1) {
-    const productId = productIds[i];
-    // eslint-disable-next-line no-await-in-loop
-    productDeliveries = await getProductDeliveriesForProduct(productId);
+  if (productDeliveries.length === 0) return null;
 
-    productDeliveries.forEach((pd) => {
-      const currentPrice = productDeliveryMap.get(pd.deliveryTypeFk);
-      if (currentPrice === null || currentPrice === undefined) {
-        productDeliveryMap.set(pd.deliveryTypeFk, pd.price);
-      } else if (pd.price > currentPrice) {
-        productDeliveryMap.set(pd.deliveryTypeFk, pd.price);
-      }
-    });
-    deliveryOptions[productId] = productDeliveries.map((pd) => pd.deliveryTypeFk);
-  }
+  let collectionWorkingDays = 0;
+  let standardPrice = 0;
+  let standardWorkingDays = 0;
+  let expressPrice = 0;
+  let expressWorkingDays = 0;
 
-  let availableOptions = [];
-
-  if (productIds.length > 0) {
-    availableOptions = deliveryOptions[productIds[0]].slice();
-
-    for (let j = 1; j < productIds.length; j += 1) {
-      availableOptions = availableOptions.filter((option) => deliveryOptions[productIds[j]].includes(option));
+  productDeliveries.forEach((productDelivery) => {
+    if (productDelivery.collectionWorkingDays > collectionWorkingDays) {
+      collectionWorkingDays = productDelivery.collectionWorkingDays;
     }
-  }
 
-  if (availableOptions.length === 0) {
-    const maxArray = [];
+    if (parseFloat(productDelivery.standardPrice) > standardPrice) {
+      standardPrice = parseFloat(productDelivery.standardPrice);
+    }
 
-    productDeliveries.forEach((pd) => {
-      if (maxArray.length === 0) {
-        maxArray.push(pd);
-      }
+    if (productDelivery.standardWorkingDays > standardWorkingDays) {
+      standardWorkingDays = productDelivery.standardWorkingDays;
+    }
 
-      if (pd.price > maxArray[0].price) {
-        maxArray.splice(0, 1);
-        maxArray.push(pd);
-      }
-    });
+    if (parseFloat(productDelivery.expressPrice) > expressPrice) {
+      expressPrice = parseFloat(productDelivery.expressPrice);
+    }
 
-    return maxArray;
-  }
-  const deliveryTypes = await models.deliveryType.findAll({
-    where: {
-      id: {
-        [Sequelize.Op.in]: availableOptions,
-      },
-    },
-    order: [['id', 'ASC']],
+    if (productDelivery.expressWorkingDays > expressWorkingDays) {
+      expressWorkingDays = productDelivery.expressWorkingDays;
+    }
   });
 
-  return deliveryTypes.map((deliveryType) => {
-    const values = deliveryType.dataValues;
-    return { ...values, price: productDeliveryMap.get(deliveryType.id) };
-  });
-}
-
-async function getAllDeliveryOptionsForProduct(productFk) {
-  return models.productDelivery.findAll({
-    where: {
-      productFk,
-      deleteFl: false,
-    },
-  });
+  return {
+    collectionWorkingDays,
+    collectionDate: await getBusinessDay(new Date(), collectionWorkingDays),
+    standardPrice: standardPrice.toFixed(2),
+    standardWorkingDays,
+    standardDate: await getBusinessDay(new Date(), standardWorkingDays),
+    expressPrice: expressPrice.toFixed(2),
+    expressDate: await getBusinessDay(new Date(), expressWorkingDays),
+    expressWorkingDays,
+  };
 }
 
 async function createShippingDetail(
@@ -207,15 +90,7 @@ async function getShippingDetailById(id) {
 }
 
 module.exports = {
-  createDeliveryOptionForProduct,
-  getAllActiveDeliveryTypes,
-  createDeliveryOptionsForProduct,
-  getProductDeliveriesForProduct,
-  updateProductDeliveriesForProduct,
-  getDeliveryType,
-  getDeliveryOptionsForProducts,
+  getDeliveryOptionsForProductIds,
   createShippingDetail,
   getShippingDetailById,
-  getAllDeliveryOptionsForProduct,
-  updateProductDeliveryPriceForProductIdAndDeliveryType,
 };

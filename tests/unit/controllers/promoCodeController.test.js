@@ -5,7 +5,6 @@ const { convertDateToString } = require('../../../utility/general/utilityHelper'
 const { createOptionGroup, getAllQuantities } = require('../../../utility/products/productOperations');
 const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
 const { createBasketItem, getBasketItem } = require('../../../utility/basket/basketOperations');
-const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 const { completePurchaseBasket } = require('../../../utility/order/orderOperations');
 
 const { createTestPurchaseBasketForBasketItem } = require('../../helper/basketTestHelper');
@@ -394,8 +393,7 @@ describe('promo code controller', () => {
       null,
     );
 
-    const deliveryTypes = await getAllActiveDeliveryTypes();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createTestPurchaseBasketForBasketItem(
       basketItem.accountFk,
       deliveryType,

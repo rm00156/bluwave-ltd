@@ -68,22 +68,62 @@ html(land="en")
                                 #flush-collapseOne.accordion-collapse.collapse.show(data-bs-parent='#accordionFlushExample')
                                     .mt-5
                                         .row
-                                            each deliveryOption, index in deliveryOptions
-                                                .col-lg-6.col-12.mb-4
-                                                    // form
-                                                    .card.card-body.p-6
-                                                        .form-check.mb-4
-                                                            input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' checked=(index==0) data-delivery-name=deliveryOption.name data-deliverytypeid=deliveryOption.id data-price=deliveryOption.price data-collectfl=(deliveryOption.collectFl == true ? 'true' : 'false'))
-                                                            label.form-check-label.text-dark
-                                                                | #{deliveryOption.name} -
-                                                                | <b>£#{deliveryOption.price}</b>
-                                                        // address
-                                                        if(deliveryOption.collectFl == true)
-                                                            address #{companyDetails.COMPANY_ADDRESS}
+                                            //- each deliveryOption, index in deliveryOptions
+                                            //-     .col-lg-6.col-12.mb-4
+                                            //-         // form
+                                            //-         .card.card-body.p-6
+                                            //-             .form-check.mb-4
+                                            //-                 input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' checked=(index==0) data-delivery-name=deliveryOption.name data-deliverytypeid=deliveryOption.id data-price=deliveryOption.price data-collectfl=(deliveryOption.collectFl == true ? 'true' : 'false'))
+                                            //-                 label.form-check-label.text-dark
+                                            //-                     | #{deliveryOption.name} -
+                                            //-                     | <b>£#{deliveryOption.price}</b>
+                                            //-             // address
+                                            //-             if(deliveryOption.collectFl == true)
+                                            //-                 address #{companyDetails.COMPANY_ADDRESS}
                                                                 
-                                                                br
-                                                                abbr(title='Phone') P: #{companyDetails.COMPANY_PHONE}
+                                            //-                     br
+                                            //-                     abbr(title='Phone') P: #{companyDetails.COMPANY_PHONE}
+                                            .col-lg-12.col-12.mb-4
+                                                .card.card-body.p-6
+                                                    .form-check.mb-4
+                                                        input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' checked data-delivery-name="Collection" data-collectfl="true" data-price="0.00")
+                                                        label.form-check-label.text-dark(style="display: flex; justify-content: space-between;")
+                                                            span(style="text-align:left")
+                                                                <b>Collection - #{deliveryOptions.collectionWorkingDays} Business days </b>
+                                                            span(style="text-align:right")
+                                                                <b>£0.00</b>
+
+                                                        //- label.form-check-label.text-dark Estimated Collection by 
+                                                        address Estimated Collection by #{deliveryOptions.collectionDate}  <br><br>#{companyDetails.COMPANY_ADDRESS}
+                                                            br
+                                                            abbr(title='Phone') P: #{companyDetails.COMPANY_PHONE}
+
                                             
+                                            .col-lg-12.col-12.mb-4
+                                                .card.card-body.p-6
+                                                    .form-check.mb-4
+                                                        input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' data-delivery-name="Express" data-collectfl="false" data-price=deliveryOptions.expressPrice)
+                                                        label.form-check-label.text-dark(style="display: flex; justify-content: space-between;")
+                                                            span(style="text-align:left")
+                                                                <b>Express - #{deliveryOptions.expressWorkingDays} Business days</b>
+                                                            span(style="text-align:right")
+                                                                <b>£#{deliveryOptions.expressPrice}</b>
+
+                                                        //- label.form-check-label.text-dark Estimated Collection by 
+                                                        address Estimated Collection by #{deliveryOptions.expressDate}
+
+                                            .col-lg-12.col-12.mb-4
+                                                .card.card-body.p-6
+                                                    .form-check.mb-4
+                                                        input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' data-delivery-name="Standard" data-collectfl="false" data-price=deliveryOptions.standardPrice)
+                                                        label.form-check-label.text-dark(style="display: flex; justify-content: space-between;")
+                                                            span(style="text-align:left")
+                                                                <b>Standard - #{deliveryOptions.standardWorkingDays} Business days</b>
+                                                            span(style="text-align:right")
+                                                                <b>£#{deliveryOptions.standardPrice}</b>
+
+                                                        //- label.form-check-label.text-dark Estimated Collection by 
+                                                        address Estimated Collection by #{deliveryOptions.standardDate}
                                 #addressSection                    
                                 
                             .col-12.col-md-12.offset-lg-1.col-lg-4

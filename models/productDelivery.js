@@ -18,17 +18,28 @@ function ProductDeliveries(sequelize, Sequelize) {
       },
     },
 
-    deliveryTypeFk: {
+    collectionWorkingDays: {
       type: Sequelize.INTEGER,
       allowNull: false,
-      references: {
-        model: 'deliveryTypes',
-        key: 'id',
-      },
     },
 
-    price: {
+    standardPrice: {
       type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+
+    standardWorkingDays: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+
+    expressPrice: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+
+    expressWorkingDays: {
+      type: Sequelize.INTEGER,
       allowNull: false,
     },
 

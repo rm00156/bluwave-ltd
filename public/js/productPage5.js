@@ -2,334 +2,372 @@ var deliveryRowCount = 1;
 var selectedDeliveryIds = [];
 
 function validateDecimal(input) {
-    const value = input.value;
-    // Parse the input value as a floating-point number
-    const number = parseFloat(value);
+  const value = input.value;
+  // Parse the input value as a floating-point number
+  const number = parseFloat(value);
 
-    if (isNaN(number)) {
-        // Invalid input, set value to empty string
-        input.value = '';
-    } else {
-        // Round the number to two decimal places
-        const roundedNumber = number.toFixed(2);
-        // Update the input value with the rounded number
-        input.value = roundedNumber;
-    }
+  if (isNaN(number)) {
+    // Invalid input, set value to empty string
+    input.value = "";
+  } else {
+    // Round the number to two decimal places
+    const roundedNumber = number.toFixed(2);
+    // Update the input value with the rounded number
+    input.value = roundedNumber;
+  }
 }
 
 function validateIsNumber(input) {
-    const value = input.value;
+  const value = input.value;
 
-    const regex = /^\d*\.?\d{0,2}$/;
+  const regex = /^\d*\.?\d{0,2}$/;
 
-    if (!regex.test(value)) {
-        // Invalid input, clear the value or display an error message
-        input.value = '';
-        // Alternatively, you can display an error message to the user
-        // and prevent form submission until a valid value is entered.
-    }
+  if (!regex.test(value)) {
+    // Invalid input, clear the value or display an error message
+    input.value = "";
+    // Alternatively, you can display an error message to the user
+    // and prevent form submission until a valid value is entered.
+  }
 }
 
 function setUpDeliveryPrice(input) {
+  // inputs.each(input => {
+  input.addEventListener("input", function () {
+    validateIsNumber(this);
+  });
+  input.addEventListener("change", function () {
+    validateDecimal(this);
+    // });
+  });
+}
 
-    input.addEventListener('input', function () {
-        validateIsNumber(this);
-    });
-    input.addEventListener('change', function () {
-        validateDecimal(this);
-    });
+function setUpWorkingDays(input) {
+  input.addEventListener("input", function () {
+    validateIsNumber(this);
+  });
+  input.addEventListener("change", function () {
+    validateIsNumber(this);
+  });
 }
 
 function handleRemoveDeliveryClick(event) {
-    const container = document.getElementById('delivery-container');
-    const removeButton = event.target;
-    const inputRow = removeButton.parentNode.parentNode;
+  const container = document.getElementById("delivery-container");
+  const removeButton = event.target;
+  const inputRow = removeButton.parentNode.parentNode;
 
+  const select = inputRow.getElementsByClassName("delivery-select")[0];
+  const selectId = select.selectedOptions[0].value;
+  selectedDeliveryIds = selectedDeliveryIds.filter((d) => d != selectId.toString());
+  // Remove the input row from the container
+  container.removeChild(inputRow);
+  deliveryRowCount--;
 
-    const select = inputRow.getElementsByClassName('delivery-select')[0];
-    const selectId = select.selectedOptions[0].value;
-    selectedDeliveryIds = selectedDeliveryIds.filter(d => d != selectId.toString());
-    // Remove the input row from the container
-    container.removeChild(inputRow);
-    deliveryRowCount--;
+  $.ajax({
+    type: "get",
+    url: "/get-delivery-types",
+    success: function (response, xhr, status) {
+      if (status.status == 200) {
+        const deliveryTypes = response.deliveryTypes;
 
-    $.ajax({
-        type: 'get',
-        url: '/get-delivery-types',
-        success: function (response, xhr, status) {
+        const selects = document.getElementsByName("delivery[]");
 
-            if (status.status == 200) {
-                const deliveryTypes = response.deliveryTypes;
+        selects.forEach((select) => {
+          const option = document.createElement("option");
+          option.value = selectId;
+          option.text = deliveryTypes.filter((d) => d.id == selectId).map((o) => o.name);
 
-                const selects = document.getElementsByName('delivery[]');
-
-                selects.forEach(select => {
-
-                    const option = document.createElement('option');
-                    option.value = selectId;
-                    option.text = deliveryTypes.filter(d => d.id == selectId).map(o => o.name);
-
-                    select.append(option);
-                })
-            }
-        }
-
-    })
+          select.append(option);
+        });
+      }
+    },
+  });
 }
 
 function handleAddDeliveryClick(event) {
-    if (deliveryRowCount == 6)
-        return;
+  if (deliveryRowCount == 6) return;
 
-    const deliveryOptionsElement = event.target.parentNode.parentNode;
-    const deliveryPriceElement = deliveryOptionsElement.getElementsByClassName('delivery-price')[0];
-    if (deliveryPriceElement.value == '')
-        return;
+  const deliveryOptionsElement = event.target.parentNode.parentNode;
+  const deliveryPriceElement = deliveryOptionsElement.getElementsByClassName("delivery-price")[0];
+  if (deliveryPriceElement.value == "") return;
 
-    $.ajax({
-        type: 'get',
-        url: '/get-delivery-types',
-        success: function (response, xhr, status) {
+  $.ajax({
+    type: "get",
+    url: "/get-delivery-types",
+    success: function (response, xhr, status) {
+      if (status.status == 200) {
+        const previousSelectElement = deliveryOptionsElement.getElementsByClassName("delivery-select")[0];
+        selectedDeliveryIds.push(previousSelectElement.selectedOptions[0].value);
+        const deliveryContainer = document.getElementById("delivery-container");
+        const addButton = event.target;
+        const row = document.createElement("div");
+        row.classList.add("row");
+        row.classList.add("mb-3");
 
-            if (status.status == 200) {
+        const deliveryOptionColumn = document.createElement("div");
+        deliveryOptionColumn.classList.add("col-sm-5");
 
-                const previousSelectElement = deliveryOptionsElement.getElementsByClassName('delivery-select')[0];
-                selectedDeliveryIds.push(previousSelectElement.selectedOptions[0].value);
-                const deliveryContainer = document.getElementById('delivery-container');
-                const addButton = event.target;
-                const row = document.createElement('div');
-                row.classList.add('row');
-                row.classList.add('mb-3');
+        const deliveryOptionColumnLabel = document.createElement("label");
+        deliveryOptionColumnLabel.classList.add("form-label");
 
-                const deliveryOptionColumn = document.createElement('div');
-                deliveryOptionColumn.classList.add('col-sm-5');
+        const selectDeliveryOption = document.createElement("select");
+        selectDeliveryOption.classList.add("form-control");
+        selectDeliveryOption.classList.add("delivery-select");
+        selectDeliveryOption.type = "text";
+        selectDeliveryOption.required = true;
+        selectDeliveryOption.name = "delivery[]";
 
-                const deliveryOptionColumnLabel = document.createElement('label');
-                deliveryOptionColumnLabel.classList.add('form-label');
+        const deliveryTypes = response.deliveryTypes.filter((d) => !selectedDeliveryIds.includes(d.id.toString()));
 
-                const selectDeliveryOption = document.createElement('select');
-                selectDeliveryOption.classList.add('form-control');
-                selectDeliveryOption.classList.add('delivery-select');
-                selectDeliveryOption.type = 'text';
-                selectDeliveryOption.required = true;
-                selectDeliveryOption.name = 'delivery[]';
-
-                const deliveryTypes = response.deliveryTypes.filter(d => !selectedDeliveryIds.includes(d.id.toString()));
-
-                deliveryTypes.forEach((deliveryType, index) => {
-                    if (index == 0) {
-                        selectDeliveryOption.setAttribute('data-current-deliverytypeid', deliveryType.id);
-                        const selects = deliveryContainer.getElementsByClassName('delivery-select');
-                        selects.forEach(s => {
-
-                            if (s != selectDeliveryOption) {
-                                s.options.forEach(o => {
-
-                                    if (o.value == deliveryType.id) {
-                                        s.removeChild(o)
-                                    }
-                                });
-                            }
-                        })
-                    }
-                    const option = document.createElement('option');
-                    option.value = deliveryType.id;
-                    option.text = deliveryType.name;
-                    selectDeliveryOption.append(option);
-                })
-
-                selectDeliveryOption.addEventListener('change', updateAllDeliverySelects);
-                deliveryOptionColumn.append(deliveryOptionColumnLabel);
-                deliveryOptionColumn.append(selectDeliveryOption);
-
-                row.append(deliveryOptionColumn);
-
-                const deliveryOptionColumn2 = document.createElement('div');
-                deliveryOptionColumn2.classList.add('col-sm-5');
-
-                const deliveryPriceColumnLabel = document.createElement('label');
-                deliveryPriceColumnLabel.classList.add('form-label');
-                deliveryPriceColumnLabel.text = 'Delivery Price';
-
-                const inputPriceElement = document.createElement('input');
-                inputPriceElement.classList.add('form-control');
-                inputPriceElement.classList.add('delivery-price');
-                inputPriceElement.type = 'text';
-                inputPriceElement.required = true;
-                inputPriceElement.addEventListener('input', function () {
-                    validateIsNumber(this);
+        deliveryTypes.forEach((deliveryType, index) => {
+          if (index == 0) {
+            selectDeliveryOption.setAttribute("data-current-deliverytypeid", deliveryType.id);
+            const selects = deliveryContainer.getElementsByClassName("delivery-select");
+            selects.forEach((s) => {
+              if (s != selectDeliveryOption) {
+                s.options.forEach((o) => {
+                  if (o.value == deliveryType.id) {
+                    s.removeChild(o);
+                  }
                 });
-                inputPriceElement.addEventListener('change', function () {
-                    validateDecimal(this);
-                });
+              }
+            });
+          }
+          const option = document.createElement("option");
+          option.value = deliveryType.id;
+          option.text = deliveryType.name;
+          selectDeliveryOption.append(option);
+        });
 
-                deliveryOptionColumn2.append(deliveryPriceColumnLabel);
-                deliveryOptionColumn2.append(inputPriceElement);
+        selectDeliveryOption.addEventListener("change", updateAllDeliverySelects);
+        deliveryOptionColumn.append(deliveryOptionColumnLabel);
+        deliveryOptionColumn.append(selectDeliveryOption);
 
-                row.append(deliveryOptionColumn2);
+        row.append(deliveryOptionColumn);
 
-                const deliveryOptionColumn3 = document.createElement('div');
-                deliveryOptionColumn3.classList.add('col-sm-2');
+        const deliveryOptionColumn2 = document.createElement("div");
+        deliveryOptionColumn2.classList.add("col-sm-5");
 
-                const invisibleLabel = document.createElement('label');
-                invisibleLabel.classList.add('form-label');
-                invisibleLabel.classList.add('text-white');
-                invisibleLabel.text = 'D';
+        const deliveryPriceColumnLabel = document.createElement("label");
+        deliveryPriceColumnLabel.classList.add("form-label");
+        deliveryPriceColumnLabel.text = "Delivery Price";
 
-                const brElement = document.createElement('br');
-                const button = document.createElement('button');
-                button.classList.add('btn');
-                button.classList.add('btn-primary');
-                button.classList.add('add-delivery-btn');
-                button.type = 'button';
-                button.append('+');
-                button.addEventListener('click', handleAddDeliveryClick);
+        const inputPriceElement = document.createElement("input");
+        inputPriceElement.classList.add("form-control");
+        inputPriceElement.classList.add("delivery-price");
+        inputPriceElement.type = "text";
+        inputPriceElement.required = true;
+        inputPriceElement.addEventListener("input", function () {
+          validateIsNumber(this);
+        });
+        inputPriceElement.addEventListener("change", function () {
+          validateDecimal(this);
+        });
 
-                deliveryOptionColumn3.append(invisibleLabel);
-                deliveryOptionColumn3.append(brElement);
-                deliveryOptionColumn3.append(button);
+        deliveryOptionColumn2.append(deliveryPriceColumnLabel);
+        deliveryOptionColumn2.append(inputPriceElement);
 
-                row.append(deliveryOptionColumn3);
+        row.append(deliveryOptionColumn2);
 
-                deliveryContainer.append(row);
+        const deliveryOptionColumn3 = document.createElement("div");
+        deliveryOptionColumn3.classList.add("col-sm-2");
 
-                addButton.textContent = '-';
-                addButton.classList.remove('add-delivery-btn');
-                addButton.classList.add('remove-delivery-btn');
-                addButton.classList.add('btn-danger');
-                addButton.type = 'button';
-                // Attach the remove button click event
-                addButton.removeEventListener('click', handleAddDeliveryClick);
-                addButton.addEventListener('click', handleRemoveDeliveryClick);
-                //continue
-                deliveryRowCount++;
-            }
-        }
-    })
+        const invisibleLabel = document.createElement("label");
+        invisibleLabel.classList.add("form-label");
+        invisibleLabel.classList.add("text-white");
+        invisibleLabel.text = "D";
+
+        const brElement = document.createElement("br");
+        const button = document.createElement("button");
+        button.classList.add("btn");
+        button.classList.add("btn-primary");
+        button.classList.add("add-delivery-btn");
+        button.type = "button";
+        button.append("+");
+        button.addEventListener("click", handleAddDeliveryClick);
+
+        deliveryOptionColumn3.append(invisibleLabel);
+        deliveryOptionColumn3.append(brElement);
+        deliveryOptionColumn3.append(button);
+
+        row.append(deliveryOptionColumn3);
+
+        deliveryContainer.append(row);
+
+        addButton.textContent = "-";
+        addButton.classList.remove("add-delivery-btn");
+        addButton.classList.add("remove-delivery-btn");
+        addButton.classList.add("btn-danger");
+        addButton.type = "button";
+        // Attach the remove button click event
+        addButton.removeEventListener("click", handleAddDeliveryClick);
+        addButton.addEventListener("click", handleRemoveDeliveryClick);
+        //continue
+        deliveryRowCount++;
+      }
+    },
+  });
 }
 
-
 function updateAllDeliverySelects(e) {
+  const select = e.currentTarget;
+  const previousDeliveryTypeId = select.getAttribute("data-current-deliverytypeid");
 
-    const select = e.currentTarget;
-    const previousDeliveryTypeId = select.getAttribute('data-current-deliverytypeid');
+  const newValue = select.selectedOptions[0].value;
 
-    const newValue = select.selectedOptions[0].value;
+  select.setAttribute("data-current-deliverytypeid", newValue);
 
-    select.setAttribute('data-current-deliverytypeid', newValue);
+  const deliveryContainer = select.parentNode.parentNode.parentNode;
 
-    const deliveryContainer = select.parentNode.parentNode.parentNode;
+  $.ajax({
+    type: "get",
+    url: "/get-delivery-type",
+    data: { id: previousDeliveryTypeId },
+    success: function (response, xhr, status) {
+      if (status.status == 200) {
+        const deliveryType = response.deliveryType;
+        const deliveryTypeName = deliveryType.name;
+        const selects = deliveryContainer.getElementsByClassName("delivery-select");
+        selects.forEach((s) => {
+          if (s != select) {
+            s.options.forEach((o) => {
+              if (o.value == newValue) {
+                s.removeChild(o);
+              }
+            });
 
+            const option = document.createElement("option");
+            option.value = previousDeliveryTypeId;
+            option.text = deliveryTypeName;
 
-
-    $.ajax({
-        type: 'get',
-        url: '/get-delivery-type',
-        data: { id: previousDeliveryTypeId },
-        success: function (response, xhr, status) {
-            if (status.status == 200) {
-
-                const deliveryType = response.deliveryType;
-                const deliveryTypeName = deliveryType.name;
-                const selects = deliveryContainer.getElementsByClassName('delivery-select');
-                selects.forEach(s => {
-                    if (s != select) {
-
-                        s.options.forEach(o => {
-                            if (o.value == newValue) {
-                                s.removeChild(o);
-                            };
-                        });
-
-                        const option = document.createElement('option');
-                        option.value = previousDeliveryTypeId;
-                        option.text = deliveryTypeName;
-
-                        s.append(option);
-                    }
-                })
-            }
-        }
-    })
+            s.append(option);
+          }
+        });
+      }
+    },
+  });
 }
 
 function createSelectedDeliveryOptionsList() {
+  var results = [];
+  const selects = document.getElementsByName("delivery[]");
 
-    var results = [];
-    const selects = document.getElementsByName('delivery[]');
+  selects.forEach((select) => {
+    const deliveryId = select.selectedOptions[0].value;
+    const deliverySection = select.parentNode.parentNode;
 
-    selects.forEach(select => {
+    const price = deliverySection.getElementsByClassName("delivery-price")[0].value;
+    results.push({ deliveryId: deliveryId, price: price });
+  });
 
-        const deliveryId = select.selectedOptions[0].value;
-        const deliverySection = select.parentNode.parentNode;
-
-        const price = deliverySection.getElementsByClassName('delivery-price')[0].value;
-        results.push({ deliveryId: deliveryId, price: price });
-    });
-
-    return results;
+  return results;
 }
 
-function continueToPage6(e) { 
-    const form = document.getElementById('form');
-    const productId = $('#productId').val();
-    if (form.checkValidity()) {
-        e.preventDefault();
+function continueToPage6(e) {
+  const form = document.getElementById("form");
+  const productId = $("#productId").val();
 
-        const deliveryOptions = createSelectedDeliveryOptionsList();
-        var data = new FormData();
-        var request = new XMLHttpRequest();
-        request.responseType = 'json';
+  $("#error-standard-working-days").text('');
+  $("#error-standard-price").text('');
+  $("#error-collection-working-days").text('');
+  $("#error-express-price").text('');
+  $("#error-express-working-days").text('');
 
-        data.append('deliveryOptions', JSON.stringify(deliveryOptions));
+  if (form.checkValidity()) {
+    e.preventDefault();
 
-        request.addEventListener('load', function (response) {
+    const standardPrice = $("#standard-price").val();
+    const expressPrice = $("#express-price").val();
 
-            if(request.status == 400) {
-                const error = response.currentTarget.response.error;
-                return;
-            }
-            
-            // return window.location = `/admin-dashboard/product/${productId}/page6`;
-            return (window.location = `/product/${productId}/validate`);
-            // var job = data.currentTarget.response;
+    const collectionWorkingDays = $("#collection-working-days").val();
+    const standardWorkingDays = $("#standard-working-days").val();
+    const expressWorkingDays = $("#express-working-days").val();
 
-            // jobs[job.id] = {id: job.id, state: "queued", totalSteps:job.totalSteps, productItemNumber: productItemNumber, productNumber: job.productNumber, productVariantId: job.productVariantId};
-        });
+    // const deliveryOptions = createSelectedDeliveryOptionsList();
+    var data = new FormData();
+    var request = new XMLHttpRequest();
+    request.responseType = "json";
 
-        request.open('post', `/product/${productId}/save-delivery-options`);
-        request.send(data);
-    }
+    data.append("standardPrice", standardPrice);
+    data.append("expressPrice", expressPrice);
+    data.append("collectionWorkingDays", collectionWorkingDays);
+    data.append("standardWorkingDays", standardWorkingDays);
+    data.append("expressWorkingDays", expressWorkingDays);
+
+    request.addEventListener("load", function (response) {
+      if (request.status == 400) {
+        const error = response.currentTarget.response.errors;
+
+        if (error.standardWorkingDays) {
+          $("#error-standard-working-days").text(error.standardWorkingDays);
+        }
+        if (error.standardPrice) {
+          $("#error-standard-price").text(error.standardPrice);
+        }
+
+        if (error.collectionWorkingDays) {
+          $("#error-collection-working-days").text(error.collectionWorkingDays);
+        }
+        if (error.expressPrice) {
+          $("#error-express-price").text(error.expressPrice);
+        }
+
+        if (error.expressWorkingDays) {
+          $("#error-express-working-days").text(error.expressWorkingDays);
+        }
+
+        return;
+      }
+
+      // return window.location = `/admin-dashboard/product/${productId}/page6`;
+      return (window.location = `/product/${productId}/validate`);
+      // var job = data.currentTarget.response;
+
+      // jobs[job.id] = {id: job.id, state: "queued", totalSteps:job.totalSteps, productItemNumber: productItemNumber, productNumber: job.productNumber, productVariantId: job.productVariantId};
+    });
+
+    request.open("post", `/product/${productId}/save-delivery-options`);
+    request.send(data);
+  }
 }
 
 // Attach the add button click event to the initial input row
 
 function setupDeliveryIds() {
-    const productId = $('#productId').val();
-    $.ajax({
-        type: 'get',
-        url: `/product/${productId}/get-product-deliveries`,
-        success: function(productDeliveries) {
-            productDeliveries.forEach(delivery => {
-                selectedDeliveryIds.push(delivery.deliveryTypeFk);
-            })
-        }
-    })
+  const productId = $("#productId").val();
+  $.ajax({
+    type: "get",
+    url: `/product/${productId}/get-product-deliveries`,
+    success: function (productDeliveries) {
+      productDeliveries.forEach((delivery) => {
+        selectedDeliveryIds.push(delivery.deliveryTypeFk);
+      });
+    },
+  });
 }
 
-
 $(function () {
+  // const addDeliveryButton = document.querySelector('.add-delivery-btn');
+  // addDeliveryButton.addEventListener('click', handleAddDeliveryClick);
 
-   
-    const addDeliveryButton = document.querySelector('.add-delivery-btn');
-    addDeliveryButton.addEventListener('click', handleAddDeliveryClick);
+  // const deliveryPriceInputs = this.documentElement.getElementsByClassName('delivery-price');
+  // console.log(deliveryPriceInputs)
+  // setUpDeliveryPrice(deliveryPriceInputs);
 
-    const deliveryPriceInput = this.documentElement.getElementsByClassName('delivery-price')[0];
-    setUpDeliveryPrice(deliveryPriceInput);
-   
-    $('.delivery-select').on('change', updateAllDeliverySelects);
-    $('.remove-delivery-btn').on('click', handleRemoveDeliveryClick);
-    setupDeliveryIds();
-    $('#form').on('submit', continueToPage6);
+  const standardPrice = document.getElementById("standard-price");
+  const expressPrice = document.getElementById("express-price");
+  setUpDeliveryPrice(standardPrice);
+  setUpDeliveryPrice(expressPrice);
 
-})
+  const collectionWorkingDays = document.getElementById("collection-working-days");
+  const standardWorkingDays = document.getElementById("standard-working-days");
+  const expressWorkingDays = document.getElementById("express-working-days");
+
+  setUpWorkingDays(collectionWorkingDays);
+  setUpWorkingDays(standardWorkingDays);
+  setUpWorkingDays(expressWorkingDays);
+
+  //   $(".delivery-select").on("change", updateAllDeliverySelects);
+  //   $(".remove-delivery-btn").on("click", handleRemoveDeliveryClick);
+  //   setupDeliveryIds();
+  $("#form").on("submit", continueToPage6);
+});

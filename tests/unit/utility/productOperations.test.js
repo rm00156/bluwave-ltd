@@ -54,20 +54,14 @@ test('when a removing quantity, updatePriceMatrixRowQuantityPricesQuantityChange
       ],
     },
   ];
-  const { quantityGroup, priceMatrix } = await productTestHelper.createTestProductWithPriceMatrix(
-    quantityIds,
-    optionIds,
-    rows,
-  );
+  const { quantityGroup, priceMatrix } = await productTestHelper.createTestProductWithPriceMatrix(quantityIds, optionIds, rows);
   const priceMatrixRowQuantityPrices = await productOperations.getPriceMatrixRowQuantityPricesForMatrix(priceMatrix.id);
   expect(priceMatrixRowQuantityPrices.length).toBe(3);
   const removeQuantityIds = [quantity1.id];
 
   await productOperations.updatePriceMatrixRowQuantityPricesQuantityChange(quantityGroup.id, removeQuantityIds, []);
 
-  const updatedPriceMatrixRowQuantityPrices = await productOperations.getPriceMatrixRowQuantityPricesForMatrix(
-    priceMatrix.id,
-  );
+  const updatedPriceMatrixRowQuantityPrices = await productOperations.getPriceMatrixRowQuantityPricesForMatrix(priceMatrix.id);
   expect(updatedPriceMatrixRowQuantityPrices.length).toBe(2);
 
   const updatedPriceMatrixRowQuantityPricesWithRemovedQuantity = updatedPriceMatrixRowQuantityPrices.filter(
@@ -95,20 +89,14 @@ test('when adding quantity, updatePriceMatrixRowQuantityPricesQuantityChange upd
       ],
     },
   ];
-  const { quantityGroup, priceMatrix } = await productTestHelper.createTestProductWithPriceMatrix(
-    quantityIds,
-    optionIds,
-    rows,
-  );
+  const { quantityGroup, priceMatrix } = await productTestHelper.createTestProductWithPriceMatrix(quantityIds, optionIds, rows);
   const priceMatrixRowQuantityPrices = await productOperations.getPriceMatrixRowQuantityPricesForMatrix(priceMatrix.id);
   expect(priceMatrixRowQuantityPrices.length).toBe(3);
   const addQuantityIds = [quantity4.id];
 
   await productOperations.updatePriceMatrixRowQuantityPricesQuantityChange(quantityGroup.id, [], addQuantityIds);
 
-  const updatedPriceMatrixRowQuantityPrices = await productOperations.getPriceMatrixRowQuantityPricesForMatrix(
-    priceMatrix.id,
-  );
+  const updatedPriceMatrixRowQuantityPrices = await productOperations.getPriceMatrixRowQuantityPricesForMatrix(priceMatrix.id);
   expect(updatedPriceMatrixRowQuantityPrices.length).toBe(4);
 
   const updatedPriceMatrixRowQuantityPricesWithAddedQuantity = updatedPriceMatrixRowQuantityPrices.filter(
@@ -319,9 +307,7 @@ test('delete finishing matrices for product', async () => {
   const deletedFinishingMatrixRows = await productOperations.getFinishingMatrixRowsForFinishingMatrix(finishingMatrix.id);
   expect(deletedFinishingMatrixRows.filter((d) => d.deleteFl === true).length).toBe(1);
 
-  const deletedFinishingMatrixRowQuantityPrices = await productOperations.getFinishingMatrixRowQuantityPrices(
-    finishingMatrix.id,
-  );
+  const deletedFinishingMatrixRowQuantityPrices = await productOperations.getFinishingMatrixRowQuantityPrices(finishingMatrix.id);
   expect(deletedFinishingMatrixRowQuantityPrices.filter((d) => d.deleteFl === 1).length).toBe(2);
 });
 
@@ -499,6 +485,32 @@ describe('product activation and deactivation', () => {
   });
 });
 
+test('should update productDelivery for product', async () => {
+  const { product } = await productTestHelper.createTestProductWithDelivery();
+
+  const collectionWorkingDays = 10;
+  const standardPrice = '3.00';
+  const standardWorkingDays = 5;
+  const expressPrice = '3.00';
+  const expressWorkingDays = 5;
+
+  await productOperations.updateProductDelivery(
+    product.id,
+    collectionWorkingDays,
+    standardPrice,
+    standardWorkingDays,
+    expressPrice,
+    expressWorkingDays,
+  );
+
+  const updatedProductDelivery = await productOperations.getProductDeliveryByProductId(product.id);
+  expect(updatedProductDelivery.collectionWorkingDays).toBe(collectionWorkingDays);
+  expect(updatedProductDelivery.standardPrice).toBe(standardPrice);
+  expect(updatedProductDelivery.standardWorkingDays).toBe(standardWorkingDays);
+  expect(updatedProductDelivery.expressPrice).toBe(expressPrice);
+  expect(updatedProductDelivery.expressWorkingDays).toBe(expressWorkingDays);
+});
+
 afterEach(async () => {
   await truncateTables([
     'optionGroupItems',
@@ -510,6 +522,7 @@ afterEach(async () => {
     'optionTypeGroupItems',
     'quantityGroups',
     'products',
+    'productDeliveries',
     'finishingMatrices',
     'finishingMatrixRows',
     'finishingMatrixRowQuantityPrices',

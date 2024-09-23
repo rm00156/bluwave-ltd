@@ -2,20 +2,17 @@ const refundOperations = require('../../../utility/refund/refundOperations');
 const { setUpTestDb, truncateTables } = require('../../helper/generalTestHelper');
 const { createPurchaseBasketForAccount } = require('../../helper/basketTestHelper');
 const { createTestCustomerAccount } = require('../../helper/accountTestHelper');
-const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 
 let refundTypes;
-let deliveryTypes;
 
 beforeAll(async () => {
   await setUpTestDb();
-  deliveryTypes = await getAllActiveDeliveryTypes();
   refundTypes = await refundOperations.getRefundTypes();
 }, 60000);
 
 test('should create refund', async () => {
   const account = await createTestCustomerAccount();
-  const deliveryType = deliveryTypes[0];
+  const deliveryType = 'Collection';
   const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
 
   const refundType = refundTypes[0];
@@ -34,7 +31,7 @@ test('should return all refund types', async () => {
 describe('is refund possible for order', () => {
   it('should return false if full refund exists for order', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const fullRefundType = await refundOperations.getRefundTypeByType('Full Refund');
     const refundAmount = '55';
@@ -48,7 +45,7 @@ describe('is refund possible for order', () => {
 
   it('should return false if total partial refunds is greater than or equal to order total', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const partialRefundType = await refundOperations.getRefundTypeByType('Partial');
     const refundAmount = '10000';
@@ -62,7 +59,7 @@ describe('is refund possible for order', () => {
 
   it('should return true if total partial refunds is less than order total', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const partialRefundType = await refundOperations.getRefundTypeByType('Partial');
     const refundAmount = '10000';
@@ -77,7 +74,7 @@ describe('is refund possible for order', () => {
 describe('get max refund possible for order', () => {
   it('should return 0 if full refund exists for order', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const fullRefundType = await refundOperations.getRefundTypeByType('Full Refund');
     const refundAmount = '55';
@@ -91,7 +88,7 @@ describe('get max refund possible for order', () => {
 
   it('should return total order minus sum of total partial refunds', async () => {
     const account = await createTestCustomerAccount();
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createPurchaseBasketForAccount(account.id, deliveryType);
     const partialRefundType = await refundOperations.getRefundTypeByType('Partial');
     const refundAmount = '10000';

@@ -3,7 +3,6 @@ const { createTestSale } = require('../../helper/saleTestHelper');
 const { createTestProduct } = require('../../helper/productTestHelper');
 const { getAllQuantities } = require('../../../utility/products/productOperations');
 const { createTestBasketItem, createTestPurchaseBasketForBasketItem } = require('../../helper/basketTestHelper');
-const { getAllActiveDeliveryTypes } = require('../../../utility/delivery/deliveryOperations');
 const { convertDateToString } = require('../../../utility/general/utilityHelper');
 const { createTestPromoCode } = require('../../helper/promoCodeTestHelper');
 
@@ -100,14 +99,13 @@ describe('sale operation', () => {
 
   it('should increment the sale usedCount for order by id', async () => {
     const quantities = await getAllQuantities();
-    const deliveryTypes = await getAllActiveDeliveryTypes();
     const quantity = quantities[0];
     const price = '5.00';
     const { sale } = await createTestSale();
 
     const basketItem = await createTestBasketItem([{ id: quantity.id, price }], sale.id);
     const accountId = basketItem.accountFk;
-    const deliveryType = deliveryTypes[0];
+    const deliveryType = 'Collection';
     const purchaseBasket = await createTestPurchaseBasketForBasketItem(accountId, deliveryType, Date.now(), basketItem.id);
 
     await saleOperations.updateSalesUsedCountForOrder(purchaseBasket.id);

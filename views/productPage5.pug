@@ -68,43 +68,76 @@ html(land="en")
                                             
                                             #delivery-container
                                                 h4.mb-4.h5 Delivery Options
+                                                .row.mb-3
+                                                    .col-4
+                                                        br
+                                                        h5 Collection
+                                                    
+                                                        
+                                                    .col-4
+                                                        label.form-label Working Days
+                                                        input.form-control#collection-working-days(type='text' min=1 required value=(productDelivery ? productDelivery.collectionWorkingDays : ''))
+                                                        p#error-collection-working-days.text-danger
+                                                .row.mb-3
+                                                    .col-4
+                                                        br
+                                                        h5 Standard
+                                                    .col-4
+                                                        label.form-label Price (£)
+                                                        input.form-control#standard-price.delivery-price(type='text' required value=(productDelivery ? productDelivery.standardPrice : ''))
+                                                        p#error-standard-price.text-danger
+                                                    .col-4
+                                                        label.form-label Working Days
+                                                        input.form-control#standard-working-days(type='text' min=1 required value=(productDelivery ? productDelivery.standardWorkingDays : ''))
+                                                        p#error-standard-working-days.text-danger
+                                                .row.mb-3
+                                                    .col-4
+                                                        br
+                                                        h5 Express
+                                                    .col-4
+                                                        label.form-label Price (£)
+                                                        input.form-control#express-price.delivery-price(type='text' required value=(productDelivery ? productDelivery.expressPrice : ''))
+                                                        p#error-express-price.text-danger
+                                                    .col-4
+                                                        label.form-label Working Days
+                                                        input.form-control#express-working-days(type='text' min=1 required value=(productDelivery ? productDelivery.expressWorkingDays : ''))
+                                                        p#error-express-working-days.text-danger
+                                                //- if(productDeliveries.length == 0)
+                                                //-     .row.mb-3
+                                                //-         .col-sm-5
+                                                //-             label.form-label Delivery Option
+                                                //-             select.form-control.delivery-select(type='text' required name='delivery[]')
+                                                //-                 each deliveryType in deliveryTypes 
+                                                //-                     option(value=deliveryType.id) #{deliveryType.name}
+                                                //-         .col-sm-5
+                                                //-             label.form-label Delivery Price
+                                                //-             input.form-control.delivery-price(type='text' required)
+                                                //-         .col-sm-2
+                                                //-             label.form-label.text-white D
+                                                //-             br
+                                                //-             button.btn.btn-primary.add-delivery-btn(type='button') +
 
-                                                if(productDeliveries.length == 0)
-                                                    .row.mb-3
-                                                        .col-sm-5
-                                                            label.form-label Delivery Option
-                                                            select.form-control.delivery-select(type='text' required name='delivery[]')
-                                                                each deliveryType in deliveryTypes 
-                                                                    option(value=deliveryType.id) #{deliveryType.name}
-                                                        .col-sm-5
-                                                            label.form-label Delivery Price
-                                                            input.form-control.delivery-price(type='text' required)
-                                                        .col-sm-2
-                                                            label.form-label.text-white D
-                                                            br
-                                                            button.btn.btn-primary.add-delivery-btn(type='button') +
-
-                                                else 
-                                                    each productDelivery, index in productDeliveries 
-                                                        .row.mb-3 
-                                                            .col-sm-5 
-                                                                label.form-label Delivery Option
-                                                                select.form-control.delivery-select(type='text' required name='delivery[]')
-                                                                    each deliveryType in deliveryTypes 
-                                                                        option(value=deliveryType.id selected=productDelivery.deliveryTypeFk == deliveryType.id) #{deliveryType.name}  
-                                                            .col-sm-5
-                                                                label.form-label Delivery Price
-                                                                input.form-control.delivery-price(type='text' required value=productDelivery.price)
-                                                            if((productDeliveries.length - 1)  === index)
-                                                                .col-sm-2
-                                                                    label.form-label.text-white D
-                                                                    br
-                                                                    button.btn.btn-primary.add-delivery-btn(type='button') +
-                                                            else
-                                                                .col-sm-2
-                                                                    label.form-label.text-white D
-                                                                    br
-                                                                    button.btn.btn-danger.remove-delivery-btn(type='button') -
+                                                //- else 
+                                                //-     each productDelivery, index in productDeliveries 
+                                                //-         .row.mb-3 
+                                                //-             .col-sm-5 
+                                                //-                 label.form-label Delivery Option
+                                                //-                 select.form-control.delivery-select(type='text' required name='delivery[]')
+                                                //-                     each deliveryType in deliveryTypes 
+                                                //-                         option(value=deliveryType.id selected=productDelivery.deliveryTypeFk == deliveryType.id) #{deliveryType.name}  
+                                                //-             .col-sm-5
+                                                //-                 label.form-label Delivery Price
+                                                //-                 input.form-control.delivery-price(type='text' required value=productDelivery.price)
+                                                //-             if((productDeliveries.length - 1)  === index)
+                                                //-                 .col-sm-2
+                                                //-                     label.form-label.text-white D
+                                                //-                     br
+                                                //-                     button.btn.btn-primary.add-delivery-btn(type='button') +
+                                                //-             else
+                                                //-                 .col-sm-2
+                                                //-                     label.form-label.text-white D
+                                                //-                     br
+                                                //-                     button.btn.btn-danger.remove-delivery-btn(type='button') -
                                         .row
                                             //- .col-sm-6
                                             //-     .d-grid

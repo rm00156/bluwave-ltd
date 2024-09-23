@@ -5,7 +5,7 @@ const { Op } = require('sequelize');
 const { isEmpty } = require('lodash');
 const Sequelize = require('sequelize');
 const { getExtension, hasTheSameItems } = require('../general/utilityHelper');
-const { getProductDeliveriesForProduct } = require('../delivery/deliveryOperations');
+// const { getProductDeliveriesForProduct } = require("../delivery/deliveryOperations");
 const models = require('../../models');
 
 const env = process.env.NODE_ENV || 'development';
@@ -16,6 +16,14 @@ async function getPriceMatrixById(id) {
   return models.priceMatrix.findOne({
     where: {
       id,
+    },
+  });
+}
+
+async function getProductDeliveryByProductId(productFk) {
+  return models.productDelivery.findOne({
+    where: {
+      productFk,
     },
   });
 }
@@ -448,8 +456,10 @@ async function getProductById(id) {
 }
 
 async function getProductDetailById(id) {
-  const productDetails = await models.sequelize.query('select p.*, pt.productType from products p inner join productTypes pt on p.productTypeFk = pt.id '
-  + ' where p.id = :id', { replacements: { id }, type: models.sequelize.QueryTypes.SELECT });
+  const productDetails = await models.sequelize.query(
+    'select p.*, pt.productType from products p inner join productTypes pt on p.productTypeFk = pt.id where p.id = :id',
+    { replacements: { id }, type: models.sequelize.QueryTypes.SELECT },
+  );
 
   return productDetails.length > 0 ? productDetails[0] : null;
 }
@@ -852,12 +862,7 @@ async function createPriceMatrix(productId, options, isComplete) {
 
   const quantityGroup = await getQuantityGroupForProductId(productId);
 
-  return createPriceMatrixForProduct(
-    productId,
-    optionTypeGroup.id,
-    isComplete ? 'Complete' : 'Incomplete',
-    quantityGroup.id,
-  );
+  return createPriceMatrixForProduct(productId, optionTypeGroup.id, isComplete ? 'Complete' : 'Incomplete', quantityGroup.id);
 }
 
 async function createOptionGroupItems(optionGroupId, optionIds) {
@@ -1824,8 +1829,8 @@ async function isProductValid(product) {
   const incompleteMatrices = finishingMatrices.filter((f) => f.status === 'Incomplete');
   if (incompleteMatrices.length > 0) return { isValid: false, page: 'page4' };
 
-  const productDeliveries = await getProductDeliveriesForProduct(product.id);
-  if (productDeliveries.length === 0) return { isValid: false, page: 'page5' };
+  const productDelivery = await getProductDeliveryByProductId(product.id);
+  if (!productDelivery) return { isValid: false, page: 'page5' };
 
   // discounts
   return { isValid: true };
@@ -2109,6 +2114,52 @@ async function getFinishingMatrixRowsForFinishingMatrix(finishingMatrixFk) {
   });
 }
 
+async function createProductDelivery(
+  productFk,
+  collectionWorkingDays,
+  standardPrice,
+  standardWorkingDays,
+  expressPrice,
+  expressWorkingDays,
+) {
+  return models.productDelivery.create({
+    productFk,
+    collectionWorkingDays,
+    standardPrice,
+    standardWorkingDays,
+    expressPrice,
+    expressWorkingDays,
+    deleteFl: false,
+    versionNo: 1,
+  });
+}
+
+async function updateProductDelivery(
+  productFk,
+  collectionWorkingDays,
+  standardPrice,
+  standardWorkingDays,
+  expressPrice,
+  expressWorkingDays,
+) {
+  await models.productDelivery.update(
+    {
+      productFk,
+      collectionWorkingDays,
+      standardPrice,
+      standardWorkingDays,
+      expressPrice,
+      expressWorkingDays,
+      versionNo: models.sequelize.literal('versionNo + 1'),
+    },
+    {
+      where: {
+        productFk,
+      },
+    },
+  );
+}
+
 module.exports = {
   getQuantityByName,
   createQuantity,
@@ -2237,4 +2288,7 @@ module.exports = {
   getAttributeTypeByType,
   getPriceMatrixRowQuantityPriceById,
   getProductDetailById,
+  getProductDeliveryByProductId,
+  updateProductDelivery,
+  createProductDelivery,
 };

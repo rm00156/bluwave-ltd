@@ -1,5 +1,4 @@
 const models = require('../../models');
-const deliveryOperations = require('../../utility/delivery/deliveryOperations');
 const productOperations = require('../../utility/products/productOperations');
 
 async function createTestProduct(complete, isActive) {
@@ -21,7 +20,10 @@ async function createTestProductWithPriceMatrix(quantityIds, options, rows) {
   const matrixRows = await productOperations.getPriceMatrixDetailsForProductId(product.id);
 
   return {
-    product, quantityGroup, priceMatrix, matrixRows,
+    product,
+    quantityGroup,
+    priceMatrix,
+    matrixRows,
   };
 }
 
@@ -32,37 +34,48 @@ async function createTestProductWithFinishingMatrices(quantityIds, matrices) {
   const finishingMatrices = await productOperations.getFinishingMatricesDetailsForProductId(product.id);
 
   return {
-    product, quantityGroup, finishingMatrices,
+    product,
+    quantityGroup,
+    finishingMatrices,
   };
 }
 
 async function createTestProductWithPriceAndPrintingMatrix(quantityIds, options, rows, matrices) {
   const {
     product, quantityGroup, priceMatrix, matrixRows,
-  } = await createTestProductWithPriceMatrix(
-    quantityIds,
-    options,
-    rows,
-  );
+  } = await createTestProductWithPriceMatrix(quantityIds, options, rows);
 
   await productOperations.createFinishingMatrices(product.id, matrices);
   const finishingMatrices = await productOperations.getFinishingMatricesDetailsForProductId(product.id);
   return {
-    product, quantityGroup, priceMatrix, matrixRows, finishingMatrices,
+    product,
+    quantityGroup,
+    priceMatrix,
+    matrixRows,
+    finishingMatrices,
   };
 }
 
-async function createTestProductWithDelivery() {
+async function createTestProductWithDelivery(
+  collectionWorkingDays,
+  standardPrice,
+  standardWorkingDays,
+  expressPrice,
+  expressWorkingDays,
+) {
   const product = await createTestProduct(false, true);
 
-  const deliveryOptions = await deliveryOperations.getAllActiveDeliveryTypes();
-  const deliveryOption = deliveryOptions[0];
-
-  const deliveryDetails = { deliveryId: deliveryOption.id, price: '10' };
-  const delivery = await deliveryOperations.createDeliveryOptionForProduct(product.id, deliveryDetails);
+  await productOperations.createProductDelivery(
+    product.id,
+    collectionWorkingDays || 1,
+    standardPrice || 1.0,
+    standardWorkingDays || 1,
+    expressPrice || 1.0,
+    expressWorkingDays || 1,
+  );
 
   return {
-    product, delivery,
+    product,
   };
 }
 

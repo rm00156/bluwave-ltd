@@ -2,21 +2,25 @@ const { createShippingDetail } = require('../../utility/delivery/deliveryOperati
 const { createTestCustomerAccount } = require('./accountTestHelper');
 const { createPurchaseBasketAtDttm } = require('../../utility/order/orderOperations');
 const {
-  createFileGroup, createFileGroupItem, createBasketItem, setPurchaseBasketForBasketItem, getPurchaseBasketById,
+  createFileGroup,
+  createFileGroupItem,
+  createBasketItem,
+  setPurchaseBasketForBasketItem,
+  getPurchaseBasketById,
 } = require('../../utility/basket/basketOperations');
 const { createTestProductWithPriceMatrix } = require('./productTestHelper');
 const { getAllOptions, createOptionGroup, createOptionGroupItem } = require('../../utility/products/productOperations');
 const { getSaleById } = require('../../utility/sales/salesOperations');
 const { getPromoCodeById } = require('../../utility/promoCode/promoCodeOperations');
 
-async function createTestShippingDetail() {
+async function createTestShippingDetail(addressLine2) {
   const account = await createTestCustomerAccount();
   return createShippingDetail(
     account.id,
     'fullName',
-    'email@email.com',
+    'email',
     'addressLine1',
-    'addressLine2',
+    addressLine2 !== undefined ? addressLine2 : 'addressLine2',
     'city',
     'postcode',
     '324534345',
@@ -56,18 +60,14 @@ async function createPurchaseBasketForAccountAtDttm(accountId, deliveryType, dtt
     subTotal,
     total,
     shippingDetail,
-    deliveryType.id,
+    deliveryType,
     deliveryPrice,
     dttm,
   );
 }
 
 async function createPurchaseBasketForAccount(accountId, deliveryType) {
-  return createPurchaseBasketForAccountAtDttm(
-    accountId,
-    deliveryType,
-    Date.now(),
-  );
+  return createPurchaseBasketForAccountAtDttm(accountId, deliveryType, Date.now());
 }
 
 async function createTestFileGroupItemWithPathAndFileName(path, fileName) {
@@ -100,7 +100,7 @@ async function createTestBasketItem(quantityGroup, saleFk, promoCodeFk) {
   const sale = saleFk ? await getSaleById(saleFk) : null;
   const promoCode = promoCodeFk ? await getPromoCodeById(promoCodeFk) : null;
   const { price } = quantityGroup[0];
-  const subtotal = price * (sale ? (1 - sale.percentage / 100) : 1) * (promoCode ? (1 - promoCode.percentage / 100) : 1);
+  const subtotal = price * (sale ? 1 - sale.percentage / 100 : 1) * (promoCode ? 1 - promoCode.percentage / 100 : 1);
   return createBasketItem(
     account.id,
     product.id,
