@@ -10,6 +10,7 @@ const shopController = require('../controllers/ShopController');
 const promoCodeController = require('../controllers/PromoCodeController');
 const saleController = require('../controllers/SaleController');
 const productController = require('../controllers/ProductController');
+const freeDeliveryController = require('../controllers/FreeDeliveryController');
 
 const { isCustomer, isNotGuest } = require('../middleware/customer');
 const {
@@ -72,6 +73,8 @@ router.get('/admin-dashboard/promo-code/create', isAdmin, adminRequire2faSetup, 
 router.post('/admin-dashboard/promo-code/create', isAdmin, adminRequire2faSetup, promoCodeController.createPromoCode);
 
 router.get('/admin-dashboard/promo-code/:id', isAdmin, adminRequire2faSetup, promoCodeController.getPromoCodePage);
+router.get('/admin-dashboard/free-delivery', isAdmin, adminRequire2faSetup, freeDeliveryController.getFreeDeliveryPage);
+router.post('/free-delivery/update', isAdmin, adminRequire2faSetup, freeDeliveryController.setFreeDelivery);
 
 router.get('/promo-codes', isAdmin, adminRequire2faSetup, promoCodeController.getPromoCodeTypes);
 router.post('/admin-dashboard/product/:id/page3/continue', isAdmin, adminRequire2faSetup, adminDashboardController.continuePage3);

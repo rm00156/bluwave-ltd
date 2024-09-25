@@ -115,12 +115,18 @@ html(land="en")
                                             .col-lg-12.col-12.mb-4
                                                 .card.card-body.p-6
                                                     .form-check.mb-4
-                                                        input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' data-delivery-name="Standard" data-collectfl="false" data-price=deliveryOptions.standardPrice)
+                                                        input.form-check-input.delivery-options(type='radio' name='flexRadioDefault' data-delivery-name="Standard" data-collectfl="false" data-price=(freeDelivery && freeDelivery.spendOver < parseFloat(basketItems.subTotalCost) ? '0.00' : deliveryOptions.standardPrice))
                                                         label.form-check-label.text-dark(style="display: flex; justify-content: space-between;")
                                                             span(style="text-align:left")
                                                                 <b>Standard - #{deliveryOptions.standardWorkingDays} Business days</b>
-                                                            span(style="text-align:right")
-                                                                <b>£#{deliveryOptions.standardPrice}</b>
+                                                            
+                                                            if(freeDelivery && freeDelivery.spendOver < parseFloat(basketItems.subTotalCost))
+                                                                span(style="text-align:right; display: inline-flex;")
+                                                                    p.text-danger(style="text-decoration: line-through; padding-right: 10px") £#{deliveryOptions.standardPrice}
+                                                                    b £0.00
+                                                            else
+                                                                span(style="text-align:right")
+                                                                    <b>£#{deliveryOptions.standardPrice}</b>
 
                                                         //- label.form-check-label.text-dark Estimated Collection by 
                                                         address Estimated Collection by #{deliveryOptions.standardDate}
@@ -197,9 +203,9 @@ html(land="en")
                                                                 span #{basketItem.quantity}
                                                             .col-3.text-lg-end.text-start.text-md-end.col-md-3
                                                                 if(basketItem.saleFk || basketItem.promoCodeFk)
-                                                                    span.fw-bold(style="text-decoration: line-through; ") £#{basketItem.price}
+                                                                    span.text-danger.fw-bold(style="text-decoration: line-through; ") £#{basketItem.price}
                                                                     br
-                                                                    span.text-danger £#{basketItem.subTotal}
+                                                                    span.fw-bold £#{basketItem.subTotal}
                                                                 else 
                                                                     span.fw-bold £#{basketItem.price}
                                             

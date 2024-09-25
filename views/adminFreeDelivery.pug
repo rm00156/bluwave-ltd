@@ -1,0 +1,77 @@
+html(land="en")
+    include common/adminHead.pug
+    include common/adminSideNav.pug
+    include common/adminTopNavbar.pug
+    include common/adminScripts.pug
+    +adminHead()
+    
+    link(rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css")
+    link(rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/5.0.1/css/fixedColumns.dataTables.css")
+    link(rel="stylesheet" href="https://cdn.datatables.net/select/2.0.4/css/select.dataTables.css")
+    div
+        
+        +adminTopNavbar()
+        
+        .main-wrapper
+            // navbar vertical
+            +adminSideNav()
+            // main wrapper
+            main.main-content-wrapper
+                // container
+                .container
+                    // row
+                    .row.mb-8
+                        .col-md-12
+                            .d-md-flex.justify-content-between.align-items-center
+                                // page header
+                                div
+                                    h2#title Free Delivery
+                                    // breacrumb
+                                    nav(aria-label='breadcrumb')
+                                        ol.breadcrumb.mb-0
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin-dashboard') Dashboard
+                                            li.breadcrumb-item
+                                                a.text-inherit(href='/admin-dashboard/free-delivery') Free Delivery
+                                
+                    // row
+                    .row
+                        .col-lg-12.col-12
+                            // card
+                            .card.mb-6.card-lg
+                                // card body
+                                .card-body.p-6
+                                    .row
+                                        h3#title Free Delivery Details
+                                        form#form
+                                            .row
+                                                p#error-noChange.small.text-danger
+                                                div
+                                                    .row.mb-3
+                                                        .col-sm-6
+                                                            .form-check.form-switch
+                                                                input#freeDeliveryStatus.form-check-input(type='checkbox' role='switch' checked=(freeDelivery ? true : false))
+                                                                label.form-check-label(for='freeDeliveryStatus') <b>Status</b>
+                                                    .row.mb-3
+                                                        .col-sm-6
+                                                            #free-delivery-container(style=(freeDelivery ? 'display: block' : 'display: none'))
+                                                                label.form-label Spend Over £(x)
+                                                                input.form-control#spend-over(required type='text' value=(freeDelivery ? freeDelivery.spendOver : ''))   
+                                                                p#error-spend-over.small.text-danger
+                                                    .row.mb-3
+                                                        .col-sm-6    
+                                                            button.btn.btn-primary#updatePromoCode(type='submit')
+                                                                | Update Free Delivery
+                                                       
+    +adminScripts()
+    //- 
+    script(src='/assets/js/vendors/editor.js')
+    //- script(src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js")
+    script(src="https://cdn.datatables.net/2.1.3/js/dataTables.js")
+    script(src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/dataTables.fixedColumns.js")
+    script(src="https://cdn.datatables.net/fixedcolumns/5.0.1/js/fixedColumns.dataTables.js")
+    script(src="https://cdn.datatables.net/select/2.0.4/js/dataTables.select.js")
+    script(src="https://cdn.datatables.net/select/2.0.4/js/select.dataTables.js")
+
+    script(src='/js/adminFreeDelivery.js')
+    script(src="/js/adminDashboard.js")

@@ -31,6 +31,8 @@ async function getShopTypePage(req, res) {
     req.user.id,
   );
   const { displayCookieMessage } = req.body;
+
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
   res.render('shop', {
     user: req.user,
     companyDetails: companyInfo.getCompanyDetails(),
@@ -40,6 +42,7 @@ async function getShopTypePage(req, res) {
     allProductTypes,
     displayCookieMessage,
     productType,
+    freeDelivery,
   });
 }
 
@@ -99,6 +102,8 @@ async function getProductPage(req, res) {
     currentQuantityId = basketItem.quantityFk;
   }
 
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
+
   return res.render('product', {
     user: req.user,
     companyDetails: companyInfo.getCompanyDetails(),
@@ -116,6 +121,7 @@ async function getProductPage(req, res) {
     finishingMatrixOptions,
     lowestPriceWithQuantity,
     sale,
+    freeDelivery,
   });
 }
 
@@ -299,6 +305,7 @@ async function getBasketPage(req, res) {
   req.session.checkoutMessage = false;
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
 
   res.render('basket', {
     user: req.user,
@@ -308,6 +315,7 @@ async function getBasketPage(req, res) {
     checkoutMessage,
     allProductTypes,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -369,6 +377,9 @@ async function getDesignUploadPage(req, res) {
   const fileGroupItems = await basketOperations.getFileGroupItemsForBasketItem(
     basketItem,
   );
+
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
+
   return res.render('designUpload', {
     user: req.user,
     companyDetails: companyInfo.getCompanyDetails(),
@@ -379,6 +390,7 @@ async function getDesignUploadPage(req, res) {
     product,
     fileGroupItems,
     displayCookieMessage,
+    freeDelivery,
   });
 }
 
@@ -433,6 +445,7 @@ async function checkoutPage(req, res) {
 
   const { displayCookieMessage } = req.body;
   const { guestEmail } = req.session;
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
 
   return res.render('checkout', {
     user: req.user,
@@ -443,6 +456,7 @@ async function checkoutPage(req, res) {
     guestEmail,
     deliveryOptions,
     displayCookieMessage,
+    freeDelivery,
   });
 }
 
@@ -454,6 +468,7 @@ async function checkoutLoginPage(req, res) {
     req.user.id,
   );
   const { displayCookieMessage } = req.body;
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
 
   res.render('checkoutLogin', {
     user: req.user,
@@ -462,6 +477,7 @@ async function checkoutLoginPage(req, res) {
     basketItems,
     allProductTypes,
     displayCookieMessage,
+    freeDelivery,
   });
 }
 
@@ -516,9 +532,6 @@ async function checkout(req, res) {
     logger.error(message);
     return res.status(400).json(message);
   }
-  // const { deliveryTypeId } = req.body;
-
-  // const deliveryType = await deliveryOperations.getDeliveryType(deliveryTypeId);
   let shippingDetail = null;
 
   const { basketItems, subTotalCost, totalCost } = await basketOperations.getAllBasketItemsForCheckout(
@@ -529,14 +542,15 @@ async function checkout(req, res) {
   let deliveryPrice;
 
   if (deliveryName === 'Standard') {
-    deliveryPrice = deliveryOptions.standardPrice;
+    const freeDelivery = await deliveryOperations.getFreeDelivery();
+
+    deliveryPrice = freeDelivery && freeDelivery.spendOver < parseFloat(subTotalCost) ? '0.00' : deliveryOptions.standardPrice;
   } else if (deliveryName === 'Express') {
     deliveryPrice = deliveryOptions.expressPrice;
   } else {
     deliveryPrice = '0.00';
   }
 
-  // const { subTotal, total } = basketOperations.getTotalsFromBasketItems(basketItems);
   const newTotal = parseFloat(subTotalCost) + parseFloat(deliveryPrice);
 
   const transaction = await models.sequelize.transaction();
@@ -544,8 +558,6 @@ async function checkout(req, res) {
   let purchaseBasket;
   try {
     if (deliveryName !== 'Collection') {
-      // createShippingDetail
-
       const { addressLine1 } = req.body;
       const { addressLine2 } = req.body;
       const { city } = req.body;

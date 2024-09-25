@@ -10,6 +10,7 @@ const queueOperations = !notProduction
   ? require('../utility/queue/queueOperations')
   : null;
 const faqOperations = require('../utility/faq/faqOperations');
+const { getFreeDelivery } = require('../utility/delivery/deliveryOperations');
 
 async function getHomePage(req, res) {
   const basketItems = await basketOperations.getActiveBasketItemsForAccount(
@@ -32,7 +33,7 @@ async function getHomePage(req, res) {
 
   const homePageOptions1To4 = homePageOptions.filter((h) => h.orderNo >= 1 && h.orderNo <= 4);
   const homePageOptions5To8 = homePageOptions.filter((h) => h.orderNo >= 5 && h.orderNo <= 8);
-
+  const freeDelivery = await getFreeDelivery();
   res.render('home', {
     user: req.user,
     basketItems,
@@ -43,6 +44,7 @@ async function getHomePage(req, res) {
     homePageOptions5To8,
     homePageBannerSection,
     homePageMainBannerSection,
+    freeDelivery,
     companyDetails: companyInfo.getCompanyDetails(),
   });
 }
@@ -54,7 +56,7 @@ async function getAboutPage(req, res) {
   const { displayCookieMessage } = req.body;
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
-
+  const freeDelivery = await getFreeDelivery();
   res.render('about', {
     user: req.user,
     navigationBarHeaders,
@@ -62,6 +64,7 @@ async function getAboutPage(req, res) {
     displayCookieMessage,
     allProductTypes,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -72,6 +75,7 @@ async function getContactPage(req, res) {
   const { displayCookieMessage } = req.body;
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
+  const freeDelivery = await getFreeDelivery();
 
   res.render('contact', {
     user: req.user,
@@ -80,6 +84,7 @@ async function getContactPage(req, res) {
     displayCookieMessage,
     allProductTypes,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -90,7 +95,7 @@ async function getTermsPage(req, res) {
   const { displayCookieMessage } = req.body;
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
-
+  const freeDelivery = await getFreeDelivery();
   res.render('terms', {
     user: req.user,
     navigationBarHeaders,
@@ -98,6 +103,7 @@ async function getTermsPage(req, res) {
     displayCookieMessage,
     allProductTypes,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -108,7 +114,7 @@ async function getPrivacyPage(req, res) {
   const { displayCookieMessage } = req.body;
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
-
+  const freeDelivery = await getFreeDelivery();
   res.render('privacy', {
     user: req.user,
     navigationBarHeaders,
@@ -116,6 +122,7 @@ async function getPrivacyPage(req, res) {
     displayCookieMessage,
     allProductTypes,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -128,7 +135,7 @@ async function getFaqsPage(req, res) {
   const allProductTypes = await productOperations.getAllActiveProductTypes();
 
   const faqsGroupedByTypes = await faqOperations.getFaqsGroupedByType();
-
+  const freeDelivery = await getFreeDelivery();
   res.render('faqs', {
     user: req.user,
     navigationBarHeaders,
@@ -137,6 +144,7 @@ async function getFaqsPage(req, res) {
     allProductTypes,
     faqsGroupedByTypes,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -150,7 +158,7 @@ async function getFaqPage(req, res) {
 
   const { id } = req.params;
   const faq = await faqOperations.getFaq(id);
-
+  const freeDelivery = await getFreeDelivery();
   res.render('faq', {
     user: req.user,
     navigationBarHeaders,
@@ -159,6 +167,7 @@ async function getFaqPage(req, res) {
     allProductTypes,
     faq,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 

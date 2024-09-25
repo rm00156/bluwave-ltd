@@ -89,8 +89,42 @@ async function getShippingDetailById(id) {
   });
 }
 
+async function getFreeDelivery() {
+  return models.freeDelivery.findOne();
+}
+
+async function deleteFreeDelivery() {
+  const freeDelivery = await getFreeDelivery();
+  if (freeDelivery) {
+    await freeDelivery.destroy();
+  }
+}
+
+async function createFreeDelivery(spendOver) {
+  return models.freeDelivery.create({
+    spendOver,
+    deleteFl: false,
+    versionNo: 1,
+  });
+}
+
+async function updateFreeDelivery(id, spendOver) {
+  await models.freeDelivery.update({
+    spendOver,
+    versionNo: models.sequelize.literal('versionNo + 1'),
+  }, {
+    where: {
+      id,
+    },
+  });
+}
+
 module.exports = {
-  getDeliveryOptionsForProductIds,
+  createFreeDelivery,
   createShippingDetail,
+  deleteFreeDelivery,
+  getDeliveryOptionsForProductIds,
+  getFreeDelivery,
   getShippingDetailById,
+  updateFreeDelivery,
 };
