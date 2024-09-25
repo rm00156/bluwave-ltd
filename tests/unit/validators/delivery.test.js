@@ -32,4 +32,17 @@ describe('validate delivery', () => {
     expect(errors.collectionWorkingDays).toBe('Please set to a value between 1 and 30');
     expect(errors.standardWorkingDays).toBe('Please set to a value between 1 and 30');
   });
+
+  it('should return error when spend over no valid', () => {
+    const spendOver = '';
+    const errors = deliveryValidator.validateSpendOver(spendOver);
+    expect(isEmpty(errors)).toBe(false);
+    expect(errors.spendOver).toBe('Please enter a valid amount above 1');
+  });
+
+  it('should return no errors when spend over is valid', () => {
+    const spendOver = '5.00';
+    const errors = deliveryValidator.validateSpendOver(spendOver);
+    expect(isEmpty(errors)).toBe(true);
+  });
 });

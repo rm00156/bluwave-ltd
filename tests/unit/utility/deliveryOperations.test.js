@@ -71,8 +71,38 @@ describe('delivery operations', () => {
     const getShippingDetail = await deliveryOperations.getShippingDetailById(0);
     expect(getShippingDetail).toBeNull();
   });
+
+  it('should return and create freeDelivery object', async () => {
+    const freeDelivery = await deliveryOperations.createFreeDelivery('5.00');
+    const getFreeDelivery = await deliveryOperations.getFreeDelivery();
+    expect(getFreeDelivery.id).toBe(freeDelivery.id);
+  });
+
+  it('should update freeDelivery', async () => {
+    const freeDelivery = await deliveryOperations.createFreeDelivery('5.00');
+    const newSpendOver = '1000.00';
+    await deliveryOperations.updateFreeDelivery(freeDelivery.id, newSpendOver);
+    const getFreeDelivery = await deliveryOperations.getFreeDelivery();
+    expect(getFreeDelivery.id).toBe(freeDelivery.id);
+    expect(getFreeDelivery.spendOver).toBe(newSpendOver);
+  });
+
+  it('should return freeDelivery object', async () => {
+    const freeDelivery = await deliveryOperations.createFreeDelivery('5.00');
+    const getFreeDelivery = await deliveryOperations.getFreeDelivery();
+    expect(getFreeDelivery.id).toBe(freeDelivery.id);
+  });
+
+  it('should delete freeDelivery when found', async () => {
+    await deliveryOperations.createFreeDelivery('5.00');
+    await deliveryOperations.deleteFreeDelivery();
+
+    const getFreeDelivery = await deliveryOperations.getFreeDelivery();
+    expect(getFreeDelivery).toBeNull();
+    await deliveryOperations.deleteFreeDelivery();
+  });
 });
 
 afterEach(async () => {
-  await truncateTables(['accounts', 'productDeliveries', 'products', 'shippingDetails']);
+  await truncateTables(['accounts', 'productDeliveries', 'products', 'shippingDetails', 'freeDeliveries']);
 });

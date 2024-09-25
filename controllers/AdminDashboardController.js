@@ -1188,7 +1188,6 @@ async function getDeliveryType(req, res) {
 
 async function getAccountsPage(req, res) {
   const accounts = await accountOperations.getAllNonGuestAccounts();
-
   res.render('adminAccounts', {
     user: req.user,
     accounts,

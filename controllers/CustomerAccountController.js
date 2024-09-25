@@ -16,6 +16,7 @@ async function getOrdersPage(req, res) {
   );
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
 
   res.render('accountOrders', {
     user: req.user,
@@ -24,6 +25,7 @@ async function getOrdersPage(req, res) {
     allProductTypes,
     orders,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -45,6 +47,7 @@ async function getOrderPage(req, res) {
   const refunds = await refundOperations.getRefundsForOrder(orderId);
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
 
   res.render('accountOrder', {
     user: req.user,
@@ -60,6 +63,7 @@ async function getOrderPage(req, res) {
     shippingDetail,
     refunds,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 
@@ -74,6 +78,7 @@ async function getSettingsPage(req, res) {
   req.session.message = undefined;
   const navigationBarHeaders = await productOperations.getNavigationBarHeadersAndProducts();
   const allProductTypes = await productOperations.getAllActiveProductTypes();
+  const freeDelivery = await deliveryOperations.getFreeDelivery();
 
   res.render('accountSettings', {
     user: req.user,
@@ -83,6 +88,7 @@ async function getSettingsPage(req, res) {
     orders,
     message,
     companyDetails: companyInfo.getCompanyDetails(),
+    freeDelivery,
   });
 }
 

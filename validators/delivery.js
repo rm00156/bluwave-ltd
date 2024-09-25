@@ -35,6 +35,17 @@ const validateDeliveryOptions = (body) => {
   return errors;
 };
 
+const validateSpendOver = (spendOver) => {
+  const errors = {};
+  if (!validator.isDecimal(spendOver, { min: 1 })) {
+    errors.spendOver = 'Please enter a valid amount above 1';
+    logger.info('Please enter a valid amount above 1');
+  }
+
+  return errors;
+};
+
 module.exports = {
   validateDeliveryOptions,
+  validateSpendOver,
 };

@@ -1,4 +1,11 @@
 mixin navbar()
+    if(freeDelivery)
+        .row#cookieDiv
+            .col-lg-12.col-md-12
+                div.bg-warning(style="text-align:center; padding-top: 1rem")
+                    .row
+                        .col-sm-12 
+                            p.h6 Free Shipping for all orders over £#{freeDelivery.spendOver}
     nav.navbar.navbar-expand-lg.navbar-light.navbar-default.py-0.py-lg-2.border-top.navbar-offcanvas-color(aria-label='Offcanvas navbar large')
         .container
             #navbar-default.offcanvas.offcanvas-start(tabindex='-1' aria-labelledby='navbar-defaultLabel')
@@ -58,5 +65,4 @@ mixin navbar()
                                         each product in navigationBarHeader.products
                                             li
                                                 a.dropdown-item(href='/shop/' + encodeURIComponent(product.name)) #{product.name}
-                                    
-                            
+                                                                   
