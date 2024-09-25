@@ -218,7 +218,7 @@ async function getProductPage2(req, res) {
 
   const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
-  const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+  const productDelivery = await productOperations.getProductDeliveryByProductId(product.id);
   const isValid = await productOperations.isProductValid(product);
   const { message } = req.session;
   req.session.message = undefined;
@@ -231,7 +231,7 @@ async function getProductPage2(req, res) {
     quantityGroup,
     priceMatrix,
     finishingMatrices,
-    productDeliveries,
+    productDelivery,
     isValid: isValid.isValid,
     message,
   });
@@ -259,7 +259,7 @@ async function getProductPage3(req, res) {
 
   const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
-  const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+  const productDelivery = await productOperations.getProductDeliveryByProductId(product.id);
   const isValid = await productOperations.isProductValid(product);
 
   const { message } = req.session;
@@ -276,7 +276,7 @@ async function getProductPage3(req, res) {
     matrixRows,
     priceMatrix,
     finishingMatrices,
-    productDeliveries,
+    productDelivery,
     isValid: isValid.isValid,
     message,
   });
@@ -306,7 +306,7 @@ async function getProductPage4(req, res) {
 
   const quantityGroup = await productOperations.getQuantityGroupForProductId(product.id);
   const finishingMatrices = await productOperations.getFinishingMatricesForProductId(product.id);
-  const productDeliveries = await deliveryOperations.getProductDeliveriesForProduct(product.id);
+  const productDelivery = await productOperations.getProductDeliveryByProductId(product.id);
   const isValid = await productOperations.isProductValid(product);
   const { message } = req.session;
   req.session.message = undefined;
@@ -322,7 +322,7 @@ async function getProductPage4(req, res) {
     matrixRows,
     priceMatrix,
     finishingMatrices,
-    productDeliveries,
+    productDelivery,
     isValid: isValid.isValid,
     message,
   });
