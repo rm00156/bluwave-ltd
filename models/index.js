@@ -7,6 +7,7 @@ const sequelize = new Sequelize(env === 'test' ? process.env.TEST_DATABASE_NAME 
   host: process.env.DATABASE_HOST,
   dialect: process.env.DATABASE_DIALECT,
   logging: env !== 'test' && env !== 'development',
+  port: process.env.DATABASE_PORT,
   pool: {
     max: 12,
     min: 0,
@@ -15,6 +16,9 @@ const sequelize = new Sequelize(env === 'test' ? process.env.TEST_DATABASE_NAME 
   timezone: 'Europe/London', // Set the connection timezone to UK time
   dialectOptions: {
     timezone: 'local', // This ensures MySQL operates in the local (system) timezone, but Sequelize will handle timezone conversion.
+    ssl: {
+      rejectUnauthorized: env === 'production', // You can change this to false if the server uses self-signed certificates
+    },
   },
 });
 const db = {};
